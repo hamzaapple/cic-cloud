@@ -1,0 +1,1 @@
+UPDATE courses SET name = 'التصميم المنطقي' WHERE name = 'التصميم المنطقى';

@@ -1,0 +1,1 @@
+ALTER TABLE public.courses ADD COLUMN description_ar text NOT NULL DEFAULT '';
