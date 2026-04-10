@@ -75,11 +75,18 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground font-sans;
     font-family: 'Cairo', 'Noto Naskh Arabic', sans-serif;
   }
-  h1, h2, h3, h4, h5, h6 {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: 'Cairo', 'Noto Naskh Arabic', sans-serif;
     font-weight: 700;
   }
@@ -89,17 +96,22 @@
   .glass-card {
     @apply bg-card/70 backdrop-blur-xl border border-border/50 shadow-lg;
   }
+
   .glow-border {
     box-shadow: 0 0 20px -5px hsl(var(--glow) / 0.3);
   }
+
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-[hsl(170,70%,50%)];
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-[hsl(170, 70%, 50%)];
   }
 }
 
 /* Hide default cursor on desktop - only when custom cursor is active */
 @media (hover: hover) and (pointer: fine) {
-  .custom-cursor-active *, .custom-cursor-active *::before, .custom-cursor-active *::after {
+
+  .custom-cursor-active *,
+  .custom-cursor-active *::before,
+  .custom-cursor-active *::after {
     cursor: none !important;
   }
 }
@@ -121,6 +133,7 @@
   margin-top: -10px;
   mix-blend-mode: difference;
 }
+
 .custom-cursor.hovering {
   width: 50px;
   height: 50px;
@@ -131,6 +144,7 @@
   margin-left: -25px;
   margin-top: -25px;
 }
+
 .custom-cursor.text {
   width: 3px;
   height: 24px;
@@ -155,6 +169,7 @@
   box-shadow: 0 0 15px hsl(var(--primary) / 0.3);
   transition: opacity 0.4s ease, transform 0.3s ease, width 0.2s ease, height 0.2s ease, border-radius 0.15s ease, background 0.2s ease;
 }
+
 .touch-cursor.hovering {
   width: 50px;
   height: 50px;
@@ -163,6 +178,7 @@
   border-color: hsl(var(--primary) / 0.8);
   box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
 }
+
 .touch-cursor.text {
   width: 3px;
   height: 24px;
@@ -172,7 +188,19 @@
 }
 
 /* Scrollbar */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: hsl(var(--muted-foreground) / 0.3); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground) / 0.5); }
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}

@@ -42,7 +42,18 @@ const AnnouncementManager = () => {
       const finalContent = isImportant ? `[URGENT] ${content}` : content;
       await db.addAnnouncement({ content: finalContent, expires_at: new Date(expiresAt).toISOString() });
       await db.addAuditLog("Add Announcement", `${content.substring(0, 30)}...`);
-      toast.success(lang === "ar" ? "تم نشر الإعلان بنجاح" : "Announcement posted successfully");
+
+      // Send push notification with the same announcement text
+      await db.addNotification({
+        title: isImportant 
+          ? (lang === "ar" ? "📢 إعلان هام!" : "📢 Important Announcement!") 
+          : (lang === "ar" ? "📢 إعلان جديد" : "📢 New Announcement"),
+        message: content, // always use raw content (without [URGENT] prefix)
+        target_audience: "all",
+        sent_by: "system",
+      });
+
+      toast.success(lang === "ar" ? "تم نشر الإعلان وإرسال الإشعار 🔔" : "Announcement posted & notification sent 🔔");
       setContent("");
       setIsImportant(false);
       setExpiresAt("");
