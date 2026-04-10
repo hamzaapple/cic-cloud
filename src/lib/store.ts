@@ -54,6 +54,7 @@ export interface Material {
   pdf_url?: string | null;
   pdf_display_name?: string | null;
   external_link?: string | null;
+  submission_link?: string | null;
   deadline?: string | null;
   is_assignment: boolean;
   archived: boolean;
@@ -282,6 +283,20 @@ export const db = {
     }).select().single();
     if (error) throw error;
     return data as Material;
+  },
+  updateMaterial: async (id: string, updates: {
+    title?: string;
+    course_id?: string;
+    category_id?: string | null;
+    pdf_url?: string | null;
+    pdf_display_name?: string | null;
+    external_link?: string | null;
+    submission_link?: string | null;
+    deadline?: string | null;
+    is_assignment?: boolean;
+  }) => {
+    const { error } = await supabase.from("materials").update(updates).eq("id", id);
+    if (error) throw error;
   },
   archiveMaterial: async (id: string) => {
     const { error } = await supabase.from("materials").update({ archived: true }).eq("id", id);

@@ -113,6 +113,7 @@ const AdminDashboard = () => {
   const [courseId, setCourseId] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [externalLink, setExternalLink] = useState("");
+  const [submissionLink, setSubmissionLink] = useState("");
   const [deadline, setDeadline] = useState("");
   const [isAssignmentOpenEnded, setIsAssignmentOpenEnded] = useState(false);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
@@ -164,11 +165,12 @@ const AdminDashboard = () => {
       await db.addMaterial({
         title,
         course_id: courseId,
-        type: "lecture", // kept for backward compat
+        type: "lecture",
         category_id: categoryId || null,
         pdf_url: pdfUrl,
         pdf_display_name: pdfDisplayName || null,
         external_link: isPdfOnly ? null : (externalLink || null),
+        submission_link: isAssignment ? (submissionLink || null) : null,
         deadline: isAssignmentOpenEnded ? null : (deadline || null),
         is_assignment: isAssignment,
       });
@@ -187,7 +189,7 @@ const AdminDashboard = () => {
       });
 
       await loadData();
-      setTitle(""); setExternalLink(""); setDeadline(""); setIsAssignmentOpenEnded(false);
+      setTitle(""); setExternalLink(""); setSubmissionLink(""); setDeadline(""); setIsAssignmentOpenEnded(false);
       setPdfFile(null); setPdfExternalUrl(""); setPdfDisplayName("");
       const fileInput = document.getElementById("pdf-upload") as HTMLInputElement;
       if (fileInput) fileInput.value = "";
@@ -350,6 +352,19 @@ const AdminDashboard = () => {
                         )}
                       </div>
                     )}
+                    {isAssignment && (
+                      <div className="space-y-1">
+                        <label className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+                          <span>🔗</span> {lang === "ar" ? "رابط التسليم (اختياري)" : "Submission Link (optional)"}
+                        </label>
+                        <Input 
+                          placeholder={lang === "ar" ? "مثال: رابط Google Form أو Moodle" : "e.g. Google Form or Moodle link"} 
+                          value={submissionLink} 
+                          onChange={e => setSubmissionLink(e.target.value)} 
+                          className="bg-secondary/50" 
+                        />
+                      </div>
+                    )}
                     <Button type="submit" className="w-full" disabled={uploading}>
                       {uploading ? t("admin.uploading") : t("admin.upload")}
                     </Button>
@@ -399,6 +414,9 @@ const AdminDashboard = () => {
                       showEdit={canEdit && !isStrictAddOnly}
                       onArchive={canDelete ? handleArchive : undefined}
                       onDelete={canDelete ? handleDelete : undefined}
+                      onUpdate={loadData}
+                      categories={categories}
+                      courses={courses}
                     />
                   ))
                 )}
