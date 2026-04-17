@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useI18n } from "@/lib/i18n";
 import { csScheduleData, cyberScheduleData, aiScheduleData, DAYS_ORDER, PERIODS_ORDER, ScheduleEntry, AllSchedules } from "@/lib/schedule-data";
@@ -319,7 +319,7 @@ const SchedulePage = () => {
   }, [selectedDayCombos]);
 
   // Reset index when day combos change
-  useMemo(() => {
+  useEffect(() => {
     setSelectedScheduleIndex(0);
   }, [selectedDayCombos]);
 
@@ -327,15 +327,21 @@ const SchedulePage = () => {
 
   const handleDownload = async (ref: React.RefObject<HTMLDivElement>, filename: string) => {
     if (!ref.current) return;
-    const canvas = await html2canvas(ref.current, {
-      scale: 2,
-      backgroundColor: "#ffffff",
-      useCORS: true,
-    });
-    const link = document.createElement("a");
-    link.download = `CIC-${filename}.png`;
-    link.href = canvas.toDataURL("image/png");
-    link.click();
+    try {
+      const isMobileDevice = window.innerWidth < 768;
+      const canvas = await html2canvas(ref.current, {
+        scale: isMobileDevice ? 1 : 2,
+        backgroundColor: "#ffffff",
+        useCORS: true,
+        logging: false,
+      });
+      const link = document.createElement("a");
+      link.download = `CIC-${filename}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    } catch (err) {
+      console.error("Download failed:", err);
+    }
   };
 
   const periodLabel = (p: string) => {

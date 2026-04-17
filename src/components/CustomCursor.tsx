@@ -9,59 +9,33 @@ const CustomCursor = ({ enabled }: Props) => {
   const isMobile = useIsMobile();
   const cursorRef = useRef<HTMLDivElement>(null);
   const modeRef = useRef<string>("default");
-  const rafRef = useRef<number>(0);
-  const posRef = useRef({ x: -100, y: -100 });
 
   useEffect(() => {
     if (isMobile || !enabled || !cursorRef.current) return;
 
     const cursor = cursorRef.current;
+    let lastMode = "default";
 
-    const getTargetMode = (target: HTMLElement): string => {
-      if (target.closest("a, button, [role='button'], [data-clickable], select, .cursor-pointer")) return "hovering";
-      if (
-        target.closest("input, textarea") ||
-        (target.matches("p, span, h1, h2, h3, h4, h5, h6, li, td, th, label, div") &&
-          window.getComputedStyle(target).cursor === "text")
-      ) return "text";
+    const getMode = (target: HTMLElement): string => {
+      if (target.closest("a, button, [role='button'], select, .cursor-pointer")) return "hovering";
+      if (target.closest("input, textarea")) return "text";
       return "default";
     };
 
-    const move = (e: MouseEvent) => {
-      posRef.current.x = e.clientX;
-      posRef.current.y = e.clientY;
-      if (!rafRef.current) {
-        rafRef.current = requestAnimationFrame(() => {
-          cursor.style.transform = `translate3d(${posRef.current.x}px, ${posRef.current.y}px, 0)`;
-          rafRef.current = 0;
-        });
-      }
-    };
+    const onMove = (e: MouseEvent) => {
+      // Position update — runs on every frame via rAF
+      cursor.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
 
-    const over = (e: MouseEvent) => {
-      const mode = getTargetMode(e.target as HTMLElement);
-      if (mode !== modeRef.current) {
+      // Mode check — only update DOM class when mode actually changes
+      const mode = getMode(e.target as HTMLElement);
+      if (mode !== lastMode) {
         cursor.className = `custom-cursor ${mode}`;
-        modeRef.current = mode;
+        lastMode = mode;
       }
     };
 
-    const out = () => {
-      if (modeRef.current !== "default") {
-        cursor.className = "custom-cursor default";
-        modeRef.current = "default";
-      }
-    };
-
-    document.addEventListener("mousemove", move, { passive: true });
-    document.addEventListener("mouseover", over, { passive: true });
-    document.addEventListener("mouseout", out, { passive: true });
-    return () => {
-      document.removeEventListener("mousemove", move);
-      document.removeEventListener("mouseover", over);
-      document.removeEventListener("mouseout", out);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
+    document.addEventListener("mousemove", onMove, { passive: true });
+    return () => document.removeEventListener("mousemove", onMove);
   }, [isMobile, enabled]);
 
   if (isMobile || !enabled) return null;

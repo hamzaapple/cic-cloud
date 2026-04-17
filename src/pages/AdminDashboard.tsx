@@ -175,25 +175,26 @@ const AdminDashboard = () => {
         is_assignment: isAssignment,
       });
 
-      // Auto notification
-      const course = courses.find(c => c.id === courseId);
-      const courseName = course?.name || "";
-      const catName = categories.find(c => c.id === categoryId);
-      const typeLabel = catName ? (lang === "ar" ? catName.name_ar : catName.name_en) : "";
-
-      await db.addNotification({
-        title: `تم رفع ${typeLabel}: ${pdfDisplayName || title}`,
-        message: isAssignment ? (isAssignmentOpenEnded ? `بدون موعد نهائي` : `موعد التسليم: ${deadline}`) : `في مقرر ${courseName}`,
-        target_audience: "all",
-        sent_by: "system",
-      });
-
       await loadData();
       setTitle(""); setExternalLink(""); setSubmissionLink(""); setDeadline(""); setIsAssignmentOpenEnded(false);
       setPdfFile(null); setPdfExternalUrl(""); setPdfDisplayName("");
       const fileInput = document.getElementById("pdf-upload") as HTMLInputElement;
       if (fileInput) fileInput.value = "";
       toast.success(t("admin.uploadSuccess"));
+
+      // Auto notification (fire-and-forget — failure doesn't affect material upload)
+      const course = courses.find(c => c.id === courseId);
+      const courseName = course?.name || "";
+      const catName = categories.find(c => c.id === categoryId);
+      const typeLabel = catName ? (lang === "ar" ? catName.name_ar : catName.name_en) : "";
+
+      db.addNotification({
+        title: `تم رفع ${typeLabel}: ${pdfDisplayName || title}`,
+        message: isAssignment ? (isAssignmentOpenEnded ? `بدون موعد نهائي` : `موعد التسليم: ${deadline}`) : `في مقرر ${courseName}`,
+        target_audience: "all",
+        sent_by: "system",
+      }).catch(err => console.warn("Auto-notification failed (material was uploaded):", err));
+
     } catch {
       toast.error(t("admin.uploadFail"));
     } finally {

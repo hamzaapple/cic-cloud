@@ -98,6 +98,10 @@ const AnnouncementBanner = () => {
   const urgentCurrent = urgentBannerItems.length > 0 ? urgentBannerItems[currentIndex % urgentBannerItems.length] : null;
   const normalCurrent = normalBannerItems.length > 0 ? normalBannerItems[currentIndex % normalBannerItems.length] : null;
 
+  // Uppercase refs required for JSX component rendering
+  const UrgentIcon = urgentCurrent?.icon;
+  const NormalIcon = normalCurrent?.icon;
+
   return (
     <div className="fixed top-20 left-0 right-0 z-40 flex flex-col items-center gap-3 px-4 pointer-events-none">
       {urgentCurrent && (
@@ -115,8 +119,8 @@ const AnnouncementBanner = () => {
               className={`backdrop-blur-xl border-2 rounded-full px-6 py-2.5 flex items-center gap-3 pointer-events-auto cursor-pointer max-w-xl shadow-[0_0_20px_rgba(239,68,68,0.3)] ${urgentCurrent.bg}`}
             >
               <div className={`p-1.5 rounded-full bg-background/80 ${urgentCurrent.color} shadow-sm`}>
-              <urgentCurrent.icon className="w-4 h-4" />
-            </div>
+                {UrgentIcon && <UrgentIcon className="w-4 h-4" />}
+              </div>
             <p className="text-sm font-bold leading-tight">{urgentCurrent.content}</p>
             {urgentBannerItems.length > 1 && (
               <div className="flex gap-1 ml-4 rtl:mr-4 rtl:ml-0">
@@ -144,7 +148,7 @@ const AnnouncementBanner = () => {
             className={`backdrop-blur-xl border rounded-full px-6 py-2.5 flex items-center gap-3 pointer-events-auto cursor-pointer max-w-xl shadow-lg ${normalCurrent.bg}`}
           >
             <div className={`p-1.5 rounded-full bg-background/50 ${normalCurrent.color}`}>
-              <normalCurrent.icon className="w-4 h-4" />
+              {NormalIcon && <NormalIcon className="w-4 h-4" />}
             </div>
             <p className="text-xs font-medium leading-tight">{normalCurrent.content}</p>
             {normalBannerItems.length > 1 && (

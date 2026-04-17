@@ -273,6 +273,7 @@ export const db = {
     pdf_url?: string | null;
     pdf_display_name?: string | null;
     external_link?: string | null;
+    submission_link?: string | null;
     deadline?: string | null;
     is_assignment?: boolean;
   }) => {
@@ -404,9 +405,11 @@ export const db = {
     const { data, error } = await supabase.from("notifications").insert(notif).select().single();
     if (error) throw error;
     
-    // Also trigger push notifications to all subscribers (Fire and forget, don't wait for it to finish)
-    supabase.functions.invoke("send-push", {
-      body: { title: notif.title, message: notif.message, target_audience: notif.target_audience },
+    // Trigger push via Vercel API route (Fire and forget)
+    fetch("/api/send-push", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: notif.title, message: notif.message, target_audience: notif.target_audience }),
     }).catch(pushErr => console.warn("Push notification send failed:", pushErr));
     
     return data as Notification;

@@ -46,27 +46,37 @@ const Navbar = ({ cursorEnabled, onToggleCursor }: Props) => {
         </div>
 
         <div className="flex items-center gap-1.5">
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={toggleMute}
-            className="p-2 rounded-lg bg-secondary text-secondary-foreground"
-            aria-label="Toggle sound"
-            title={muted ? "تشغيل الصوت" : "كتم الصوت"}
-          >
-            {muted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-          </motion.button>
-          {!isMobile && (
+          <div className="flex flex-col items-center">
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              onClick={onToggleCursor}
+              onClick={toggleMute}
               className="p-2 rounded-lg bg-secondary text-secondary-foreground"
-              aria-label="Toggle cursor effect"
-              title={cursorEnabled ? "إلغاء تأثير المؤشر" : "تفعيل تأثير المؤشر"}
+              aria-label="Toggle sound"
+              title={muted ? "تشغيل الصوت" : "كتم الصوت"}
             >
-              {cursorEnabled ? <MousePointerClick className="w-4 h-4" /> : <MousePointer className="w-4 h-4" />}
+              {muted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
             </motion.button>
+            <span className="text-[8px] text-muted-foreground text-center leading-tight mt-0.5 max-w-[60px] hidden md:block">
+              {lang === "ar" ? "إذا أردت إلغاء المؤثرات الصوتية اضغط هنا" : "Toggle sound effects"}
+            </span>
+          </div>
+          {!isMobile && (
+            <div className="flex flex-col items-center">
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={onToggleCursor}
+                className="p-2 rounded-lg bg-secondary text-secondary-foreground"
+                aria-label="Toggle cursor effect"
+                title={cursorEnabled ? "إلغاء تأثير المؤشر" : "تفعيل تأثير المؤشر"}
+              >
+                {cursorEnabled ? <MousePointerClick className="w-4 h-4" /> : <MousePointer className="w-4 h-4" />}
+              </motion.button>
+              <span className="text-[8px] text-muted-foreground text-center leading-tight mt-0.5 max-w-[60px]">
+                {lang === "ar" ? "إذا أردت إلغاء تخصيص شكل المؤشر اضغط هنا" : "Toggle cursor style"}
+              </span>
+            </div>
           )}
           <motion.button
             whileHover={{ scale: 1.1 }}

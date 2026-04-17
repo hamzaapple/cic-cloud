@@ -147,7 +147,7 @@ const ManageModerators = ({ departments }: Props) => {
 
             <div className="space-y-2 pt-2">
               <p className="text-sm font-medium text-muted-foreground flex items-center gap-1"><Shield className="w-3.5 h-3.5" /> {t("mod.permissions")}</p>
-              
+
               <label className="flex items-center gap-2 text-sm cursor-pointer font-semibold text-primary py-1 border-b border-border/50 mb-1">
                 <button type="button" onClick={toggleAll} className="p-0.5">
                   {allSelected

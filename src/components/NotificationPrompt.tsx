@@ -7,7 +7,7 @@ import { useI18n } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
-const VAPID_PUBLIC_KEY = "BKZRratAiVsA6zZo4zLJhuN8Q0EDuIPU9e2rpTkvQgUYs4NKB3CEra1BhQALPzzjovuh0fJxEwHBzuY2hd5NJhE";
+const VAPID_PUBLIC_KEY = "BMhK9GP8n21fNOujtdNIXhot-tFp3FqCHpK_bag8iBojHfLRFk8T1Y79Ls8O97Bxj21Eu5wOUgMpRV9goyMtbfo";
 
 const NotificationPrompt = () => {
   const { t } = useI18n();
