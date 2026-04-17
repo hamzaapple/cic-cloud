@@ -57,7 +57,7 @@ const Navbar = ({ cursorEnabled, onToggleCursor }: Props) => {
             >
               {muted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
             </motion.button>
-            <span className="text-[8px] text-muted-foreground text-center leading-tight mt-0.5 max-w-[60px] hidden md:block">
+            <span className="text-[10px] text-muted-foreground text-center leading-tight mt-1 max-w-[80px] hidden md:block">
               {lang === "ar" ? "إذا أردت إلغاء المؤثرات الصوتية اضغط هنا" : "Toggle sound effects"}
             </span>
           </div>
@@ -73,7 +73,7 @@ const Navbar = ({ cursorEnabled, onToggleCursor }: Props) => {
               >
                 {cursorEnabled ? <MousePointerClick className="w-4 h-4" /> : <MousePointer className="w-4 h-4" />}
               </motion.button>
-              <span className="text-[8px] text-muted-foreground text-center leading-tight mt-0.5 max-w-[60px]">
+              <span className="text-[10px] text-muted-foreground text-center leading-tight mt-1 max-w-[80px]">
                 {lang === "ar" ? "إذا أردت إلغاء تخصيص شكل المؤشر اضغط هنا" : "Toggle cursor style"}
               </span>
             </div>
