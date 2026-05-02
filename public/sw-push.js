@@ -17,8 +17,8 @@ self.addEventListener("push", (event) => {
 
   let title = "CIC Cloud 🎓";
   let body = "";
-  let icon = "/icons/icon-192x192.png";
-  let badge = "/icons/icon-72x72.png";
+  let icon = "/logo.png";
+  let badge = "/pwa-192x192.png";
   let url = "/";
 
   try {
@@ -27,6 +27,7 @@ self.addEventListener("push", (event) => {
     body = data.message || data.body || "";
     if (data.icon) icon = data.icon;
     if (data.link) url = data.link;
+    if (data.data && data.data.url) url = data.data.url;
   } catch {
     // Fallback: treat as plain text
     body = event.data.text();
@@ -36,11 +37,11 @@ self.addEventListener("push", (event) => {
     body,
     icon,
     badge,
-    tag: "cic-notification",       // Replace previous notification instead of stacking
-    renotify: true,                  // Still vibrate/ring even if tag matches
+    tag: "cic-notification-" + Date.now(), // Unique tag so notifications don't replace each other
+    renotify: true,                         // Still vibrate/ring
     data: { url },
     vibrate: [200, 100, 200, 100, 200],
-    requireInteraction: false,       // Auto-dismiss after a while (better UX)
+    requireInteraction: false,
     actions: [
       { action: "open", title: "فتح الموقع 🌐" },
       { action: "dismiss", title: "إغلاق ✕" },

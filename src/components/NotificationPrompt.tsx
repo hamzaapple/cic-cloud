@@ -7,7 +7,7 @@ import { useI18n } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
-const VAPID_PUBLIC_KEY = "BMhK9GP8n21fNOujtdNIXhot-tFp3FqCHpK_bag8iBojHfLRFk8T1Y79Ls8O97Bxj21Eu5wOUgMpRV9goyMtbfo";
+const VAPID_PUBLIC_KEY = "BGjzM7P_sdHVBjEkwo4XKB_rdq9sM_bq9orpj4ZLnfQzXd5g6g6ZCd3bUBiteLKuD62AkYn6IWcZxW20XSqq7e0";
 
 const NotificationPrompt = () => {
   const { t } = useI18n();
@@ -64,17 +64,20 @@ const NotificationPrompt = () => {
               applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
             });
 
-            const { error } = await supabase.from("push_subscriptions").insert({
+            // Use base64url encoding (required by web-push)
+            const subJson = subscription.toJSON();
+            const { error } = await supabase.from("push_subscriptions" as any).insert({
               endpoint: subscription.endpoint,
-              p256dh: arrayBufferToBase64(subscription.getKey("p256dh")),
-              auth: arrayBufferToBase64(subscription.getKey("auth")),
+              p256dh: subJson.keys?.p256dh || null,
+              auth: subJson.keys?.auth || null,
               user_agent: navigator.userAgent,
               department: selectedDept,
             });
 
             if (error) console.error("Failed to save subscription:", error);
+            else console.log("Push subscription saved successfully");
           } catch (pushError) {
-            console.log("Push subscription not available:", pushError);
+            console.error("Push subscription failed:", pushError);
           }
         }
         toast({ title: t("push.granted"), description: "✓" });
@@ -107,14 +110,6 @@ const NotificationPrompt = () => {
     const outputArray = new Uint8Array(rawData.length);
     for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
     return outputArray;
-  }
-
-  function arrayBufferToBase64(buffer: ArrayBuffer | null) {
-    if (!buffer) return null;
-    const bytes = new Uint8Array(buffer);
-    let binary = "";
-    for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
-    return window.btoa(binary);
   }
 
   const showInstallMessage = !hasNotificationAPI && !isPWA;

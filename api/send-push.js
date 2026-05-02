@@ -1,8 +1,8 @@
 import webpush from 'web-push';
 import { createClient } from '@supabase/supabase-js';
 
-const VAPID_PUBLIC_KEY = 'BMhK9GP8n21fNOujtdNIXhot-tFp3FqCHpK_bag8iBojHfLRFk8T1Y79Ls8O97Bxj21Eu5wOUgMpRV9goyMtbfo';
-const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY || 'DK23C96LCsZlbtMORr5ok5DSC28Ustl4C6-ji5uvlbY';
+const VAPID_PUBLIC_KEY = 'BGjzM7P_sdHVBjEkwo4XKB_rdq9sM_bq9orpj4ZLnfQzXd5g6g6ZCd3bUBiteLKuD62AkYn6IWcZxW20XSqq7e0';
+const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY;
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'https://fyuxsyqgpukeqvpmwzxn.supabase.co';
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
@@ -33,13 +33,18 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'title and message are required' });
     }
 
+    if (!VAPID_PRIVATE_KEY) {
+      console.error('VAPID_PRIVATE_KEY environment variable is not set');
+      return res.status(500).json({ error: 'VAPID not configured' });
+    }
+
     // Create Supabase client
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
     // Fetch all push subscriptions
     let query = supabase.from('push_subscriptions').select('*');
     if (target_audience && target_audience !== 'all') {
-      query = query.or(`department.eq.${target_audience},department.eq.all`);
+      query = query.or(`department.eq.${target_audience},department.is.null,department.eq.all`);
     }
     const { data: subscriptions, error: fetchError } = await query;
 
@@ -54,9 +59,10 @@ export default async function handler(req, res) {
 
     const payload = JSON.stringify({
       title,
+      message,
       body: message,
       icon: '/logo.png',
-      badge: '/logo.png',
+      badge: '/pwa-192x192.png',
       data: { url: '/' },
     });
 
@@ -65,7 +71,7 @@ export default async function handler(req, res) {
     const expiredIds = [];
 
     // Send to all subscriptions
-    const results = await Promise.allSettled(
+    await Promise.allSettled(
       subscriptions.map(async (sub) => {
         try {
           const pushSub = {
@@ -95,6 +101,7 @@ export default async function handler(req, res) {
         .from('push_subscriptions')
         .delete()
         .in('id', expiredIds);
+      console.log(`Cleaned up ${expiredIds.length} expired subscriptions`);
     }
 
     return res.status(200).json({

@@ -405,11 +405,9 @@ export const db = {
     const { data, error } = await supabase.from("notifications").insert(notif).select().single();
     if (error) throw error;
     
-    // Trigger push via Vercel API route (Fire and forget)
-    fetch("/api/send-push", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: notif.title, message: notif.message, target_audience: notif.target_audience }),
+    // Trigger push via Supabase Edge Function (Fire and forget)
+    supabase.functions.invoke('send-push', {
+      body: { title: notif.title, message: notif.message, target_audience: notif.target_audience },
     }).catch(pushErr => console.warn("Push notification send failed:", pushErr));
     
     return data as Notification;

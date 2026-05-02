@@ -1,3 +1,5 @@
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Info } from "lucide-react"; // أيقونة للتنبيه
 import { useParams, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
@@ -5,8 +7,7 @@ import { db } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
 import { useQuery } from "@tanstack/react-query";
 import MaterialCard from "@/components/MaterialCard";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ArrowRight, ArrowLeft, Info } from "lucide-react";
+import { ArrowRight, ArrowLeft } from "lucide-react";
 
 const CoursePage = () => {
   const { id } = useParams<{ id: string }>();
@@ -24,9 +25,6 @@ const CoursePage = () => {
 
   // Set default active category
   const activeCategory = activeCategoryId || categories[0]?.id || "";
-
-  const activeCategoryObj = categories.find(c => c.id === activeCategory);
-  const isAssignmentCategory = activeCategoryObj?.name_en.toLowerCase() === "assignments" || activeCategoryObj?.name_ar === "تكليفات" || activeCategoryObj?.name_ar === "التكليفات";
 
   const materials = allMaterials
     .filter(m => !m.archived && m.category_id === activeCategory)
@@ -79,21 +77,6 @@ const CoursePage = () => {
 
         <AnimatePresence mode="wait">
           <motion.div key={activeCategory} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-3">
-            {isAssignmentCategory && (
-              <motion.div 
-                initial={{ opacity: 0, y: -10 }} 
-                animate={{ opacity: 1, y: 0 }}
-                className="mb-4"
-              >
-                <Alert className="bg-blue-500/10 border-blue-500/20 text-blue-500 dark:text-blue-400" variant="default" style={{ direction: "rtl", textAlign: "right" }}>
-                  <Info className="h-4 w-4 ml-2 mt-0.5" />
-                  <AlertDescription className="font-medium text-sm leading-relaxed">
-                    تنويه : تسليم الأسايمنتات ليس هنا ولكن في موقع التعليم الإلكتروني ، رابط تسليم كل أسايمنت موجود تحت الأسايمنت
-                  </AlertDescription>
-                </Alert>
-              </motion.div>
-            )}
-
             {materials.length === 0 ? (
               <div className="text-center py-16 text-muted-foreground">
                 {t("course.noMaterials")}

@@ -173,7 +173,7 @@ async function sendWebPush(
   vapidSubject: string
 ): Promise<boolean> {
   try {
-    const payload = JSON.stringify({ title, message, icon: "/icons/icon-192x192.png" });
+    const payload = JSON.stringify({ title, message, icon: "/logo.png" });
     const url = new URL(sub.endpoint);
     const audience = `${url.protocol}//${url.host}`;
 
@@ -261,7 +261,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const vapidPublicKey = "BKZRratAiVsA6zZo4zLJhuN8Q0EDuIPU9e2rpTkvQgUYs4NKB3CEra1BhQALPzzjovuh0fJxEwHBzuY2hd5NJhE";
+    const vapidPublicKey = "BGjzM7P_sdHVBjEkwo4XKB_rdq9sM_bq9orpj4ZLnfQzXd5g6g6ZCd3bUBiteLKuD62AkYn6IWcZxW20XSqq7e0";
     const vapidPrivateKeyB64 = Deno.env.get("VAPID_PRIVATE_KEY");
     if (!vapidPrivateKeyB64) {
       console.error("VAPID_PRIVATE_KEY not configured");
