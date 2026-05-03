@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      announcements: {
+        Row: {
+          content: string
+          created_at: string
+          created_by: string | null
+          expires_at: string
+          id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          created_by?: string | null
+          expires_at: string
+          id?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      audit_logs: {
+        Row: {
+          action: string
+          admin_id: string | null
+          admin_name: string
+          created_at: string
+          details: string | null
+          id: string
+        }
+        Insert: {
+          action: string
+          admin_id?: string | null
+          admin_name: string
+          created_at?: string
+          details?: string | null
+          id?: string
+        }
+        Update: {
+          action?: string
+          admin_id?: string | null
+          admin_name?: string
+          created_at?: string
+          details?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
       courses: {
         Row: {
           code: string
@@ -165,6 +216,7 @@ export type Database = {
           is_assignment: boolean
           pdf_display_name: string | null
           pdf_url: string | null
+          submission_link: string | null
           title: string
           type: string
         }
@@ -179,6 +231,7 @@ export type Database = {
           is_assignment?: boolean
           pdf_display_name?: string | null
           pdf_url?: string | null
+          submission_link?: string | null
           title: string
           type: string
         }
@@ -193,6 +246,7 @@ export type Database = {
           is_assignment?: boolean
           pdf_display_name?: string | null
           pdf_url?: string | null
+          submission_link?: string | null
           title?: string
           type?: string
         }
@@ -321,6 +375,7 @@ export type Database = {
         Row: {
           auth: string | null
           created_at: string
+          department: string | null
           endpoint: string
           id: string
           p256dh: string | null
@@ -329,6 +384,7 @@ export type Database = {
         Insert: {
           auth?: string | null
           created_at?: string
+          department?: string | null
           endpoint: string
           id?: string
           p256dh?: string | null
@@ -337,6 +393,7 @@ export type Database = {
         Update: {
           auth?: string | null
           created_at?: string
+          department?: string | null
           endpoint?: string
           id?: string
           p256dh?: string | null
