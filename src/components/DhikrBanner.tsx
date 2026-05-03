@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles } from "lucide-react";
 
 const DHIKR = [
   "سبحان الله",
@@ -59,8 +58,8 @@ const DhikrBanner = () => {
             className="backdrop-blur-xl border-2 border-emerald-500/40 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 rounded-full px-6 py-2 flex items-center gap-3 shadow-[0_0_20px_rgba(16,185,129,0.25)] max-w-xl"
             dir="rtl"
           >
-            <div className="p-1.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400">
-              <Sparkles className="w-4 h-4" />
+            <div className="text-base leading-none" aria-hidden>
+              📿
             </div>
             <p className="text-sm font-semibold leading-tight whitespace-nowrap">
               {DHIKR[index]}
