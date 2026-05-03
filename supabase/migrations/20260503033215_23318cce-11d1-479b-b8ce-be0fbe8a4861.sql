@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Anyone can read subscriptions" ON public.push_subscriptions;
