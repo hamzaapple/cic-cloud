@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import { Link, useParams } from "react-router-dom";
 import { db } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
@@ -6,13 +6,13 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { playClickSfx } from "@/hooks/use-sfx";
 
-const container = {
+const container: Variants = {
   hidden: { opacity: 0 },
   show: { opacity: 1, transition: { staggerChildren: 0.04 } }
 };
-const item = {
+const item: Variants = {
   hidden: { opacity: 0, y: 15 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.25, ease: "easeOut" } }
+  show: { opacity: 1, y: 0, transition: { duration: 0.25, ease: "easeOut" as const } }
 };
 
 const DepartmentPage = () => {
