@@ -103,7 +103,7 @@ const AnnouncementBanner = () => {
   const NormalIcon = normalCurrent?.icon;
 
   return (
-    <div className="fixed top-20 left-0 right-0 z-40 flex flex-col items-center gap-3 px-4 pointer-events-none">
+    <div className="fixed top-[7.5rem] left-0 right-0 z-40 flex flex-col items-center gap-3 px-4 pointer-events-none">
       {urgentCurrent && (
         <AnimatePresence mode="wait">
           <motion.div
