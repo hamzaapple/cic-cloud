@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import { Link } from "react-router-dom";
 import { db, type Department } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
@@ -6,11 +6,11 @@ import { ArrowLeft, ArrowRight, Monitor, Brain } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { playClickSfx } from "@/hooks/use-sfx";
 
-const container = {
+const container: Variants = {
   hidden: { opacity: 0 },
   show: { opacity: 1, transition: { staggerChildren: 0.05 } }
 };
-const item = {
+const item: Variants = {
   hidden: { opacity: 0, y: 20, scale: 0.98 },
   show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.3, ease: "easeOut" } }
 };
