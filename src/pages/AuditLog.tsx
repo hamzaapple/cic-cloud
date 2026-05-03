@@ -37,7 +37,7 @@ const AuditLog = () => {
           .order("created_at", { ascending: false })
           .limit(100);
           
-        if (data) setLogs(data as AuditLogEntry[]);
+        if (data) setLogs(data as unknown as AuditLogEntry[]);
       } catch (e) {
         console.error("Failed to load audit logs", e);
       } finally {
