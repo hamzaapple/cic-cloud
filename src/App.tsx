@@ -44,6 +44,7 @@ const AppContent = () => {
       <CustomCursor enabled={cursorEnabled} />
       <Navbar cursorEnabled={cursorEnabled} onToggleCursor={toggleCursor} />
       <AnnouncementBanner />
+      <DhikrBanner />
       <NotificationPrompt />
       <InstallPrompt />
       <div className="relative z-10">
