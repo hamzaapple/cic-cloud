@@ -10,6 +10,7 @@ import CustomCursor from "./components/CustomCursor";
 import NotificationPrompt from "./components/NotificationPrompt";
 import InstallPrompt from "./components/InstallPrompt";
 import AnnouncementBanner from "./components/AnnouncementBanner";
+import DhikrBanner from "./components/DhikrBanner";
 import { useCursorToggle } from "./hooks/use-cursor";
 
 // Lazy load pages
@@ -43,6 +44,7 @@ const AppContent = () => {
       <CustomCursor enabled={cursorEnabled} />
       <Navbar cursorEnabled={cursorEnabled} onToggleCursor={toggleCursor} />
       <AnnouncementBanner />
+      <DhikrBanner />
       <NotificationPrompt />
       <InstallPrompt />
       <div className="relative z-10">

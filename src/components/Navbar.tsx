@@ -46,35 +46,33 @@ const Navbar = ({ cursorEnabled, onToggleCursor }: Props) => {
         </div>
 
         <div className="flex items-center gap-1.5">
-          <div className="flex flex-col items-center">
+          <div className="relative group">
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={toggleMute}
               className="p-2 rounded-lg bg-secondary text-secondary-foreground"
               aria-label="Toggle sound"
-              title={muted ? "تشغيل الصوت" : "كتم الصوت"}
             >
               {muted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
             </motion.button>
-            <span className="text-[10px] text-muted-foreground text-center leading-tight mt-1 max-w-[80px] hidden md:block">
-              {lang === "ar" ? "إذا أردت إلغاء المؤثرات الصوتية اضغط هنا" : "Toggle sound effects"}
+            <span className="pointer-events-none absolute top-full mt-2 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] px-2 py-1 rounded-md bg-popover text-popover-foreground border border-border shadow opacity-0 group-hover:opacity-100 transition-opacity">
+              {lang === "ar" ? (muted ? "تشغيل الصوت" : "كتم الصوت") : muted ? "Unmute" : "Mute"}
             </span>
           </div>
           {!isMobile && (
-            <div className="flex flex-col items-center">
+            <div className="relative group">
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={onToggleCursor}
                 className="p-2 rounded-lg bg-secondary text-secondary-foreground"
                 aria-label="Toggle cursor effect"
-                title={cursorEnabled ? "إلغاء تأثير المؤشر" : "تفعيل تأثير المؤشر"}
               >
                 {cursorEnabled ? <MousePointerClick className="w-4 h-4" /> : <MousePointer className="w-4 h-4" />}
               </motion.button>
-              <span className="text-[10px] text-muted-foreground text-center leading-tight mt-1 max-w-[80px]">
-                {lang === "ar" ? "إذا أردت إلغاء تخصيص شكل المؤشر اضغط هنا" : "Toggle cursor style"}
+              <span className="pointer-events-none absolute top-full mt-2 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] px-2 py-1 rounded-md bg-popover text-popover-foreground border border-border shadow opacity-0 group-hover:opacity-100 transition-opacity">
+                {lang === "ar" ? (cursorEnabled ? "إلغاء تأثير المؤشر" : "تفعيل تأثير المؤشر") : "Cursor effect"}
               </span>
             </div>
           )}
