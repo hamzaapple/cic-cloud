@@ -12,7 +12,7 @@ const container: Variants = {
 };
 const item: Variants = {
   hidden: { opacity: 0, y: 20, scale: 0.98 },
-  show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.3, ease: "easeOut" } }
+  show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.3, ease: "easeOut" as const } }
 };
 
 const DEPT_ICONS: Record<string, typeof Monitor> = {
