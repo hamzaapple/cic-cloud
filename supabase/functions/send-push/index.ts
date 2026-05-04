@@ -3,11 +3,11 @@ import { SignJWT, importJWK } from "https://deno.land/x/jose@v5.2.3/index.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 // ─── VAPID signing key ────────────────────────────────────────────────────────
-async function getVapidSigningKey(base64url: string) {
+async function getVapidKeys(base64url: string): Promise<{ signingKey: CryptoKey; publicKey: string }> {
   const std = base64url.replace(/-/g, "+").replace(/_/g, "/");
   const padding = "=".repeat((4 - (std.length % 4)) % 4);
   const binary = atob(std + padding);
@@ -32,7 +32,23 @@ async function getVapidSigningKey(base64url: string) {
     ["sign"]
   );
   const jwk = await crypto.subtle.exportKey("jwk", key);
-  return await importJWK(jwk, "ES256");
+  if (!jwk.x || !jwk.y) throw new Error("Invalid VAPID private key");
+
+  const publicBytes = new Uint8Array(65);
+  publicBytes[0] = 0x04;
+  publicBytes.set(b64UrlToBytes(jwk.x), 1);
+  publicBytes.set(b64UrlToBytes(jwk.y), 33);
+
+  return {
+    signingKey: (await importJWK(jwk, "ES256")) as CryptoKey,
+    publicKey: bytesToB64Url(publicBytes),
+  };
+}
+
+async function getConfiguredVapidKeys(): Promise<{ signingKey: CryptoKey; publicKey: string }> {
+  const vapidPrivateKeyB64 = Deno.env.get("VAPID_PRIVATE_KEY");
+  if (!vapidPrivateKeyB64) throw new Error("VAPID_PRIVATE_KEY not configured");
+  return getVapidKeys(vapidPrivateKeyB64);
 }
 
 // ─── Base64url helpers ────────────────────────────────────────────────────────
@@ -171,7 +187,7 @@ async function sendWebPush(
   vapidPublicKey: string,
   signingKey: CryptoKey,
   vapidSubject: string
-): Promise<boolean> {
+): Promise<{ ok: boolean; status?: number }> {
   try {
     const payload = JSON.stringify({ title, message, icon: "/logo.png" });
     const url = new URL(sub.endpoint);
@@ -213,18 +229,33 @@ async function sendWebPush(
     if (!response.ok) {
       const text = await response.text();
       console.error(`Push failed (${response.status}) for ${sub.endpoint}: ${text}`);
-      return false;
+      return { ok: false, status: response.status };
     }
-    return true;
+    return { ok: true };
   } catch (err) {
     console.error("Push send error:", err);
-    return false;
+    return { ok: false };
   }
 }
 
 // ─── Edge Function handler ────────────────────────────────────────────────────
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  if (req.method === "GET") {
+    try {
+      const { publicKey } = await getConfiguredVapidKeys();
+      return new Response(JSON.stringify({ publicKey }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    } catch (keyError) {
+      console.error("VAPID public key unavailable:", keyError);
+      return new Response(JSON.stringify({ error: "VAPID not configured" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+  }
 
   const authHeader = req.headers.get("authorization") || "";
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -261,23 +292,22 @@ Deno.serve(async (req) => {
       });
     }
 
-    const vapidPublicKey = "BGjzM7P_sdHVBjEkwo4XKB_rdq9sM_bq9orpj4ZLnfQzXd5g6g6ZCd3bUBiteLKuD62AkYn6IWcZxW20XSqq7e0";
-    const vapidPrivateKeyB64 = Deno.env.get("VAPID_PRIVATE_KEY");
-    if (!vapidPrivateKeyB64) {
-      console.error("VAPID_PRIVATE_KEY not configured");
+    let vapidKeys: { signingKey: CryptoKey; publicKey: string };
+    try {
+      vapidKeys = await getConfiguredVapidKeys();
+    } catch (keyError) {
+      console.error("VAPID_PRIVATE_KEY not configured or invalid:", keyError);
       return new Response(JSON.stringify({ error: "VAPID not configured" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const signingKey = await getVapidSigningKey(vapidPrivateKeyB64);
-
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabase = createClient(supabaseUrl, serviceKey);
     const { data: subs, error } = await supabase
       .from("push_subscriptions")
-      .select("endpoint, p256dh, auth, department");
+      .select("id, endpoint, p256dh, auth, department");
 
     if (error) {
       console.error("Failed to fetch subscriptions:", error);
@@ -297,6 +327,7 @@ Deno.serve(async (req) => {
     const vapidSubject = "mailto:admin@cic-cloud.app";
     let sent = 0;
     let failed = 0;
+    const staleIds: string[] = [];
 
     for (const sub of subs) {
       if (
@@ -308,12 +339,21 @@ Deno.serve(async (req) => {
         continue;
       }
 
-      const ok = await sendWebPush(sub, title, message, vapidPublicKey, signingKey as CryptoKey, vapidSubject);
-      if (ok) sent++; else failed++;
+      const result = await sendWebPush(sub, title, message, vapidKeys.publicKey, vapidKeys.signingKey, vapidSubject);
+      if (result.ok) {
+        sent++;
+      } else {
+        failed++;
+        if (result.status === 403 || result.status === 404 || result.status === 410) staleIds.push(sub.id);
+      }
+    }
+
+    if (staleIds.length > 0) {
+      await supabase.from("push_subscriptions").delete().in("id", staleIds);
     }
 
     console.log(`Push: ${sent} sent, ${failed} failed / ${subs.length} total`);
-    return new Response(JSON.stringify({ sent, failed, total: subs.length }), {
+    return new Response(JSON.stringify({ sent, failed, total: subs.length, cleaned: staleIds.length }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

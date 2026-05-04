@@ -168,11 +168,30 @@ Deno.serve(async (req) => {
     } else {
       session = signInData.session
 
-      // Ensure app_metadata is up-to-date (e.g. if role changed)
+      // Ensure app_metadata is up-to-date (e.g. if role changed). If we update it,
+      // sign in again so the returned JWT immediately contains the role used by RLS.
       if (signInData.user) {
-        await adminClient.auth.admin.updateUserById(signInData.user.id, {
-          app_metadata: appMetadata,
-        })
+        const currentRole = signInData.user.app_metadata?.app_role
+        if (currentRole !== role) {
+          await adminClient.auth.admin.updateUserById(signInData.user.id, {
+            app_metadata: appMetadata,
+          })
+
+          const { data: refreshedSignIn, error: refreshedSignInError } = await anonClient.auth.signInWithPassword({
+            email: authEmail,
+            password: authPassword,
+          })
+
+          if (refreshedSignInError) {
+            console.error('Failed to refresh sign in after role update:', refreshedSignInError.message)
+            return new Response(
+              JSON.stringify({ error: 'Authentication failed' }),
+              { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            )
+          }
+
+          session = refreshedSignIn.session
+        }
       }
     }
 
