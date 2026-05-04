@@ -87,6 +87,7 @@ const Navbar = ({ cursorEnabled, onToggleCursor }: Props) => {
             <Globe className="w-4 h-4" />
             <span>{lang === "ar" ? "EN" : "AR"}</span>
           </motion.button>
+          <NotificationBell />
           <ThemeToggle />
           <button className="md:hidden p-2" onClick={() => setOpen(!open)}>
             {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
