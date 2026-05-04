@@ -307,7 +307,7 @@ Deno.serve(async (req) => {
     const supabase = createClient(supabaseUrl, serviceKey);
     const { data: subs, error } = await supabase
       .from("push_subscriptions")
-      .select("endpoint, p256dh, auth, department");
+      .select("id, endpoint, p256dh, auth, department");
 
     if (error) {
       console.error("Failed to fetch subscriptions:", error);
@@ -327,6 +327,7 @@ Deno.serve(async (req) => {
     const vapidSubject = "mailto:admin@cic-cloud.app";
     let sent = 0;
     let failed = 0;
+    const staleIds: string[] = [];
 
     for (const sub of subs) {
       if (
@@ -338,12 +339,21 @@ Deno.serve(async (req) => {
         continue;
       }
 
-      const ok = await sendWebPush(sub, title, message, vapidKeys.publicKey, vapidKeys.signingKey, vapidSubject);
-      if (ok) sent++; else failed++;
+      const result = await sendWebPush(sub, title, message, vapidKeys.publicKey, vapidKeys.signingKey, vapidSubject);
+      if (result.ok) {
+        sent++;
+      } else {
+        failed++;
+        if (result.status === 403 || result.status === 404 || result.status === 410) staleIds.push(sub.id);
+      }
+    }
+
+    if (staleIds.length > 0) {
+      await supabase.from("push_subscriptions").delete().in("id", staleIds);
     }
 
     console.log(`Push: ${sent} sent, ${failed} failed / ${subs.length} total`);
-    return new Response(JSON.stringify({ sent, failed, total: subs.length }), {
+    return new Response(JSON.stringify({ sent, failed, total: subs.length, cleaned: staleIds.length }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
