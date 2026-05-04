@@ -35,7 +35,7 @@ const NotificationPrompt = () => {
     // Show every 10 visits
     const visitCount = parseInt(localStorage.getItem("cic_visit_count") || "0", 10) + 1;
     localStorage.setItem("cic_visit_count", visitCount.toString());
-    const shouldShowByVisit = visitCount % 10 === 1; // Show on 1st, 11th, 21st...
+    const shouldShowByVisit = visitCount % 3 === 1; // Show on 1st, 4th, 7th...
 
     // Only show the notification prompt if the device actually supports Notifications (hasAPI).
     // If it doesn't support it, the InstallPrompt is already doing its job to tell them to install first.
