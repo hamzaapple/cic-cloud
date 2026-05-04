@@ -402,6 +402,7 @@ export const db = {
     return (data || []) as Notification[];
   },
   addNotification: async (notif: { title: string; message: string; target_audience: string; link?: string | null; sent_by?: string }) => {
+    await supabase.auth.refreshSession().catch(() => undefined);
     const { data, error } = await supabase.from("notifications").insert(notif).select().single();
     if (error) throw error;
     
