@@ -7,7 +7,11 @@ import { useI18n } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
-const VAPID_PUBLIC_KEY = "BGjzM7P_sdHVBjEkwo4XKB_rdq9sM_bq9orpj4ZLnfQzXd5g6g6ZCd3bUBiteLKuD62AkYn6IWcZxW20XSqq7e0";
+async function getVapidPublicKey() {
+  const { data, error } = await supabase.functions.invoke("send-push", { method: "GET" } as any);
+  if (error || !data?.publicKey) throw error || new Error("Missing VAPID public key");
+  return data.publicKey as string;
+}
 
 const NotificationPrompt = () => {
   const { t } = useI18n();
@@ -59,9 +63,14 @@ const NotificationPrompt = () => {
         if ("serviceWorker" in navigator && "PushManager" in window) {
           try {
             const registration = await navigator.serviceWorker.ready;
+            const existingSubscription = await registration.pushManager.getSubscription();
+            if (existingSubscription) {
+              await existingSubscription.unsubscribe().catch(() => undefined);
+            }
+            const vapidPublicKey = await getVapidPublicKey();
             const subscription = await registration.pushManager.subscribe({
               userVisibleOnly: true,
-              applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+              applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
             });
 
             // Use base64url encoding (required by web-push)
