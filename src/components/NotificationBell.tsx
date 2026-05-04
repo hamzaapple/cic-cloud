@@ -5,8 +5,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { useI18n } from "@/lib/i18n";
 
-const VAPID_PUBLIC_KEY =
-  "BGjzM7P_sdHVBjEkwo4XKB_rdq9sM_bq9orpj4ZLnfQzXd5g6g6ZCd3bUBiteLKuD62AkYn6IWcZxW20XSqq7e0";
+async function getVapidPublicKey() {
+  const { data, error } = await supabase.functions.invoke("send-push", { method: "GET" } as any);
+  if (error || !data?.publicKey) throw error || new Error("Missing VAPID public key");
+  return data.publicKey as string;
+}
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -64,12 +67,14 @@ const NotificationBell = () => {
 
       const registration = await navigator.serviceWorker.ready;
       let subscription = await registration.pushManager.getSubscription();
-      if (!subscription) {
-        subscription = await registration.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
-        });
+      if (subscription) {
+        await subscription.unsubscribe().catch(() => undefined);
       }
+      const vapidPublicKey = await getVapidPublicKey();
+      subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+      });
 
       const sub = subscription.toJSON();
       const { error } = await supabase.from("push_subscriptions" as any).insert({
