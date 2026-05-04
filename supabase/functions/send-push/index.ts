@@ -187,7 +187,7 @@ async function sendWebPush(
   vapidPublicKey: string,
   signingKey: CryptoKey,
   vapidSubject: string
-): Promise<boolean> {
+): Promise<{ ok: boolean; status?: number }> {
   try {
     const payload = JSON.stringify({ title, message, icon: "/logo.png" });
     const url = new URL(sub.endpoint);
@@ -229,12 +229,12 @@ async function sendWebPush(
     if (!response.ok) {
       const text = await response.text();
       console.error(`Push failed (${response.status}) for ${sub.endpoint}: ${text}`);
-      return false;
+      return { ok: false, status: response.status };
     }
-    return true;
+    return { ok: true };
   } catch (err) {
     console.error("Push send error:", err);
-    return false;
+    return { ok: false };
   }
 }
 
