@@ -242,6 +242,21 @@ async function sendWebPush(
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
+  if (req.method === "GET") {
+    try {
+      const { publicKey } = await getConfiguredVapidKeys();
+      return new Response(JSON.stringify({ publicKey }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    } catch (keyError) {
+      console.error("VAPID public key unavailable:", keyError);
+      return new Response(JSON.stringify({ error: "VAPID not configured" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+  }
+
   const authHeader = req.headers.get("authorization") || "";
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
   const token = authHeader.replace("Bearer ", "");
