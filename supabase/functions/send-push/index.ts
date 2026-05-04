@@ -277,17 +277,16 @@ Deno.serve(async (req) => {
       });
     }
 
-    const vapidPublicKey = "BGjzM7P_sdHVBjEkwo4XKB_rdq9sM_bq9orpj4ZLnfQzXd5g6g6ZCd3bUBiteLKuD62AkYn6IWcZxW20XSqq7e0";
-    const vapidPrivateKeyB64 = Deno.env.get("VAPID_PRIVATE_KEY");
-    if (!vapidPrivateKeyB64) {
-      console.error("VAPID_PRIVATE_KEY not configured");
+    let vapidKeys: { signingKey: CryptoKey; publicKey: string };
+    try {
+      vapidKeys = await getConfiguredVapidKeys();
+    } catch (keyError) {
+      console.error("VAPID_PRIVATE_KEY not configured or invalid:", keyError);
       return new Response(JSON.stringify({ error: "VAPID not configured" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-
-    const signingKey = await getVapidSigningKey(vapidPrivateKeyB64);
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabase = createClient(supabaseUrl, serviceKey);
@@ -324,7 +323,7 @@ Deno.serve(async (req) => {
         continue;
       }
 
-      const ok = await sendWebPush(sub, title, message, vapidPublicKey, signingKey as CryptoKey, vapidSubject);
+      const ok = await sendWebPush(sub, title, message, vapidKeys.publicKey, vapidKeys.signingKey, vapidSubject);
       if (ok) sent++; else failed++;
     }
 
