@@ -402,14 +402,30 @@ export const db = {
     return (data || []) as Notification[];
   },
   addNotification: async (notif: { title: string; message: string; target_audience: string; link?: string | null; sent_by?: string }) => {
-    await supabase.auth.refreshSession().catch(() => undefined);
+    // Ensure we have a fresh session before insert (RLS requires authenticated user)
+    const { data: sessionData } = await supabase.auth.refreshSession().catch(() => ({ data: null }));
+    const session = sessionData?.session ?? (await supabase.auth.getSession()).data.session;
+
     const { data, error } = await supabase.from("notifications").insert(notif).select().single();
     if (error) throw error;
     
-    // Trigger push via Supabase Edge Function (Fire and forget)
-    supabase.functions.invoke('send-push', {
-      body: { title: notif.title, message: notif.message, target_audience: notif.target_audience },
-    }).catch(pushErr => console.warn("Push notification send failed:", pushErr));
+    // Trigger push via Supabase Edge Function
+    // Pass the access token explicitly so the Edge Function can verify the caller
+    try {
+      const headers: Record<string, string> = {};
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`;
+      }
+      const { error: pushError } = await supabase.functions.invoke('send-push', {
+        body: { title: notif.title, message: notif.message, target_audience: notif.target_audience },
+        headers,
+      });
+      if (pushError) {
+        console.warn("Push notification send failed:", pushError);
+      }
+    } catch (pushErr) {
+      console.warn("Push notification send failed:", pushErr);
+    }
     
     return data as Notification;
   },

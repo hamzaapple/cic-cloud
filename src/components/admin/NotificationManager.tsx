@@ -39,11 +39,11 @@ const NotificationManager = () => {
         link: link || null, sent_by: "owner",
       });
 
-      if ("Notification" in window && window.Notification.permission === "granted") {
-        new window.Notification(title, { body: message });
-      } else if ("Notification" in window && window.Notification.permission !== "denied") {
-        const perm = await window.Notification.requestPermission();
-        if (perm === "granted") new window.Notification(title, { body: message });
+      // Try to show a local notification for the sender (safely using Service Worker for Android compatibility)
+      if ("Notification" in window && "serviceWorker" in navigator && window.Notification.permission === "granted") {
+        navigator.serviceWorker.ready.then(registration => {
+          registration.showNotification(title, { body: message, icon: "/logo.png" }).catch(e => console.log("Local notif error", e));
+        }).catch(() => { /* ignore */ });
       }
 
       await loadNotifications();
