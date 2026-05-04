@@ -410,21 +410,18 @@ export const db = {
     if (error) throw error;
     
     // Trigger push via Supabase Edge Function
-    // Pass the access token explicitly so the Edge Function can verify the caller
-    try {
-      const headers: Record<string, string> = {};
-      if (session?.access_token) {
-        headers['Authorization'] = `Bearer ${session.access_token}`;
-      }
-      const { error: pushError } = await supabase.functions.invoke('send-push', {
-        body: { title: notif.title, message: notif.message, target_audience: notif.target_audience },
-        headers,
-      });
-      if (pushError) {
-        console.warn("Push notification send failed:", pushError);
-      }
-    } catch (pushErr) {
-      console.warn("Push notification send failed:", pushErr);
+    const headers: Record<string, string> = {};
+    if (session?.access_token) {
+      headers['Authorization'] = `Bearer ${session.access_token}`;
+    }
+    const { error: pushError } = await supabase.functions.invoke('send-push', {
+      body: { title: notif.title, message: notif.message, target_audience: notif.target_audience },
+      headers,
+    });
+    
+    if (pushError) {
+      console.warn("Push notification send failed:", pushError);
+      throw new Error("تم حفظ الإشعار في السجل، ولكن فشل إرساله كإشعار منبثق للأجهزة. " + (pushError.message || ""));
     }
     
     return data as Notification;
