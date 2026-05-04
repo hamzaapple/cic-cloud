@@ -7,7 +7,7 @@ const corsHeaders = {
 };
 
 // ─── VAPID signing key ────────────────────────────────────────────────────────
-async function getVapidSigningKey(base64url: string) {
+async function getVapidKeys(base64url: string): Promise<{ signingKey: CryptoKey; publicKey: string }> {
   const std = base64url.replace(/-/g, "+").replace(/_/g, "/");
   const padding = "=".repeat((4 - (std.length % 4)) % 4);
   const binary = atob(std + padding);
@@ -32,7 +32,23 @@ async function getVapidSigningKey(base64url: string) {
     ["sign"]
   );
   const jwk = await crypto.subtle.exportKey("jwk", key);
-  return await importJWK(jwk, "ES256");
+  if (!jwk.x || !jwk.y) throw new Error("Invalid VAPID private key");
+
+  const publicBytes = new Uint8Array(65);
+  publicBytes[0] = 0x04;
+  publicBytes.set(b64UrlToBytes(jwk.x), 1);
+  publicBytes.set(b64UrlToBytes(jwk.y), 33);
+
+  return {
+    signingKey: (await importJWK(jwk, "ES256")) as CryptoKey,
+    publicKey: bytesToB64Url(publicBytes),
+  };
+}
+
+async function getConfiguredVapidKeys(): Promise<{ signingKey: CryptoKey; publicKey: string }> {
+  const vapidPrivateKeyB64 = Deno.env.get("VAPID_PRIVATE_KEY");
+  if (!vapidPrivateKeyB64) throw new Error("VAPID_PRIVATE_KEY not configured");
+  return getVapidKeys(vapidPrivateKeyB64);
 }
 
 // ─── Base64url helpers ────────────────────────────────────────────────────────
