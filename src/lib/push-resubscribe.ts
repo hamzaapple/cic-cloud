@@ -57,7 +57,7 @@ async function subscribeWithRetry(
       }
       return await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: expectedKey,
+        applicationServerKey: expectedKey.buffer.slice(0) as ArrayBuffer,
       });
     } catch (err) {
       lastErr = err;
