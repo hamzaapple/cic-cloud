@@ -79,8 +79,14 @@ self.addEventListener("notificationclick", (event) => {
   );
 });
 
-// ─── Push Subscription Change (handles key rotation) ──────────────────────
+// ─── Push Subscription Change (handles expiry/key rotation) ──────────────
 self.addEventListener("pushsubscriptionchange", (event) => {
-  console.log("[SW] Push subscription changed — re-subscribing...");
-  // The app will handle re-subscription on next load
+  console.log("[SW] Push subscription changed — notifying clients to re-subscribe");
+  event.waitUntil(
+    self.clients.matchAll({ includeUncontrolled: true, type: "window" }).then((clients) => {
+      clients.forEach((client) => {
+        client.postMessage({ type: "PUSH_SUBSCRIPTION_CHANGED" });
+      });
+    })
+  );
 });
