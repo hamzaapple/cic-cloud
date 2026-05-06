@@ -76,7 +76,14 @@ serve(async (req: Request) => {
     const staleIds: string[] = [];
 
     const sendPromises = subs.map(async (sub) => {
-      if (target_audience && target_audience !== "all" && sub.department && sub.department !== target_audience) {
+      // Filter: send if audience='all', OR sub has no dept, OR sub.dept='all', OR sub.dept matches audience
+      if (
+        target_audience &&
+        target_audience !== "all" &&
+        sub.department &&
+        sub.department !== "all" &&
+        sub.department !== target_audience
+      ) {
         return; // skip
       }
 
