@@ -40,20 +40,34 @@ const NotificationPrompt = () => {
         const askedAt = parseInt(localStorage.getItem(DENIED_KEY) || "0", 10);
         if (askedAt && Date.now() - askedAt < 7 * 24 * 60 * 60 * 1000) return;
 
-        // Wait a bit so we don't startle on first paint
-        await new Promise((r) => setTimeout(r, 2500));
+        // Browsers (esp. mobile/iOS) require a user gesture to show the permission prompt.
+        // Wait for the first interaction, then ask once.
+        const askOnGesture = async () => {
+          cleanup();
+          if (Notification.permission !== "default") {
+            if (Notification.permission === "granted") await ensureSubscribed();
+            return;
+          }
+          localStorage.setItem(ASKED_KEY, "1");
+          try {
+            const perm = await Notification.requestPermission();
+            if (perm === "granted") {
+              await ensureSubscribed();
+              toast({
+                title: lang === "ar" ? "تم تفعيل الإشعارات ✓" : "Notifications enabled ✓",
+                description: lang === "ar" ? "هتوصلك التنبيهات الجديدة." : "You'll receive new alerts.",
+              });
+            } else {
+              localStorage.setItem(DENIED_KEY, String(Date.now()));
+            }
+          } catch (e) {
+            console.warn("[Push] requestPermission failed:", e);
+          }
+        };
 
-        localStorage.setItem(ASKED_KEY, "1");
-        const perm = await Notification.requestPermission();
-        if (perm === "granted") {
-          await ensureSubscribed();
-          toast({
-            title: lang === "ar" ? "تم تفعيل الإشعارات ✓" : "Notifications enabled ✓",
-            description: lang === "ar" ? "هتوصلك التنبيهات الجديدة." : "You'll receive new alerts.",
-          });
-        } else {
-          localStorage.setItem(DENIED_KEY, String(Date.now()));
-        }
+        const events = ["pointerdown", "touchstart", "keydown", "click"];
+        const cleanup = () => events.forEach((ev) => window.removeEventListener(ev, askOnGesture));
+        events.forEach((ev) => window.addEventListener(ev, askOnGesture, { once: true, passive: true }));
       } catch (err) {
         console.warn("[Push] auto-prompt failed:", err);
       }
