@@ -104,13 +104,18 @@ const CoursePage = () => {
       // Set highlight
       setHighlightedMaterialId(sharedMaterialId);
 
-      // Scroll to the material after a brief delay for rendering
-      const scrollTimer = setTimeout(() => {
+      // Scroll to the material once it renders in the DOM
+      let attempts = 0;
+      const scrollInterval = setInterval(() => {
         const el = document.getElementById(`material-${sharedMaterialId}`);
         if (el) {
           el.scrollIntoView({ behavior: "smooth", block: "center" });
+          clearInterval(scrollInterval);
+        } else if (attempts > 15) {
+          clearInterval(scrollInterval);
         }
-      }, 400);
+        attempts++;
+      }, 200);
 
       // Clear highlight after 4 seconds
       highlightTimeoutRef.current = setTimeout(() => {
@@ -124,7 +129,7 @@ const CoursePage = () => {
       setSearchParams(newParams, { replace: true });
 
       return () => {
-        clearTimeout(scrollTimer);
+        clearInterval(scrollInterval);
         if (highlightTimeoutRef.current) clearTimeout(highlightTimeoutRef.current);
       };
     }
