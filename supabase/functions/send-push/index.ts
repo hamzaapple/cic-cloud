@@ -120,7 +120,9 @@ serve(async (req: Request) => {
         await webpush.sendNotification(pushSubscription, payload);
         return { success: true };
       } catch (err: any) {
-        if (err.statusCode === 404 || err.statusCode === 410) {
+        console.error(`[send-push] failed for ${sub.endpoint?.slice(0, 60)} status=${err?.statusCode} body=${err?.body || err?.message}`);
+        // Remove stale/invalid subs (gone, forbidden — wrong VAPID key, bad request)
+        if (err.statusCode === 404 || err.statusCode === 410 || err.statusCode === 403 || err.statusCode === 400) {
           staleIds.push(sub.id);
         }
         throw err;
