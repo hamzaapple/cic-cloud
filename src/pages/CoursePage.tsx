@@ -109,13 +109,16 @@ const CoursePage = () => {
       const scrollInterval = setInterval(() => {
         const el = document.getElementById(`material-${sharedMaterialId}`);
         if (el) {
-          el.scrollIntoView({ behavior: "smooth", block: "center" });
           clearInterval(scrollInterval);
-        } else if (attempts > 15) {
+          // Wait for framer-motion entrance animations to finish before scrolling
+          setTimeout(() => {
+            el.scrollIntoView({ behavior: "smooth", block: "center" });
+          }, 600);
+        } else if (attempts > 20) {
           clearInterval(scrollInterval);
         }
         attempts++;
-      }, 200);
+      }, 100);
 
       // Clear highlight after 4 seconds
       highlightTimeoutRef.current = setTimeout(() => {
