@@ -1,18 +1,23 @@
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Info } from "lucide-react"; // أيقونة للتنبيه
-import { useParams, Link } from "react-router-dom";
+import { Info, ArrowDownToLine } from "lucide-react"; // أيقونة للتنبيه
+import { useParams, Link, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { db } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
 import { useQuery } from "@tanstack/react-query";
 import MaterialCard from "@/components/MaterialCard";
-import { ArrowRight, ArrowLeft } from "lucide-react";
+import { ArrowRight, ArrowLeft, FolderDown } from "lucide-react";
+import { toast } from "sonner";
+import JSZip from "jszip";
 
 const CoursePage = () => {
   const { id } = useParams<{ id: string }>();
   const { t, tCourse, lang } = useI18n();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
+  const [highlightedMaterialId, setHighlightedMaterialId] = useState<string | null>(null);
+  const highlightTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { data: courses = [] } = useQuery({ queryKey: ["courses"], queryFn: db.getCourses });
   const { data: allMaterials = [] } = useQuery({ queryKey: ["materials", id], queryFn: () => db.getMaterials(id) });
@@ -31,6 +36,99 @@ const CoursePage = () => {
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
   const BackArrow = lang === "ar" ? ArrowRight : ArrowLeft;
+  const [isDownloadingAll, setIsDownloadingAll] = useState(false);
+
+  // Download all PDFs in current category as ZIP
+  const handleDownloadAllZip = async () => {
+    const pdfMaterials = materials.filter(m => m.pdf_url);
+    if (pdfMaterials.length === 0) {
+      toast.error(t("material.noFiles"));
+      return;
+    }
+    setIsDownloadingAll(true);
+    const toastId = "zip-download";
+    toast.loading(t("material.downloading"), { id: toastId });
+    try {
+      const zip = new JSZip();
+      let done = 0;
+      await Promise.all(
+        pdfMaterials.map(async (m) => {
+          try {
+            const res = await fetch(m.pdf_url!);
+            if (!res.ok) return;
+            const blob = await res.blob();
+            const fileName = m.pdf_display_name
+              ? `${m.pdf_display_name}.pdf`
+              : `${m.title}.pdf`;
+            zip.file(fileName, blob);
+            done++;
+            toast.loading(`${t("material.downloading")} (${done}/${pdfMaterials.length})`, { id: toastId });
+          } catch {
+            // skip failed files
+          }
+        })
+      );
+      if (Object.keys(zip.files).length === 0) {
+        toast.error(t("material.downloadFail"), { id: toastId });
+        return;
+      }
+      const content = await zip.generateAsync({ type: "blob" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(content);
+      const categoryObj = categories.find(c => c.id === activeCategory);
+      const catName = categoryObj ? (lang === "ar" ? categoryObj.name_ar : categoryObj.name_en) : "materials";
+      const courseName = course ? course.code : "course";
+      a.download = `${courseName}_${catName}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(a.href);
+      toast.success(t("material.downloadSuccess"), { id: toastId });
+    } catch {
+      toast.error(t("material.downloadFail"), { id: toastId });
+    } finally {
+      setIsDownloadingAll(false);
+    }
+  };
+
+  // Handle shared material link: auto-select category and highlight material
+  useEffect(() => {
+    const sharedMaterialId = searchParams.get("material");
+    const sharedCategoryId = searchParams.get("category");
+
+    if (sharedMaterialId && categories.length > 0) {
+      // Auto-select the category tab if provided
+      if (sharedCategoryId) {
+        setActiveCategoryId(sharedCategoryId);
+      }
+      // Set highlight
+      setHighlightedMaterialId(sharedMaterialId);
+
+      // Scroll to the material after a brief delay for rendering
+      const scrollTimer = setTimeout(() => {
+        const el = document.getElementById(`material-${sharedMaterialId}`);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 400);
+
+      // Clear highlight after 4 seconds
+      highlightTimeoutRef.current = setTimeout(() => {
+        setHighlightedMaterialId(null);
+      }, 4000);
+
+      // Clean the URL params so refreshing doesn't re-highlight
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete("material");
+      newParams.delete("category");
+      setSearchParams(newParams, { replace: true });
+
+      return () => {
+        clearTimeout(scrollTimer);
+        if (highlightTimeoutRef.current) clearTimeout(highlightTimeoutRef.current);
+      };
+    }
+  }, [categories, searchParams]);
 
   if (!course) {
     return (
@@ -77,12 +175,25 @@ const CoursePage = () => {
 
         <AnimatePresence mode="wait">
           <motion.div key={activeCategory} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-3">
+            {/* Download All ZIP button */}
+            {materials.some(m => m.pdf_url) && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-end mb-2">
+                <button
+                  onClick={handleDownloadAllZip}
+                  disabled={isDownloadingAll}
+                  className="flex items-center gap-2 text-xs font-medium px-4 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <FolderDown className="w-4 h-4" />
+                  {isDownloadingAll ? t("material.downloading") : t("material.downloadAll")}
+                </button>
+              </motion.div>
+            )}
             {materials.length === 0 ? (
               <div className="text-center py-16 text-muted-foreground">
                 {t("course.noMaterials")}
               </div>
             ) : (
-              materials.map((m, i) => <MaterialCard key={m.id} material={m} index={i} />)
+              materials.map((m, i) => <MaterialCard key={m.id} material={m} index={i} highlightedId={highlightedMaterialId} />)
             )}
           </motion.div>
         </AnimatePresence>

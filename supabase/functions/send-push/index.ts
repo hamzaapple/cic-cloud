@@ -13,20 +13,26 @@ serve(async (req: Request) => {
   try {
     const vapidPrivateKey = Deno.env.get("VAPID_PRIVATE_KEY");
     const vapidPublicKey = Deno.env.get("VAPID_PUBLIC_KEY");
+    let vapidSubject = Deno.env.get("VAPID_SUBJECT") || "mailto:admin@cic-cloud.app";
     
+    // Ensure VAPID_SUBJECT is a valid mailto: link
+    if (vapidSubject && !vapidSubject.startsWith("mailto:")) {
+      vapidSubject = `mailto:${vapidSubject}`;
+    }
+
     if (!vapidPrivateKey || !vapidPublicKey) {
       console.error("VAPID keys not configured in Edge Function env");
       return new Response(JSON.stringify({ error: "VAPID keys missing" }), { status: 500, headers: corsHeaders });
     }
 
     webpush.setVapidDetails(
-      "mailto:admin@cic-cloud.app",
+      vapidSubject,
       vapidPublicKey,
       vapidPrivateKey
     );
 
+    // Get VAPID public key for frontend
     if (req.method === "GET") {
-      const body = await req.json().catch(() => ({}));
       return new Response(JSON.stringify({ publicKey: vapidPublicKey }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -58,25 +64,38 @@ serve(async (req: Request) => {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: corsHeaders });
     }
 
-    const { title, message, target_audience } = body;
+    const { title, message, target_audience, link } = body;
     if (!title || !message) {
       return new Response(JSON.stringify({ error: "Missing title or message" }), { status: 400, headers: corsHeaders });
     }
 
     const supabase = createClient(Deno.env.get("SUPABASE_URL")!, serviceKey);
-    const { data: subs, error } = await supabase.from("push_subscriptions").select("*");
+    
+    // Fetch ALL subscriptions from the table
+    const { data: subs, error: subsError } = await supabase.from("push_subscriptions").select("*");
 
-    if (error || !subs || subs.length === 0) {
-      return new Response(JSON.stringify({ sent: 0, failed: 0, total: 0 }), { headers: corsHeaders });
+    if (subsError || !subs || subs.length === 0) {
+      console.log("No subscriptions found or error fetching them:", subsError);
+      return new Response(JSON.stringify({ sent: 0, failed: 0, total: 0 }), { 
+        headers: { ...corsHeaders, "Content-Type": "application/json" } 
+      });
     }
 
-    const payload = JSON.stringify({ title, message, icon: "/logo.png" });
-    let sent = 0;
-    let failed = 0;
+    const payload = JSON.stringify({ 
+      title, 
+      message, 
+      body: message,
+      icon: "/logo.png",
+      data: { url: link || "/" }
+    });
+
+    let sentCount = 0;
+    let failedCount = 0;
     const staleIds: string[] = [];
 
-    const sendPromises = subs.map(async (sub) => {
-      // Filter: send if audience='all', OR sub has no dept, OR sub.dept='all', OR sub.dept matches audience
+    // Use Promise.allSettled to handle multiple requests without failing the whole process
+    const results = await Promise.allSettled(subs.map(async (sub) => {
+      // Filter by department if target_audience is provided
       if (
         target_audience &&
         target_audience !== "all" &&
@@ -84,13 +103,12 @@ serve(async (req: Request) => {
         sub.department !== "all" &&
         sub.department !== target_audience
       ) {
-        return; // skip
+        return { skipped: true };
       }
 
       if (!sub.endpoint || !sub.p256dh || !sub.auth) {
         staleIds.push(sub.id);
-        failed++;
-        return;
+        return { failed: true, reason: "Missing subscription keys" };
       }
 
       const pushSubscription = {
@@ -100,23 +118,36 @@ serve(async (req: Request) => {
 
       try {
         await webpush.sendNotification(pushSubscription, payload);
-        sent++;
+        return { success: true };
       } catch (err: any) {
-        failed++;
         if (err.statusCode === 404 || err.statusCode === 410) {
           staleIds.push(sub.id);
         }
+        throw err;
+      }
+    }));
+
+    results.forEach((res) => {
+      if (res.status === "fulfilled") {
+        if ((res.value as any).success) sentCount++;
+        else if ((res.value as any).failed) failedCount++;
+      } else {
+        failedCount++;
       }
     });
 
-    await Promise.all(sendPromises);
-
+    // Cleanup stale subscriptions
     if (staleIds.length > 0) {
       await supabase.from("push_subscriptions").delete().in("id", staleIds);
     }
 
-    console.log(`Push completed: ${sent} sent, ${failed} failed / ${subs.length} total`);
-    return new Response(JSON.stringify({ sent, failed, cleaned: staleIds.length }), {
+    console.log(`Push completed: ${sentCount} sent, ${failedCount} failed / ${subs.length} total`);
+    return new Response(JSON.stringify({ 
+      sent: sentCount, 
+      failed: failedCount, 
+      cleaned: staleIds.length,
+      total: subs.length
+    }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {
@@ -124,3 +155,4 @@ serve(async (req: Request) => {
     return new Response(JSON.stringify({ error: String(err) }), { status: 500, headers: corsHeaders });
   }
 });
+

@@ -1,15 +1,25 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { AlertCircle, Clock, Volume2 } from "lucide-react";
+import { AlertCircle, Clock, Volume2, X } from "lucide-react";
 import { db, type Announcement, type Material, type Course } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
 import { differenceInHours } from "date-fns";
+
+const AUTO_DISMISS_MS = 10_000; // 10 seconds
 
 const AnnouncementBanner = () => {
   const { lang } = useI18n();
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [urgentAssignments, setUrgentAssignments] = useState<{ id: string; title: string; course: string; hoursLeft: number; minutesLeft: number }[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  // Track which banner sections have been dismissed (urgent / normal)
+  const [urgentDismissed, setUrgentDismissed] = useState(false);
+  const [normalDismissed, setNormalDismissed] = useState(false);
+
+  // Auto-dismiss timers
+  const urgentTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const normalTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -93,10 +103,34 @@ const AnnouncementBanner = () => {
     return () => clearInterval(timer);
   }, [urgentBannerItems.length, normalBannerItems.length]);
 
+  // Reset dismissed state when new data arrives (new announcements / assignments)
+  useEffect(() => {
+    if (urgentBannerItems.length > 0) setUrgentDismissed(false);
+    if (normalBannerItems.length > 0) setNormalDismissed(false);
+  }, [
+    // Only react to actual content changes, not re-renders
+    urgentBannerItems.map(i => i.id).join(","),
+    normalBannerItems.map(i => i.id).join(","),
+  ]);
+
+  // Auto-dismiss urgent banner after 10s
+  useEffect(() => {
+    if (urgentBannerItems.length === 0 || urgentDismissed) return;
+    urgentTimerRef.current = setTimeout(() => setUrgentDismissed(true), AUTO_DISMISS_MS);
+    return () => { if (urgentTimerRef.current) clearTimeout(urgentTimerRef.current); };
+  }, [urgentBannerItems.length, urgentDismissed]);
+
+  // Auto-dismiss normal banner after 10s
+  useEffect(() => {
+    if (normalBannerItems.length === 0 || normalDismissed) return;
+    normalTimerRef.current = setTimeout(() => setNormalDismissed(true), AUTO_DISMISS_MS);
+    return () => { if (normalTimerRef.current) clearTimeout(normalTimerRef.current); };
+  }, [normalBannerItems.length, normalDismissed]);
+
   if (allItems.length === 0) return null;
 
-  const urgentCurrent = urgentBannerItems.length > 0 ? urgentBannerItems[currentIndex % urgentBannerItems.length] : null;
-  const normalCurrent = normalBannerItems.length > 0 ? normalBannerItems[currentIndex % normalBannerItems.length] : null;
+  const urgentCurrent = (!urgentDismissed && urgentBannerItems.length > 0) ? urgentBannerItems[currentIndex % urgentBannerItems.length] : null;
+  const normalCurrent = (!normalDismissed && normalBannerItems.length > 0) ? normalBannerItems[currentIndex % normalBannerItems.length] : null;
 
   // Uppercase refs required for JSX component rendering
   const UrgentIcon = urgentCurrent?.icon;
@@ -104,8 +138,8 @@ const AnnouncementBanner = () => {
 
   return (
     <div className="fixed top-[7.5rem] left-0 right-0 z-40 flex flex-col items-center gap-3 px-4 pointer-events-none">
-      {urgentCurrent && (
-        <AnimatePresence mode="wait">
+      <AnimatePresence mode="wait">
+        {urgentCurrent && (
           <motion.div
             key={urgentCurrent.id}
             initial={{ opacity: 0, y: -40 }}
@@ -132,13 +166,21 @@ const AnnouncementBanner = () => {
                 ))}
               </div>
             )}
+            {/* Close button */}
+            <button
+              onClick={(e) => { e.stopPropagation(); setUrgentDismissed(true); }}
+              className="p-1 rounded-full hover:bg-red-500/20 transition-colors shrink-0"
+              title={lang === "ar" ? "إغلاق" : "Close"}
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
             </motion.div>
           </motion.div>
-        </AnimatePresence>
-      )}
+        )}
+      </AnimatePresence>
 
-      {normalCurrent && (
-        <AnimatePresence mode="wait">
+      <AnimatePresence mode="wait">
+        {normalCurrent && (
           <motion.div
             key={normalCurrent.id}
             initial={{ opacity: 0, y: -40 }}
@@ -161,9 +203,17 @@ const AnnouncementBanner = () => {
                 ))}
               </div>
             )}
+            {/* Close button */}
+            <button
+              onClick={(e) => { e.stopPropagation(); setNormalDismissed(true); }}
+              className="p-1 rounded-full hover:bg-secondary transition-colors shrink-0"
+              title={lang === "ar" ? "إغلاق" : "Close"}
+            >
+              <X className="w-3.5 h-3.5 text-muted-foreground" />
+            </button>
           </motion.div>
-        </AnimatePresence>
-      )}
+        )}
+      </AnimatePresence>
     </div>
   );
 };

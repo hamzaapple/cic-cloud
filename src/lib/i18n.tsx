@@ -126,6 +126,15 @@ const translations: Record<string, Record<Lang, string>> = {
   "material.expired": { ar: "انتهى", en: "Expired" },
   "material.downloadPdf": { ar: "تحميل PDF", en: "Download PDF" },
   "material.externalLink": { ar: "رابط خارجي", en: "External Link" },
+  "material.share": { ar: "مشاركة", en: "Share" },
+  "material.linkCopied": { ar: "تم نسخ رابط المشاركة! 📋", en: "Share link copied! 📋" },
+  "material.shareFail": { ar: "فشل نسخ الرابط", en: "Failed to copy link" },
+  "material.directDownload": { ar: "تحميل مباشر", en: "Download" },
+  "material.downloadAll": { ar: "تحميل الكل ZIP", en: "Download All ZIP" },
+  "material.downloading": { ar: "جاري التحميل...", en: "Downloading..." },
+  "material.downloadSuccess": { ar: "تم التحميل بنجاح! 📥", en: "Downloaded successfully! 📥" },
+  "material.downloadFail": { ar: "فشل التحميل", en: "Download failed" },
+  "material.noFiles": { ar: "لا توجد ملفات للتحميل", en: "No files to download" },
 
   // Moderators
   "mod.addModerator": { ar: "إضافة مشرف", en: "Add Moderator" },

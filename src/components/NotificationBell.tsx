@@ -77,15 +77,18 @@ const NotificationBell = () => {
       });
 
       const sub = subscription.toJSON();
-      const { error } = await supabase.from("push_subscriptions" as any).insert({
-        endpoint: subscription.endpoint,
-        p256dh: sub.keys?.p256dh || null,
-        auth: sub.keys?.auth || null,
-        user_agent: navigator.userAgent,
-        department: "all",
-      });
+      const { error } = await supabase.from("push_subscriptions" as any).upsert(
+        {
+          endpoint: subscription.endpoint,
+          p256dh: sub.keys?.p256dh || null,
+          auth: sub.keys?.auth || null,
+          user_agent: navigator.userAgent,
+          department: "all",
+        },
+        { onConflict: "endpoint" }
+      );
 
-      if (error && !String(error.message).includes("duplicate")) {
+      if (error) {
         console.error("Subscription save failed:", error);
       }
 

@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Calendar, Link2, Menu, X, BookOpen, CalendarDays, Globe, Volume2, VolumeX, MousePointer, MousePointerClick } from "lucide-react";
+import { Calendar, Link2, Menu, X, BookOpen, CalendarDays, Globe, Volume2, VolumeX } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import NotificationBell from "./NotificationBell";
 import { useState } from "react";
@@ -8,12 +8,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useI18n } from "@/lib/i18n";
 import { useSfx } from "@/hooks/use-sfx";
 
-interface Props {
-  cursorEnabled: boolean;
-  onToggleCursor: () => void;
-}
-
-const Navbar = ({ cursorEnabled, onToggleCursor }: Props) => {
+const Navbar = () => {
   const location = useLocation();
   const [open, setOpen] = useState(false);
   const isMobile = useIsMobile();
@@ -61,22 +56,6 @@ const Navbar = ({ cursorEnabled, onToggleCursor }: Props) => {
               {lang === "ar" ? (muted ? "تشغيل الصوت" : "كتم الصوت") : muted ? "Unmute" : "Mute"}
             </span>
           </div>
-          {!isMobile && (
-            <div className="relative group">
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={onToggleCursor}
-                className="p-2 rounded-lg bg-secondary text-secondary-foreground"
-                aria-label="Toggle cursor effect"
-              >
-                {cursorEnabled ? <MousePointerClick className="w-4 h-4" /> : <MousePointer className="w-4 h-4" />}
-              </motion.button>
-              <span className="pointer-events-none absolute top-full mt-2 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] px-2 py-1 rounded-md bg-popover text-popover-foreground border border-border shadow opacity-0 group-hover:opacity-100 transition-opacity">
-                {lang === "ar" ? (cursorEnabled ? "إلغاء تأثير المؤشر" : "تفعيل تأثير المؤشر") : "Cursor effect"}
-              </span>
-            </div>
-          )}
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}

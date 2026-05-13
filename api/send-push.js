@@ -1,13 +1,14 @@
 import webpush from 'web-push';
 import { createClient } from '@supabase/supabase-js';
 
-const VAPID_PUBLIC_KEY = 'BEZSVUlPSj3xA4Y0HLs0r_J0Gp2fgO5ahvk1HWgQiN2ZzfXbboDaIk1m4hu0Jg-kf7td36GjkgT6jkKXvHIrMxo';
-const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY;
+const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY || 'BEZSVUlPSj3xA4Y0HLs0r_J0Gp2fgO5ahvk1HWgQiN2ZzfXbboDaIk1m4hu0Jg-kf7td36GjkgT6jkKXvHIrMxo';
+const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY || 'mC8d90loIBkHrG8RekAG2vCsbaeT8PrumYLGaEgrsRg';
+const VAPID_SUBJECT = process.env.VAPID_SUBJECT || 'mailto:admin@cic-cloud.app';
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'https://fyuxsyqgpukeqvpmwzxn.supabase.co';
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
 webpush.setVapidDetails(
-  'mailto:cic-cloud@example.com',
+  VAPID_SUBJECT.startsWith('mailto:') ? VAPID_SUBJECT : `mailto:${VAPID_SUBJECT}`,
   VAPID_PUBLIC_KEY,
   VAPID_PRIVATE_KEY
 );

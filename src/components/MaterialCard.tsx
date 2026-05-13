@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { FileText, ExternalLink, Clock, Archive, Trash2, Download, Pencil, X, Save, Link } from "lucide-react";
+import { FileText, ExternalLink, Clock, Archive, Trash2, Download, Pencil, X, Save, Link, Share2, ArrowDownToLine } from "lucide-react";
 import type { Material, MaterialCategory, Course } from "@/lib/store";
 import { db } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
@@ -17,6 +17,7 @@ interface Props {
   isAdmin?: boolean;
   showDelete?: boolean;
   showEdit?: boolean;
+  highlightedId?: string | null;
   onArchive?: (id: string) => void;
   onDelete?: (id: string) => void;
   onUpdate?: () => void;
@@ -30,6 +31,7 @@ const MaterialCard = ({
   isAdmin,
   showDelete = true,
   showEdit = true,
+  highlightedId,
   onArchive,
   onDelete,
   onUpdate,
@@ -39,6 +41,7 @@ const MaterialCard = ({
   const { t, lang } = useI18n();
   const locale = lang === "ar" ? ar : enUS;
   const deadlinePast = material.deadline && isPast(new Date(material.deadline));
+  const isHighlighted = highlightedId === material.id;
 
   // Edit modal state
   const [editOpen, setEditOpen] = useState(false);
@@ -94,11 +97,13 @@ const MaterialCard = ({
   return (
     <>
       <motion.div
+        id={`material-${material.id}`}
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: Math.min(index * 0.03, 0.3), duration: 0.25, ease: "easeOut" }}
         whileHover={{ y: -4, scale: 1.01 }}
-        className={`glass-card rounded-xl p-5 group relative overflow-hidden ${material.archived ? "opacity-60" : ""}`}
+        className={`glass-card rounded-xl p-5 group relative overflow-hidden ${material.archived ? "opacity-60" : ""} ${isHighlighted ? "ring-2 ring-primary ring-offset-2 ring-offset-background animate-pulse" : ""}`}
+        style={isHighlighted ? { animationDuration: "1.5s", animationIterationCount: "3" } : undefined}
       >
         <div className="absolute top-0 start-0 w-1 h-full bg-primary rounded-s-xl opacity-60 group-hover:opacity-100 transition-opacity" />
 
@@ -138,6 +143,58 @@ const MaterialCard = ({
                 <a href={material.external_link} target="_blank" rel="noopener noreferrer" onClick={() => playClickSfx()} className="flex items-center gap-1 text-primary hover:underline">
                   <ExternalLink className="w-3 h-3" /> {t("material.externalLink")}
                 </a>
+              )}
+              {/* Share button — visible to everyone */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  playClickSfx();
+                  const url = new URL(window.location.origin + `/course/${material.course_id}`);
+                  if (material.category_id) url.searchParams.set("category", material.category_id);
+                  url.searchParams.set("material", material.id);
+                  navigator.clipboard.writeText(url.toString()).then(() => {
+                    toast.success(t("material.linkCopied"));
+                  }).catch(() => {
+                    toast.error(t("material.shareFail"));
+                  });
+                }}
+                title={t("material.share")}
+                className="flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+              >
+                <Share2 className="w-3 h-3" />
+                <span>{t("material.share")}</span>
+              </button>
+              {/* Direct download button — for materials with PDF */}
+              {material.pdf_url && (
+                <button
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    playClickSfx();
+                    try {
+                      toast.loading(t("material.downloading"), { id: `dl-${material.id}` });
+                      const res = await fetch(material.pdf_url!);
+                      if (!res.ok) throw new Error("fetch failed");
+                      const blob = await res.blob();
+                      const a = document.createElement("a");
+                      a.href = URL.createObjectURL(blob);
+                      a.download = material.pdf_display_name
+                        ? `${material.pdf_display_name}.pdf`
+                        : `${material.title}.pdf`;
+                      document.body.appendChild(a);
+                      a.click();
+                      a.remove();
+                      URL.revokeObjectURL(a.href);
+                      toast.success(t("material.downloadSuccess"), { id: `dl-${material.id}` });
+                    } catch {
+                      toast.error(t("material.downloadFail"), { id: `dl-${material.id}` });
+                    }
+                  }}
+                  title={t("material.directDownload")}
+                  className="flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+                >
+                  <ArrowDownToLine className="w-3 h-3" />
+                  <span>{t("material.directDownload")}</span>
+                </button>
               )}
             </div>
 
