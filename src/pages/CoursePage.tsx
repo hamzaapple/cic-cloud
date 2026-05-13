@@ -104,6 +104,16 @@ const CoursePage = () => {
       // Set highlight
       setHighlightedMaterialId(sharedMaterialId);
 
+      // Clean the URL params so refreshing doesn't re-highlight
+      const cleanUrlParams = () => {
+        const newParams = new URLSearchParams(searchParams);
+        if (newParams.has("material")) {
+          newParams.delete("material");
+          newParams.delete("category");
+          setSearchParams(newParams, { replace: true });
+        }
+      };
+
       // Scroll to the material once it renders in the DOM
       let attempts = 0;
       const scrollInterval = setInterval(() => {
@@ -114,22 +124,18 @@ const CoursePage = () => {
           setTimeout(() => {
             el.scrollIntoView({ behavior: "smooth", block: "center" });
           }, 600);
-        } else if (attempts > 20) {
+          cleanUrlParams();
+        } else if (attempts > 100) { // Try for 10 seconds (100 * 100ms)
           clearInterval(scrollInterval);
+          cleanUrlParams();
         }
         attempts++;
       }, 100);
 
-      // Clear highlight after 4 seconds
+      // Clear highlight after 5 seconds
       highlightTimeoutRef.current = setTimeout(() => {
         setHighlightedMaterialId(null);
-      }, 4000);
-
-      // Clean the URL params so refreshing doesn't re-highlight
-      const newParams = new URLSearchParams(searchParams);
-      newParams.delete("material");
-      newParams.delete("category");
-      setSearchParams(newParams, { replace: true });
+      }, 5000);
 
       return () => {
         clearInterval(scrollInterval);

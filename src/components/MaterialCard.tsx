@@ -152,11 +152,31 @@ const MaterialCard = ({
                   const url = new URL(window.location.origin + `/course/${material.course_id}`);
                   if (material.category_id) url.searchParams.set("category", material.category_id);
                   url.searchParams.set("material", material.id);
-                  navigator.clipboard.writeText(url.toString()).then(() => {
-                    toast.success(t("material.linkCopied"));
-                  }).catch(() => {
-                    toast.error(t("material.shareFail"));
-                  });
+                  
+                  const shareTitle = material.title;
+                  const shareText = lang === "ar" ? `شاهد "${material.title}" على منصة CIC Cloud` : `Check out "${material.title}" on CIC Cloud`;
+                  const shareUrl = url.toString();
+
+                  if (navigator.share) {
+                    navigator.share({
+                      title: shareTitle,
+                      text: shareText,
+                      url: shareUrl,
+                    }).catch(() => {
+                      // Fallback to clipboard if share gets aborted
+                      const clipboardText = `${shareTitle}\n${shareUrl}`;
+                      navigator.clipboard.writeText(clipboardText).then(() => {
+                        toast.success(t("material.linkCopied"));
+                      });
+                    });
+                  } else {
+                    const clipboardText = `${shareTitle}\n${shareUrl}`;
+                    navigator.clipboard.writeText(clipboardText).then(() => {
+                      toast.success(t("material.linkCopied"));
+                    }).catch(() => {
+                      toast.error(t("material.shareFail"));
+                    });
+                  }
                 }}
                 title={t("material.share")}
                 className="flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
