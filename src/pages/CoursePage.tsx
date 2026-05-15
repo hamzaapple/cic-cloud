@@ -51,15 +51,28 @@ const CoursePage = () => {
     try {
       const zip = new JSZip();
       let done = 0;
+      const usedNames = new Set<string>();
+      
       await Promise.all(
         pdfMaterials.map(async (m) => {
           try {
             const res = await fetch(m.pdf_url!);
             if (!res.ok) return;
             const blob = await res.blob();
-            const fileName = m.pdf_display_name
-              ? `${m.pdf_display_name}.pdf`
-              : `${m.title}.pdf`;
+            
+            let baseName = m.pdf_display_name || m.title || "material";
+            if (baseName.toLowerCase().endsWith(".pdf")) {
+              baseName = baseName.slice(0, -4);
+            }
+            
+            let fileName = `${baseName}.pdf`;
+            let counter = 1;
+            while (usedNames.has(fileName)) {
+              fileName = `${baseName} (${counter}).pdf`;
+              counter++;
+            }
+            usedNames.add(fileName);
+
             zip.file(fileName, blob);
             done++;
             toast.loading(`${t("material.downloading")} (${done}/${pdfMaterials.length})`, { id: toastId });
