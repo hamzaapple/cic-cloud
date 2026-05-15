@@ -60,7 +60,7 @@ const CoursePage = () => {
             if (!res.ok) return;
             const blob = await res.blob();
             
-            let baseName = m.pdf_display_name || m.title || "material";
+            let baseName = m.title || m.pdf_display_name || "material";
             if (baseName.toLowerCase().endsWith(".pdf")) {
               baseName = baseName.slice(0, -4);
             }
@@ -90,8 +90,8 @@ const CoursePage = () => {
       a.href = URL.createObjectURL(content);
       const categoryObj = categories.find(c => c.id === activeCategory);
       const catName = categoryObj ? (lang === "ar" ? categoryObj.name_ar : categoryObj.name_en) : "materials";
-      const courseName = course ? course.code : "course";
-      a.download = `${courseName}_${catName}.zip`;
+      const courseNameStr = course ? tCourse(course.name) : "course";
+      a.download = `${catName} (${courseNameStr}).zip`;
       document.body.appendChild(a);
       a.click();
       a.remove();
