@@ -14,7 +14,6 @@ import JSZip from "jszip";
 const CoursePage = () => {
   const { id } = useParams<{ id: string }>();
   const { t, tCourse, lang } = useI18n();
-  const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeCategoryId, setActiveCategoryIdRaw] = useState<string | null>(
     () => searchParams.get("category") || null
