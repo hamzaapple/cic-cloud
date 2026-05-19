@@ -7,7 +7,7 @@ import { db } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
 import { useQuery } from "@tanstack/react-query";
 import MaterialCard from "@/components/MaterialCard";
-import { ArrowRight, ArrowLeft, FolderDown } from "lucide-react";
+import { ArrowRight, ArrowLeft, FolderDown, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import JSZip from "jszip";
 
@@ -15,8 +15,22 @@ const CoursePage = () => {
   const { id } = useParams<{ id: string }>();
   const { t, tCourse, lang } = useI18n();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
+  const [activeCategoryId, setActiveCategoryIdRaw] = useState<string | null>(
+    () => searchParams.get("category") || null
+  );
   const [highlightedMaterialId, setHighlightedMaterialId] = useState<string | null>(null);
+
+  // Wrapper that keeps the URL in sync with the active tab
+  const setActiveCategoryId = (catId: string) => {
+    setActiveCategoryIdRaw(catId);
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev);
+      next.set("category", catId);
+      // remove material highlight param when just switching tabs
+      next.delete("material");
+      return next;
+    }, { replace: true });
+  };
   const highlightTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { data: courses = [] } = useQuery({ queryKey: ["courses"], queryFn: db.getCourses });
@@ -157,6 +171,41 @@ const CoursePage = () => {
     }
   }, [categories, searchParams]);
 
+  // ─── Share Category Link ───
+  const handleShareCategory = async () => {
+    const categoryObj = categories.find(c => c.id === activeCategory);
+    const catName = categoryObj ? (lang === "ar" ? categoryObj.name_ar : categoryObj.name_en) : "";
+    const courseName = course ? tCourse(course.name) : "";
+    const shareTitle = lang === "ar"
+      ? `${catName} — ${courseName}`
+      : `Check out the ${catName} materials for ${courseName}`;
+
+    // Build URL with the current category param
+    const url = new URL(window.location.href);
+    url.searchParams.set("category", activeCategory);
+    url.searchParams.delete("material"); // clean up stale params
+    const shareUrl = url.toString();
+
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: shareTitle, url: shareUrl });
+      } else {
+        await navigator.clipboard.writeText(shareUrl);
+        toast.success(lang === "ar" ? "تم نسخ رابط القسم! 📋" : "Category link copied to clipboard! 📋");
+      }
+    } catch (err: any) {
+      // User cancelled the native share dialog — not an error
+      if (err?.name !== "AbortError") {
+        try {
+          await navigator.clipboard.writeText(shareUrl);
+          toast.success(lang === "ar" ? "تم نسخ رابط القسم! 📋" : "Category link copied to clipboard! 📋");
+        } catch {
+          toast.error(lang === "ar" ? "فشل نسخ الرابط" : "Failed to copy link");
+        }
+      }
+    }
+  };
+
   if (!course) {
     return (
       <div className="min-h-screen pt-24 flex items-center justify-center">
@@ -185,19 +234,28 @@ const CoursePage = () => {
           <p className="text-muted-foreground mt-1">{course.description}</p>
         </motion.div>
 
-        {/* Dynamic tabs from DB */}
-        <div className="flex gap-1 mb-8 bg-secondary/50 rounded-xl p-1 overflow-x-auto">
-          {categories.map(cat => (
-            <button
-              key={cat.id}
-              onClick={() => setActiveCategoryId(cat.id)}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
-                activeCategory === cat.id ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {lang === "ar" ? cat.name_ar : cat.name_en}
-            </button>
-          ))}
+        {/* Dynamic tabs from DB + Share button */}
+        <div className="flex items-center gap-2 mb-8">
+          <div className="flex gap-1 flex-1 bg-secondary/50 rounded-xl p-1 overflow-x-auto">
+            {categories.map(cat => (
+              <button
+                key={cat.id}
+                onClick={() => setActiveCategoryId(cat.id)}
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
+                  activeCategory === cat.id ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {lang === "ar" ? cat.name_ar : cat.name_en}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={handleShareCategory}
+            title={lang === "ar" ? "مشاركة القسم" : "Share Category"}
+            className="shrink-0 p-2.5 rounded-xl bg-secondary/50 text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
+          >
+            <Share2 className="w-4 h-4" />
+          </button>
         </div>
 
         <AnimatePresence mode="wait">
