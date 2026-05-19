@@ -2,56 +2,14 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Info, ArrowDownToLine } from "lucide-react"; // أيقونة للتنبيه
 import { useParams, Link, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect, useRef, useCallback } from "react";
-import { db, auth } from "@/lib/store";
-import type { Material } from "@/lib/store";
+import { useState, useEffect, useRef } from "react";
+import { db } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import MaterialCard from "@/components/MaterialCard";
 import { ArrowRight, ArrowLeft, FolderDown, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import JSZip from "jszip";
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-} from "@dnd-kit/core";
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-
-// ─── Sortable Wrapper for MaterialCard ───
-function SortableMaterialCard({ material, index, highlightedId }: { material: Material; index: number; highlightedId: string | null }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: material.id });
-  const style: React.CSSProperties = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : undefined,
-    zIndex: isDragging ? 50 : undefined,
-    position: "relative" as const,
-  };
-  return (
-    <div ref={setNodeRef}>
-      <MaterialCard
-        material={material}
-        index={index}
-        highlightedId={highlightedId}
-        dragHandleListeners={listeners}
-        dragHandleAttributes={attributes}
-        style={style}
-      />
-    </div>
-  );
-}
 
 const CoursePage = () => {
   const { id } = useParams<{ id: string }>();
@@ -84,67 +42,13 @@ const CoursePage = () => {
   });
 
   const course = courses.find(c => c.id === id);
-  const isAdmin = auth.isLoggedIn();
 
   // Set default active category
   const activeCategory = activeCategoryId || categories[0]?.id || "";
 
-  // Filter + sort materials (sort_order from DB is already applied by the query;
-  // fallback to created_at DESC for materials without sort_order)
-  const filteredMaterials = allMaterials
+  // Materials are already sorted by sort_order from the DB query
+  const materials = allMaterials
     .filter(m => !m.archived && m.category_id === activeCategory);
-
-  // ─── Local ordered state for DnD (synced from query data) ───
-  const [orderedMaterials, setOrderedMaterials] = useState<Material[]>([]);
-  const [isSavingOrder, setIsSavingOrder] = useState(false);
-
-  // Sync orderedMaterials when query data or category changes
-  useEffect(() => {
-    setOrderedMaterials(filteredMaterials);
-  }, [allMaterials, activeCategory]);
-
-  // Use orderedMaterials for rendering (DnD-aware) instead of filteredMaterials
-  const materials = orderedMaterials;
-
-  // ─── DnD sensors & handler ───
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
-  );
-
-  const handleDragEnd = useCallback(async (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-
-    const oldIndex = orderedMaterials.findIndex(m => m.id === active.id);
-    const newIndex = orderedMaterials.findIndex(m => m.id === over.id);
-    if (oldIndex === -1 || newIndex === -1) return;
-
-    const reordered = arrayMove(orderedMaterials, oldIndex, newIndex);
-    const previousOrder = [...orderedMaterials];
-
-    // Optimistic update
-    setOrderedMaterials(reordered);
-
-    // Persist to DB
-    setIsSavingOrder(true);
-    const toastId = "reorder-save";
-    toast.loading(lang === "ar" ? "جاري حفظ الترتيب..." : "Saving order...", { id: toastId });
-
-    try {
-      await db.reorderMaterials(reordered.map(m => m.id));
-      toast.success(lang === "ar" ? "تم حفظ الترتيب ✅" : "Order saved ✅", { id: toastId });
-      // Refresh query cache so other views stay in sync
-      queryClient.invalidateQueries({ queryKey: ["materials", id] });
-    } catch (err) {
-      console.error("Reorder failed:", err);
-      // Rollback to previous order
-      setOrderedMaterials(previousOrder);
-      toast.error(lang === "ar" ? "فشل حفظ الترتيب" : "Failed to save order", { id: toastId });
-    } finally {
-      setIsSavingOrder(false);
-    }
-  }, [orderedMaterials, lang, id, queryClient]);
 
   const BackArrow = lang === "ar" ? ArrowRight : ArrowLeft;
   const [isDownloadingAll, setIsDownloadingAll] = useState(false);
@@ -374,19 +278,7 @@ const CoursePage = () => {
               <div className="text-center py-16 text-muted-foreground">
                 {t("course.noMaterials")}
               </div>
-            ) : isAdmin ? (
-              /* ── Admin: DnD-enabled sortable list ── */
-              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                <SortableContext items={materials.map(m => m.id)} strategy={verticalListSortingStrategy}>
-                  <div className="space-y-3">
-                    {materials.map((m, i) => (
-                      <SortableMaterialCard key={m.id} material={m} index={i} highlightedId={highlightedMaterialId} />
-                    ))}
-                  </div>
-                </SortableContext>
-              </DndContext>
             ) : (
-              /* ── Regular user: static list ── */
               materials.map((m, i) => <MaterialCard key={m.id} material={m} index={i} highlightedId={highlightedMaterialId} />)
             )}
           </motion.div>
