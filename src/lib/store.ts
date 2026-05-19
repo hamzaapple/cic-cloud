@@ -58,6 +58,7 @@ export interface Material {
   deadline?: string | null;
   is_assignment: boolean;
   archived: boolean;
+  sort_order?: number | null;
   created_at: string;
 }
 
@@ -250,7 +251,9 @@ export const db = {
 
   // Materials
   getMaterials: async (courseId?: string): Promise<Material[]> => {
-    let query = supabase.from("materials").select("*").order("created_at", { ascending: false });
+    let query = supabase.from("materials").select("*")
+      .order("sort_order", { ascending: true, nullsFirst: false })
+      .order("created_at", { ascending: false });
     if (courseId) query = query.eq("course_id", courseId);
     const { data } = await query;
     return (data || []) as Material[];
@@ -262,6 +265,7 @@ export const db = {
     const courseIds = courses.map(c => c.id);
     const { data } = await supabase.from("materials").select("*")
       .in("course_id", courseIds)
+      .order("sort_order", { ascending: true, nullsFirst: false })
       .order("created_at", { ascending: false });
     return (data || []) as Material[];
   },
@@ -306,6 +310,16 @@ export const db = {
   deleteMaterial: async (id: string) => {
     const { error } = await supabase.from("materials").delete().eq("id", id);
     if (error) throw error;
+  },
+  /** Batch-update sort_order for a list of material IDs (index = order). */
+  reorderMaterials: async (orderedIds: string[]) => {
+    // Update each material's sort_order to its index position
+    const updates = orderedIds.map((id, index) =>
+      supabase.from("materials").update({ sort_order: index }).eq("id", id)
+    );
+    const results = await Promise.all(updates);
+    const failed = results.find(r => r.error);
+    if (failed?.error) throw failed.error;
   },
 
   // Links

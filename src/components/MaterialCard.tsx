@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { FileText, ExternalLink, Clock, Archive, Trash2, Download, Pencil, X, Save, Link, Share2, ArrowDownToLine } from "lucide-react";
+import { FileText, ExternalLink, Clock, Archive, Trash2, Download, Pencil, X, Save, Link, Share2, ArrowDownToLine, GripVertical } from "lucide-react";
 import type { Material, MaterialCategory, Course } from "@/lib/store";
 import { db } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
@@ -23,6 +23,10 @@ interface Props {
   onUpdate?: () => void;
   categories?: MaterialCategory[];
   courses?: Course[];
+  // DnD handle props (from useSortable)
+  dragHandleListeners?: Record<string, Function>;
+  dragHandleAttributes?: Record<string, any>;
+  style?: React.CSSProperties;
 }
 
 const MaterialCard = ({
@@ -37,6 +41,9 @@ const MaterialCard = ({
   onUpdate,
   categories = [],
   courses = [],
+  dragHandleListeners,
+  dragHandleAttributes,
+  style,
 }: Props) => {
   const { t, lang } = useI18n();
   const locale = lang === "ar" ? ar : enUS;
@@ -103,9 +110,21 @@ const MaterialCard = ({
         transition={{ delay: Math.min(index * 0.03, 0.3), duration: 0.25, ease: "easeOut" }}
         whileHover={{ y: -4, scale: 1.01 }}
         className={`glass-card rounded-xl p-5 group relative overflow-hidden ${material.archived ? "opacity-60" : ""} ${isHighlighted ? "ring-2 ring-primary ring-offset-2 ring-offset-background animate-pulse" : ""}`}
-        style={isHighlighted ? { animationDuration: "1.5s", animationIterationCount: "3" } : undefined}
+        style={{ ...style, ...(isHighlighted ? { animationDuration: "1.5s", animationIterationCount: "3" } : {}) }}
       >
-        <div className="absolute top-0 start-0 w-1 h-full bg-primary rounded-s-xl opacity-60 group-hover:opacity-100 transition-opacity" />
+        {/* Drag handle — only shown when DnD props are provided */}
+        {dragHandleListeners && (
+          <button
+            type="button"
+            {...dragHandleListeners}
+            {...dragHandleAttributes}
+            className="absolute top-0 start-0 h-full w-6 flex items-center justify-center cursor-grab active:cursor-grabbing text-muted-foreground/40 hover:text-muted-foreground transition-colors z-10"
+            tabIndex={-1}
+          >
+            <GripVertical className="w-4 h-4" />
+          </button>
+        )}
+        <div className={`absolute top-0 start-0 w-1 h-full bg-primary rounded-s-xl opacity-60 group-hover:opacity-100 transition-opacity ${dragHandleListeners ? "ms-6" : ""}`} />
 
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
