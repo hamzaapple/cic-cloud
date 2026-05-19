@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import MaterialCard from "@/components/MaterialCard";
-import { LogOut, Plus, Bell, Link2, Upload, Trash2, BookPlus, Users, Layers } from "lucide-react";
+import { LogOut, Plus, Bell, Link2, Upload, Trash2, BookPlus, Users, Layers, FolderUp } from "lucide-react";
 import { toast } from "sonner";
 import ManageModerators from "@/components/admin/ManageModerators";
 import CourseManager from "@/components/admin/CourseManager";
@@ -122,6 +122,11 @@ const AdminDashboard = () => {
   const [pdfMode, setPdfMode] = useState<"upload" | "url">("upload");
   const [uploading, setUploading] = useState(false);
 
+  // Bulk folder upload state
+  const [isFolderMode, setIsFolderMode] = useState(false);
+  const [bulkProgress, setBulkProgress] = useState(0);
+  const [bulkTotal, setBulkTotal] = useState(0);
+
   // Find assignment category
   const assignmentCategory = categories.find(c => c.name_en === "Assignments");
   const isAssignment = categoryId === assignmentCategory?.id;
@@ -200,6 +205,96 @@ const AdminDashboard = () => {
     } finally {
       setUploading(false);
     }
+  };
+
+  // ─── Bulk Folder Upload Handler ───
+  const handleBulkFolderUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const fileList = e.target.files;
+    if (!fileList || fileList.length === 0) return;
+
+    if (!courseId) {
+      toast.error(t("admin.bulkSelectCourseCategory"));
+      e.target.value = "";
+      return;
+    }
+
+    // Filter to PDF files only
+    const pdfFiles = Array.from(fileList).filter(
+      (f) => f.type === "application/pdf" || f.name.toLowerCase().endsWith(".pdf")
+    );
+
+    if (pdfFiles.length === 0) {
+      toast.warning(t("admin.bulkNoPdfs"));
+      e.target.value = "";
+      return;
+    }
+
+    setUploading(true);
+    setBulkTotal(pdfFiles.length);
+    setBulkProgress(0);
+
+    let successCount = 0;
+    let errorCount = 0;
+
+    for (let i = 0; i < pdfFiles.length; i++) {
+      const file = pdfFiles[i];
+      setBulkProgress(i + 1);
+
+      // Derive a user-friendly title from the original file name (without extension)
+      const originalName = file.name;
+      const friendlyTitle = originalName.replace(/\.pdf$/i, "");
+
+      try {
+        // Upload with sanitized storage path
+        const pdfUrl = await db.uploadPdfSanitized(file);
+
+        // Insert into materials table
+        await db.addMaterial({
+          title: friendlyTitle,
+          course_id: courseId,
+          type: "lecture",
+          category_id: categoryId || null,
+          pdf_url: pdfUrl,
+          pdf_display_name: friendlyTitle,
+          external_link: null,
+          submission_link: null,
+          deadline: null,
+          is_assignment: false,
+        });
+
+        successCount++;
+      } catch (err) {
+        console.error(`Bulk upload failed for "${originalName}":`, err);
+        errorCount++;
+      }
+    }
+
+    // Refresh data once after all uploads
+    await loadData();
+
+    if (errorCount === 0) {
+      toast.success(`${t("admin.bulkUploadDone")} (${successCount})`);
+    } else {
+      toast.warning(`${t("admin.bulkUploadPartial")} — ✅ ${successCount} / ❌ ${errorCount}`);
+    }
+
+    // Fire a single summary notification (fire-and-forget)
+    const course = courses.find(c => c.id === courseId);
+    const courseName = course?.name || "";
+    const catName = categories.find(c => c.id === categoryId);
+    const typeLabel = catName ? (lang === "ar" ? catName.name_ar : catName.name_en) : "";
+    db.addNotification({
+      title: `تم رفع ${successCount} ${typeLabel} جديدة`,
+      message: `في مقرر ${courseName}`,
+      target_audience: "all",
+      sent_by: "system",
+    }).catch(err => console.warn("Auto-notification failed (bulk upload):", err));
+
+    // Reset state
+    setUploading(false);
+    setBulkProgress(0);
+    setBulkTotal(0);
+    e.target.value = "";
   };
 
   const handleAddLink = async (e: React.FormEvent) => {
@@ -309,17 +404,59 @@ const AdminDashboard = () => {
                     <div className="space-y-2">
                       <p className="text-sm font-medium text-muted-foreground">{t("admin.pdfFile")}</p>
                       <div className="flex gap-1 bg-secondary/30 rounded-lg p-0.5">
-                        <button type="button" onClick={() => setPdfMode("upload")}
-                          className={`flex-1 text-xs py-1.5 rounded-md transition-all ${pdfMode === "upload" ? "bg-card shadow-sm text-foreground" : "text-muted-foreground"}`}>
+                        <button type="button" onClick={() => { setPdfMode("upload"); setIsFolderMode(false); }}
+                          className={`flex-1 text-xs py-1.5 rounded-md transition-all ${pdfMode === "upload" && !isFolderMode ? "bg-card shadow-sm text-foreground" : "text-muted-foreground"}`}>
                           {t("admin.uploadFile")}
                         </button>
-                        <button type="button" onClick={() => setPdfMode("url")}
+                        <button type="button" onClick={() => { setPdfMode("upload"); setIsFolderMode(true); }}
+                          className={`flex-1 text-xs py-1.5 rounded-md transition-all flex items-center justify-center gap-1 ${isFolderMode ? "bg-card shadow-sm text-foreground" : "text-muted-foreground"}`}>
+                          <FolderUp className="w-3 h-3" />
+                          {t("admin.bulkFolderUpload")}
+                        </button>
+                        <button type="button" onClick={() => { setPdfMode("url"); setIsFolderMode(false); }}
                           className={`flex-1 text-xs py-1.5 rounded-md transition-all ${pdfMode === "url" ? "bg-card shadow-sm text-foreground" : "text-muted-foreground"}`}>
                           {t("admin.directLink")}
                         </button>
                       </div>
 
-                      {pdfMode === "upload" ? (
+                      {isFolderMode ? (
+                        <div className="space-y-2">
+                          <div className="relative">
+                            <input
+                              id="folder-upload"
+                              type="file"
+                              // @ts-ignore — webkitdirectory is non-standard but widely supported
+                              webkitdirectory=""
+                              directory=""
+                              multiple
+                              onChange={handleBulkFolderUpload}
+                              disabled={uploading}
+                              className="block w-full text-xs file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed bg-secondary/50 rounded-lg py-2 px-3 border border-input"
+                            />
+                          </div>
+                          <p className="text-[11px] text-muted-foreground leading-relaxed">
+                            {lang === "ar"
+                              ? "سيتم رفع ملفات PDF فقط من المجلد. الملفات الأخرى سيتم تجاهلها."
+                              : "Only PDF files from the folder will be uploaded. Other files will be ignored."}
+                          </p>
+                          {uploading && bulkTotal > 0 && (
+                            <div className="space-y-1.5">
+                              <div className="flex items-center justify-between text-xs">
+                                <span className="text-primary font-medium">
+                                  {t("admin.bulkUploadProgress")} {bulkProgress} {t("admin.bulkUploadOf")} {bulkTotal} {t("admin.bulkUploadFiles")}...
+                                </span>
+                                <span className="text-muted-foreground">{Math.round((bulkProgress / bulkTotal) * 100)}%</span>
+                              </div>
+                              <div className="w-full bg-secondary rounded-full h-2 overflow-hidden">
+                                <div
+                                  className="h-full bg-primary rounded-full transition-all duration-300 ease-out"
+                                  style={{ width: `${(bulkProgress / bulkTotal) * 100}%` }}
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ) : pdfMode === "upload" ? (
                         <div className="space-y-1">
                           <Input id="pdf-upload" type="file" accept=".pdf" onChange={e => setPdfFile(e.target.files?.[0] || null)} className="bg-secondary/50" />
                           {pdfFile && <p className="text-xs text-primary">{pdfFile.name}</p>}
@@ -327,7 +464,9 @@ const AdminDashboard = () => {
                       ) : (
                         <Input placeholder={t("admin.pdfDirectLink")} value={pdfExternalUrl} onChange={e => setPdfExternalUrl(e.target.value)} className="bg-secondary/50" />
                       )}
-                      <Input placeholder={t("admin.pdfDisplayName")} value={pdfDisplayName} onChange={e => setPdfDisplayName(e.target.value)} className="bg-secondary/50" />
+                      {!isFolderMode && (
+                        <Input placeholder={t("admin.pdfDisplayName")} value={pdfDisplayName} onChange={e => setPdfDisplayName(e.target.value)} className="bg-secondary/50" />
+                      )}
                     </div>
 
                     {!isPdfOnly && categoryId !== assignmentCategory?.id && (
@@ -366,9 +505,11 @@ const AdminDashboard = () => {
                         />
                       </div>
                     )}
-                    <Button type="submit" className="w-full" disabled={uploading}>
-                      {uploading ? t("admin.uploading") : t("admin.upload")}
-                    </Button>
+                    {!isFolderMode && (
+                      <Button type="submit" className="w-full" disabled={uploading}>
+                        {uploading ? t("admin.uploading") : t("admin.upload")}
+                      </Button>
+                    )}
                   </form>
                 </div>
               </motion.div>

@@ -97,6 +97,14 @@ const translations: Record<string, Record<Lang, string>> = {
   "admin.linkDeleted": { ar: "تم حذف الرابط", en: "Link deleted" },
   "admin.loggedOut": { ar: "تم تسجيل الخروج", en: "Logged out" },
   "admin.deadlineRequired": { ar: "الموعد النهائي مطلوب للتكليفات", en: "Deadline is required for assignments" },
+  "admin.bulkFolderUpload": { ar: "رفع مجلد كامل", en: "Upload Whole Folder" },
+  "admin.bulkUploadProgress": { ar: "جاري الرفع", en: "Uploading" },
+  "admin.bulkUploadOf": { ar: "من", en: "of" },
+  "admin.bulkUploadFiles": { ar: "ملفات", en: "files" },
+  "admin.bulkUploadDone": { ar: "تم رفع جميع الملفات بنجاح!", en: "All files uploaded successfully!" },
+  "admin.bulkUploadPartial": { ar: "تم رفع بعض الملفات مع أخطاء", en: "Some files uploaded with errors" },
+  "admin.bulkNoPdfs": { ar: "لم يتم العثور على ملفات PDF في المجلد", en: "No PDF files found in the folder" },
+  "admin.bulkSelectCourseCategory": { ar: "اختر المقرر والقسم أولاً قبل رفع المجلد", en: "Select course and category before uploading a folder" },
 
   // Login
   "login.title": { ar: "تسجيل الدخول", en: "Login" },

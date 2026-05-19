@@ -459,11 +459,34 @@ export const db = {
   },
 
   // Storage
+  /**
+   * Sanitize a filename to be safe for Supabase storage URLs.
+   * Strips Arabic characters, special symbols, and spaces — keeps only
+   * alphanumeric chars, hyphens, underscores and dots.
+   */
+  sanitizeFileName: (name: string): string => {
+    // Remove extension, sanitize, then re-attach
+    const ext = name.lastIndexOf('.') >= 0 ? name.slice(name.lastIndexOf('.')) : '';
+    const base = name.lastIndexOf('.') >= 0 ? name.slice(0, name.lastIndexOf('.')) : name;
+    // Replace anything that isn't a-z, A-Z, 0-9, hyphen or underscore
+    const clean = base.replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 60) || 'file';
+    return `${Date.now()}-${clean}${ext}`;
+  },
+
   uploadPdf: async (file: File): Promise<string> => {
     const fileName = `${Date.now()}-${file.name}`;
     const { error } = await supabase.storage.from("materials").upload(fileName, file);
     if (error) throw error;
     const { data: urlData } = supabase.storage.from("materials").getPublicUrl(fileName);
+    return urlData.publicUrl;
+  },
+
+  /** Upload a PDF with a sanitized storage path. Returns the public URL. */
+  uploadPdfSanitized: async (file: File): Promise<string> => {
+    const safeName = db.sanitizeFileName(file.name);
+    const { error } = await supabase.storage.from("materials").upload(safeName, file);
+    if (error) throw error;
+    const { data: urlData } = supabase.storage.from("materials").getPublicUrl(safeName);
     return urlData.publicUrl;
   },
 };
