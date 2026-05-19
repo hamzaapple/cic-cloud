@@ -17,6 +17,60 @@ import CategoryManager from "@/components/admin/CategoryManager";
 import AnnouncementManager from "@/components/admin/AnnouncementManager";
 import AuditLog from "./AuditLog";
 import { ShieldAlert, Megaphone } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  KeyboardSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
+// ─── Sortable wrapper for admin MaterialCard ───
+function SortableAdminMaterialCard({
+  material, index, canDelete, canEdit, isStrictAddOnly,
+  handleArchive, handleDelete, loadData, categories, courses,
+}: {
+  material: Material; index: number;
+  canDelete: boolean; canEdit: boolean; isStrictAddOnly: boolean;
+  handleArchive: (id: string) => void; handleDelete: (id: string) => void;
+  loadData: () => void; categories: MaterialCategory[]; courses: Course[];
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: material.id });
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : undefined,
+    zIndex: isDragging ? 50 : undefined,
+    position: "relative" as const,
+  };
+  return (
+    <div ref={setNodeRef}>
+      <MaterialCard
+        material={material} index={index} isAdmin
+        showDelete={canDelete && !isStrictAddOnly}
+        showEdit={canEdit && !isStrictAddOnly}
+        onArchive={canDelete ? handleArchive : undefined}
+        onDelete={canDelete ? handleDelete : undefined}
+        onUpdate={loadData}
+        categories={categories}
+        courses={courses}
+        dragHandleListeners={listeners}
+        dragHandleAttributes={attributes}
+        style={style}
+      />
+    </div>
+  );
+}
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -330,8 +384,56 @@ const AdminDashboard = () => {
   const filtered = materials
     .filter(m => showArchived ? m.archived : !m.archived)
     .filter(m => materialCourseFilter === "all" ? true : m.course_id === materialCourseFilter)
-    .filter(m => materialCategoryFilter === "all" ? true : m.category_id === materialCategoryFilter)
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    .filter(m => materialCategoryFilter === "all" ? true : m.category_id === materialCategoryFilter);
+
+  // ─── DnD reordering for admin materials ───
+  const canReorder = materialCourseFilter !== "all" && materialCategoryFilter !== "all";
+
+  const [orderedFiltered, setOrderedFiltered] = useState<Material[]>([]);
+  const [isSavingOrder, setIsSavingOrder] = useState(false);
+
+  // Sync local order state when query data or filters change
+  useEffect(() => {
+    setOrderedFiltered(filtered);
+  }, [materials, materialCourseFilter, materialCategoryFilter, showArchived]);
+
+  const dndSensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  const handleReorderDragEnd = useCallback(async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = orderedFiltered.findIndex(m => m.id === active.id);
+    const newIndex = orderedFiltered.findIndex(m => m.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    const reordered = arrayMove(orderedFiltered, oldIndex, newIndex);
+    const previousOrder = [...orderedFiltered];
+
+    setOrderedFiltered(reordered);
+
+    setIsSavingOrder(true);
+    const toastId = "reorder-save";
+    toast.loading(lang === "ar" ? "جاري حفظ الترتيب..." : "Saving order...", { id: toastId });
+
+    try {
+      await db.reorderMaterials(reordered.map(m => m.id));
+      toast.success(lang === "ar" ? "تم حفظ الترتيب ✅" : "Order saved ✅", { id: toastId });
+      await loadData();
+    } catch (err) {
+      console.error("Reorder failed:", err);
+      setOrderedFiltered(previousOrder);
+      toast.error(lang === "ar" ? "فشل حفظ الترتيب" : "Failed to save order", { id: toastId });
+    } finally {
+      setIsSavingOrder(false);
+    }
+  }, [orderedFiltered, lang, loadData]);
+
+  // Use orderedFiltered for rendering
+  const displayMaterials = orderedFiltered;
 
   return (
     <div className="min-h-screen pt-24 pb-12 px-4">
@@ -547,10 +649,26 @@ const AdminDashboard = () => {
                 </div>
               </div>
               <div className="space-y-3">
-                {filtered.length === 0 ? (
+                {displayMaterials.length === 0 ? (
                   <p className="text-center py-12 text-muted-foreground">{t("admin.noMaterials")}</p>
+                ) : canReorder ? (
+                  /* DnD-enabled list when both course+category are filtered */
+                  <DndContext sensors={dndSensors} collisionDetection={closestCenter} onDragEnd={handleReorderDragEnd}>
+                    <SortableContext items={displayMaterials.map(m => m.id)} strategy={verticalListSortingStrategy}>
+                      <div className="space-y-3">
+                        {displayMaterials.map((m, i) => (
+                          <SortableAdminMaterialCard
+                            key={m.id} material={m} index={i}
+                            canDelete={canDelete} canEdit={canEdit} isStrictAddOnly={isStrictAddOnly}
+                            handleArchive={handleArchive} handleDelete={handleDelete}
+                            loadData={loadData} categories={categories} courses={courses}
+                          />
+                        ))}
+                      </div>
+                    </SortableContext>
+                  </DndContext>
                 ) : (
-                  filtered.map((m, i) => (
+                  displayMaterials.map((m, i) => (
                     <MaterialCard key={m.id} material={m} index={i} isAdmin
                       showDelete={canDelete && !isStrictAddOnly}
                       showEdit={canEdit && !isStrictAddOnly}
@@ -563,6 +681,11 @@ const AdminDashboard = () => {
                   ))
                 )}
               </div>
+              {!canReorder && displayMaterials.length > 0 && (
+                <p className="text-[11px] text-muted-foreground mt-3 text-center">
+                  {lang === "ar" ? "💡 لتفعيل إعادة الترتيب بالسحب، اختر مقرر وقسم معين من الفلاتر أعلاه" : "💡 To enable drag reordering, filter by a specific course and category above"}
+                </p>
+              )}
             </motion.div>
           </div>
         )}
