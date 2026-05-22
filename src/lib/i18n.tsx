@@ -144,6 +144,21 @@ const translations: Record<string, Record<Lang, string>> = {
   "material.downloadFail": { ar: "فشل التحميل", en: "Download failed" },
   "material.noFiles": { ar: "لا توجد ملفات للتحميل", en: "No files to download" },
 
+  // PDF Viewer
+  "pdfViewer.viewPdf": { ar: "عرض PDF", en: "View PDF" },
+  "pdfViewer.viewingDocument": { ar: "عرض المستند", en: "Viewing document" },
+  "pdfViewer.download": { ar: "تحميل", en: "Download" },
+  "pdfViewer.loading": { ar: "جاري تحميل المستند...", en: "Loading document..." },
+  "pdfViewer.fallbackTitle": { ar: "المتصفح لا يدعم عرض PDF المضمّن", en: "Your browser doesn't support embedded PDFs" },
+  "pdfViewer.fallbackMessage": { ar: "يمكنك تحميل الملف مباشرة على جهازك.", en: "You can download the file directly to your device." },
+
+
+  // External Link Modal
+  "externalLink.openInNewTab": { ar: "فتح في تبويب جديد", en: "Open in new tab" },
+  "externalLink.blockedHint": { ar: "ملاحظة: بعض المواقع تمنع العرض المضمن. إذا ظهرت لك صفحة فارغة، استخدم زر الفتح في تبويب جديد بالأعلى.", en: "Note: Some sites block embedding. If you see a blank page, use the Open in new tab button above." },
+  "externalLink.sharepointTitle": { ar: "محتوى محمي (SharePoint)", en: "Protected Content (SharePoint)" },
+  "externalLink.sharepointMessage": { ar: "روابط منصة SharePoint ومايكروسوفت تمنع العرض المضمن للحفاظ على أمان حسابك الجامعي. يرجى فتح الرابط في تبويب جديد للاستمرار.", en: "SharePoint and Microsoft links block embedded viewing to protect your university account. Please open the link in a new tab." },
+
   // Moderators
   "mod.addModerator": { ar: "إضافة مشرف", en: "Add Moderator" },
   "mod.displayName": { ar: "الاسم المعروض", en: "Display Name" },

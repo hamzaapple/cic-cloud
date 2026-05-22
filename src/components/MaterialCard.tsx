@@ -1,15 +1,18 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { FileText, ExternalLink, Clock, Archive, Trash2, Download, Pencil, X, Save, Link, Share2, ArrowDownToLine, GripVertical } from "lucide-react";
+import { FileText, ExternalLink, Clock, Archive, Trash2, Download, Pencil, X, Save, Link, Share2, GripVertical } from "lucide-react";
 import type { Material, MaterialCategory, Course } from "@/lib/store";
 import { db } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
 import { format, isPast } from "date-fns";
 import { ar, enUS } from "date-fns/locale";
 import { playClickSfx } from "@/hooks/use-sfx";
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
+const PdfViewerModal = lazy(() => import("@/components/PdfViewerModal"));
+// const ExternalLinkModal = lazy(() => import("@/components/ExternalLinkModal"));
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { PlayCircle } from "lucide-react";
 
 interface Props {
   material: Material;
@@ -51,6 +54,8 @@ const MaterialCard = ({
   const isHighlighted = highlightedId === material.id;
 
   // Edit modal state
+  const [pdfViewerOpen, setPdfViewerOpen] = useState(false);
+  // const [activeLinkUrl, setActiveLinkUrl] = useState<string | null>(null);
   const [editOpen, setEditOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [editTitle, setEditTitle] = useState(material.title);
@@ -154,12 +159,44 @@ const MaterialCard = ({
                 </span>
               )}
               {material.pdf_url && (
-                <a href={material.pdf_url} target="_blank" rel="noopener noreferrer" onClick={() => playClickSfx()} className="flex items-center gap-1 text-primary hover:underline">
-                  <Download className="w-3 h-3" /> {material.pdf_display_name || t("material.downloadPdf")}
-                </a>
+                material.pdf_url.includes("supabase.co") ? (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      playClickSfx();
+                      setPdfViewerOpen(true);
+                    }}
+                    className="flex items-center gap-1 text-primary hover:underline cursor-pointer"
+                    id={`view-pdf-${material.id}`}
+                  >
+                    <FileText className="w-3 h-3" /> {material.pdf_display_name || t("pdfViewer.viewPdf")}
+                  </button>
+                ) : (
+                  <a
+                    href={material.pdf_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      playClickSfx();
+                    }}
+                    className="flex items-center gap-1 text-primary hover:underline cursor-pointer"
+                  >
+                    <PlayCircle className="w-3 h-3" /> {material.pdf_display_name || t("pdfViewer.viewPdf")}
+                  </a>
+                )
               )}
               {material.external_link && (
-                <a href={material.external_link} target="_blank" rel="noopener noreferrer" onClick={() => playClickSfx()} className="flex items-center gap-1 text-primary hover:underline">
+                <a
+                  href={material.external_link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    playClickSfx();
+                  }}
+                  className="flex items-center gap-1 text-primary hover:underline cursor-pointer"
+                >
                   <ExternalLink className="w-3 h-3" /> {t("material.externalLink")}
                 </a>
               )}
@@ -203,38 +240,7 @@ const MaterialCard = ({
                 <Share2 className="w-3 h-3" />
                 <span>{t("material.share")}</span>
               </button>
-              {/* Direct download button — for materials with PDF */}
-              {material.pdf_url && (
-                <button
-                  onClick={async (e) => {
-                    e.stopPropagation();
-                    playClickSfx();
-                    try {
-                      toast.loading(t("material.downloading"), { id: `dl-${material.id}` });
-                      const res = await fetch(material.pdf_url!);
-                      if (!res.ok) throw new Error("fetch failed");
-                      const blob = await res.blob();
-                      const a = document.createElement("a");
-                      a.href = URL.createObjectURL(blob);
-                      a.download = material.pdf_display_name
-                        ? `${material.pdf_display_name}.pdf`
-                        : `${material.title}.pdf`;
-                      document.body.appendChild(a);
-                      a.click();
-                      a.remove();
-                      URL.revokeObjectURL(a.href);
-                      toast.success(t("material.downloadSuccess"), { id: `dl-${material.id}` });
-                    } catch {
-                      toast.error(t("material.downloadFail"), { id: `dl-${material.id}` });
-                    }
-                  }}
-                  title={t("material.directDownload")}
-                  className="flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
-                >
-                  <ArrowDownToLine className="w-3 h-3" />
-                  <span>{t("material.directDownload")}</span>
-                </button>
-              )}
+
             </div>
 
             {/* Submission Link — shown to everyone for assignments */}
@@ -243,8 +249,11 @@ const MaterialCard = ({
                 href={material.submission_link}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => playClickSfx()}
-                className="mt-3 flex items-center gap-2 text-xs font-semibold text-white bg-primary hover:bg-primary/90 transition-colors px-3 py-1.5 rounded-lg w-fit"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  playClickSfx();
+                }}
+                className="mt-3 flex items-center gap-2 text-xs font-semibold text-white bg-primary hover:bg-primary/90 transition-colors px-3 py-1.5 rounded-lg w-fit cursor-pointer"
               >
                 <Link className="w-3 h-3" />
                 {lang === "ar" ? "🔗 رابط تسليم التكليف" : "🔗 Submit Assignment"}
@@ -374,6 +383,31 @@ const MaterialCard = ({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* PDF Viewer Modal */}
+      {material.pdf_url && (
+        <Suspense fallback={null}>
+          <PdfViewerModal
+            open={pdfViewerOpen}
+            onOpenChange={setPdfViewerOpen}
+            pdfUrl={material.pdf_url}
+            title={material.title}
+            displayName={material.pdf_display_name || undefined}
+          />
+        </Suspense>
+      )}
+
+      {/* External Link Modal (Commented out for future use) */}
+      {/* activeLinkUrl && (
+        <Suspense fallback={null}>
+          <ExternalLinkModal
+            open={!!activeLinkUrl}
+            onOpenChange={(open) => !open && setActiveLinkUrl(null)}
+            url={activeLinkUrl}
+            title={material.title}
+          />
+        </Suspense>
+      ) */}
     </>
   );
 };
