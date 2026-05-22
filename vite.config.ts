@@ -20,6 +20,17 @@ export default defineConfig(({ mode }) => ({
       includeAssets: ["favicon.ico", "robots.txt"],
       workbox: {
         navigateFallbackDenylist: [/^\/~oauth/],
+        globPatterns: [], // Disable precaching to fix caching issues
+        runtimeCaching: [
+          {
+            urlPattern: /.*/,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'cic-runtime-cache',
+              networkTimeoutSeconds: 2,
+            }
+          }
+        ]
       },
       manifest: {
         name: "CIC — CA Interactive Cloud",
