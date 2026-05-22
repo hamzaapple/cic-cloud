@@ -6,12 +6,13 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Download, FileWarning, Loader2 } from "lucide-react";
+import { Download, FileWarning, Loader2, Maximize, Minimize } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { playClickSfx } from "@/hooks/use-sfx";
 import { toast } from "sonner";
 import { useState, useCallback, useEffect, useRef } from "react";
+import { cn } from "@/lib/utils";
 
 interface PdfViewerModalProps {
   open: boolean;
@@ -36,6 +37,7 @@ const PdfViewerModal = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
+  const [isMaximized, setIsMaximized] = useState(false);
   const blobUrlRef = useRef<string | null>(null);
 
   const fileName = displayName
@@ -148,31 +150,47 @@ const PdfViewerModal = ({
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent
-        className="max-w-5xl w-[95vw] h-[90vh] flex flex-col gap-0 p-0 overflow-hidden"
-        id="pdf-viewer-modal"
+        className={cn(
+          "flex flex-col gap-0 p-0 overflow-hidden transition-all duration-300 ease-in-out",
+          isMaximized 
+            ? "max-w-none w-[100vw] h-[100vh] sm:rounded-none border-0 m-0" 
+            : "max-w-5xl w-[95vw] h-[90vh]"
+        )}
       >
         {/* Header */}
-        <DialogHeader className="px-5 pt-5 pb-3 border-b border-border/50 shrink-0">
-          <div className="flex items-center justify-between gap-3 pe-8">
+        <DialogHeader className="px-5 pt-4 pb-3 border-b border-border/50 shrink-0">
+          <div className="flex items-start justify-between gap-3 pe-8 mb-1">
             <div className="min-w-0 flex-1">
               <DialogTitle className="truncate text-base font-display">
                 {title}
               </DialogTitle>
-              <DialogDescription className="truncate text-xs mt-0.5">
-                {displayName || t("pdfViewer.viewingDocument")}
+              <DialogDescription className="truncate text-xs mt-0.5 text-left" dir="ltr">
+                {fileName}
               </DialogDescription>
             </div>
-            <Button
-              size="sm"
-              onClick={handleDownload}
-              className="gap-1.5 text-xs shrink-0"
-              id="pdf-viewer-download"
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">
-                {t("pdfViewer.download")}
-              </span>
-            </Button>
+            <div className="flex items-center gap-2 shrink-0">
+              {!isMobile && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setIsMaximized(!isMaximized)}
+                  className="gap-1.5 text-xs h-9"
+                >
+                  {isMaximized ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
+                </Button>
+              )}
+              <Button
+                size="sm"
+                onClick={handleDownload}
+                className="gap-1.5 text-xs h-9"
+                id="pdf-viewer-download"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">
+                  {t("pdfViewer.download")}
+                </span>
+              </Button>
+            </div>
           </div>
         </DialogHeader>
 
