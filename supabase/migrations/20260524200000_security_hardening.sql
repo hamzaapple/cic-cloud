@@ -87,7 +87,7 @@ CREATE POLICY "Scoped read for course access"
 ON public.moderator_course_access FOR SELECT TO authenticated
 USING (
   (auth.jwt() -> 'app_metadata' ->> 'app_role') = 'owner'
-  OR moderator_id = auth.uid()
+  OR moderator_id = (auth.jwt() -> 'app_metadata' ->> 'moderator_id')::uuid
 );
 
 
