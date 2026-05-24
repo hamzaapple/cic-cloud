@@ -467,6 +467,8 @@ const MaterialCard = ({
                     </div>
                   </>
                 )}
+                  </>
+                )}
               </div>
 
               <div className="flex gap-2 mt-5">
