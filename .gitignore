@@ -23,4 +23,9 @@ dist-ssr
 *.sln
 *.sw?
 
+# Environment variables (secrets)
+.env
+.env.*
+!.env.example
+
 .vercel

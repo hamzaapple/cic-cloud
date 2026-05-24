@@ -124,7 +124,8 @@ Deno.serve(async (req) => {
 
     // Create a deterministic auth password (not guessable from client)
     const authPassword = `internal:${serviceRoleKey.slice(0, 32)}:${username}`
-    const appMetadata = { app_role: role }
+    const appMetadata: Record<string, string> = { app_role: role }
+    if (moderatorId) appMetadata.moderator_id = moderatorId
 
     // Try to sign in first
     let session = null
