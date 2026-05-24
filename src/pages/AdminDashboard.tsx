@@ -175,6 +175,8 @@ const AdminDashboard = () => {
   const [pdfDisplayName, setPdfDisplayName] = useState("");
   const [pdfMode, setPdfMode] = useState<"upload" | "url">("upload");
   const [uploading, setUploading] = useState(false);
+  const [isList, setIsList] = useState(false);
+  const [listContent, setListContent] = useState("");
 
   // Bulk folder upload state
   const [isFolderMode, setIsFolderMode] = useState(false);
@@ -232,11 +234,13 @@ const AdminDashboard = () => {
         submission_link: isAssignment ? (submissionLink || null) : null,
         deadline: isAssignmentOpenEnded ? null : (deadline || null),
         is_assignment: isAssignment,
+        is_list: isList,
+        list_content: isList ? listContent : null,
       });
 
       await loadData();
       setTitle(""); setExternalLink(""); setSubmissionLink(""); setDeadline(""); setIsAssignmentOpenEnded(false);
-      setPdfFile(null); setPdfExternalUrl(""); setPdfDisplayName("");
+      setPdfFile(null); setPdfExternalUrl(""); setPdfDisplayName(""); setIsList(false); setListContent("");
       const fileInput = document.getElementById("pdf-upload") as HTMLInputElement;
       if (fileInput) fileInput.value = "";
       toast.success(t("admin.uploadSuccess"));
@@ -503,8 +507,35 @@ const AdminDashboard = () => {
                       </Select>
                     )}
 
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium text-muted-foreground">{t("admin.pdfFile")}</p>
+                    <div className="flex items-center gap-2 mt-2 mb-2">
+                      <input
+                        type="checkbox"
+                        id="isListCheckbox"
+                        checked={isList}
+                        onChange={(e) => setIsList(e.target.checked)}
+                        className="accent-primary"
+                      />
+                      <label htmlFor="isListCheckbox" className="text-sm font-medium cursor-pointer">
+                        {lang === "ar" ? "هذه المادة عبارة عن قائمة منسدلة (Playlist)" : "This material is a dropdown list (Playlist)"}
+                      </label>
+                    </div>
+
+                    {isList ? (
+                      <div className="space-y-1">
+                        <label className="text-sm font-medium text-muted-foreground">
+                          {lang === "ar" ? "محتوى القائمة (يمكنك لصق نصوص وروابط)" : "List Content (You can paste text and links)"}
+                        </label>
+                        <textarea
+                          value={listContent}
+                          onChange={e => setListContent(e.target.value)}
+                          className="w-full bg-secondary/50 rounded-md border border-input px-3 py-2 text-sm min-h-[150px]"
+                          placeholder={lang === "ar" ? "الدرس الأول\nhttps://link1.com\n\nالدرس الثاني\nhttps://link2.com" : "Lesson 1\nhttps://link1.com\n\nLesson 2\nhttps://link2.com"}
+                        />
+                      </div>
+                    ) : (
+                      <>
+                        <div className="space-y-2">
+                          <p className="text-sm font-medium text-muted-foreground">{t("admin.pdfFile")}</p>
                       <div className="flex gap-1 bg-secondary/30 rounded-lg p-0.5">
                         <button type="button" onClick={() => { setPdfMode("upload"); setIsFolderMode(false); }}
                           className={`flex-1 text-xs py-1.5 rounded-md transition-all ${pdfMode === "upload" && !isFolderMode ? "bg-card shadow-sm text-foreground" : "text-muted-foreground"}`}>
@@ -606,6 +637,8 @@ const AdminDashboard = () => {
                           className="bg-secondary/50" 
                         />
                       </div>
+                    )}
+                    </>
                     )}
                     {!isFolderMode && (
                       <Button type="submit" className="w-full" disabled={uploading}>

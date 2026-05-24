@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { FileText, ExternalLink, Clock, Archive, Trash2, Download, Pencil, X, Save, Link, Share2, GripVertical } from "lucide-react";
+import { FileText, ExternalLink, Clock, Archive, Trash2, Download, Pencil, X, Save, Link, Share2, GripVertical, ChevronDown, ChevronUp, Copy } from "lucide-react";
 import type { Material, MaterialCategory, Course } from "@/lib/store";
 import { db } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
@@ -67,6 +67,39 @@ const MaterialCard = ({
     material.deadline ? material.deadline.slice(0, 16) : ""
   );
   const [editPdfDisplayName, setEditPdfDisplayName] = useState(material.pdf_display_name || "");
+  const [editIsList, setEditIsList] = useState(material.is_list || false);
+  const [editListContent, setEditListContent] = useState(material.list_content || "");
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const copyListContent = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    playClickSfx();
+    if (material.list_content) {
+      navigator.clipboard.writeText(material.list_content);
+      toast.success(lang === "ar" ? "تم نسخ المحتوى" : "Content copied");
+    }
+  };
+
+  const renderListContent = (content: string) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    return content.split('\n').map((line, i) => {
+      const parts = line.split(urlRegex);
+      return (
+        <div key={i} className="mb-2 last:mb-0 min-h-[1.5rem]">
+          {parts.map((part, j) => {
+            if (part.match(urlRegex)) {
+              return (
+                <a key={j} href={part} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline break-all" onClick={(e) => e.stopPropagation()}>
+                  {part}
+                </a>
+              );
+            }
+            return <span key={j}>{part}</span>;
+          })}
+        </div>
+      );
+    });
+  };
 
   const openEdit = () => {
     playClickSfx();
@@ -77,6 +110,8 @@ const MaterialCard = ({
     setEditSubmissionLink(material.submission_link || "");
     setEditDeadline(material.deadline ? material.deadline.slice(0, 16) : "");
     setEditPdfDisplayName(material.pdf_display_name || "");
+    setEditIsList(material.is_list || false);
+    setEditListContent(material.list_content || "");
     setEditOpen(true);
   };
 
@@ -95,6 +130,8 @@ const MaterialCard = ({
         submission_link: material.is_assignment ? (editSubmissionLink || null) : null,
         deadline: editDeadline || null,
         pdf_display_name: editPdfDisplayName || null,
+        is_list: editIsList,
+        list_content: editIsList ? editListContent : null,
       });
       toast.success(lang === "ar" ? "تم التعديل بنجاح ✅" : "Updated successfully ✅");
       setEditOpen(false);
@@ -135,7 +172,7 @@ const MaterialCard = ({
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2">
               <FileText className="w-4 h-4 text-primary shrink-0" />
-              <h3 className="font-display font-semibold text-sm truncate">{material.title}</h3>
+              <h3 className={`font-display truncate ${material.is_list ? "font-bold text-base" : "font-semibold text-sm"}`}>{material.title}</h3>
             </div>
 
             {material.is_assignment && (
@@ -259,6 +296,41 @@ const MaterialCard = ({
                 {lang === "ar" ? "🔗 رابط تسليم التكليف" : "🔗 Submit Assignment"}
               </a>
             )}
+
+            {material.is_list && (
+              <div className="mt-3">
+                <button 
+                  onClick={(e) => { e.stopPropagation(); playClickSfx(); setIsExpanded(!isExpanded); }}
+                  className="flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80 transition-colors cursor-pointer"
+                >
+                  {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  {lang === "ar" ? "عرض القائمة" : "View List"}
+                </button>
+                <AnimatePresence>
+                  {isExpanded && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden mt-3"
+                    >
+                      <div className="bg-secondary/30 rounded-lg p-4 text-sm text-foreground relative whitespace-pre-wrap">
+                        <button 
+                          onClick={copyListContent}
+                          className="absolute top-2 end-2 p-1.5 rounded-md hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                          title={lang === "ar" ? "نسخ" : "Copy"}
+                        >
+                          <Copy className="w-4 h-4" />
+                        </button>
+                        <div className="pt-2 pe-6">
+                          {renderListContent(material.list_content || "")}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
           </div>
 
           {isAdmin && (
@@ -345,6 +417,33 @@ const MaterialCard = ({
                     </select>
                   </div>
                 )}
+
+                <div className="flex items-center gap-2 mt-2 mb-2">
+                  <input
+                    type="checkbox"
+                    id={`editIsList-${material.id}`}
+                    checked={editIsList}
+                    onChange={(e) => setEditIsList(e.target.checked)}
+                    className="accent-primary"
+                  />
+                  <label htmlFor={`editIsList-${material.id}`} className="text-sm font-medium cursor-pointer">
+                    {lang === "ar" ? "هذه المادة عبارة عن قائمة منسدلة (Playlist)" : "This material is a dropdown list (Playlist)"}
+                  </label>
+                </div>
+
+                {editIsList ? (
+                  <div className="space-y-1">
+                    <label className="text-xs text-muted-foreground mb-1 block">
+                      {lang === "ar" ? "محتوى القائمة" : "List Content"}
+                    </label>
+                    <textarea
+                      value={editListContent}
+                      onChange={e => setEditListContent(e.target.value)}
+                      className="w-full bg-secondary/50 rounded-md border border-input px-3 py-2 text-sm min-h-[150px]"
+                    />
+                  </div>
+                ) : (
+                  <>
 
                 <div>
                   <label className="text-xs text-muted-foreground mb-1 block">{lang === "ar" ? "اسم عرض الـ PDF" : "PDF Display Name"}</label>

@@ -57,6 +57,8 @@ export interface Material {
   submission_link?: string | null;
   deadline?: string | null;
   is_assignment: boolean;
+  is_list?: boolean;
+  list_content?: string | null;
   archived: boolean;
   sort_order?: number | null;
   created_at: string;
@@ -280,11 +282,14 @@ export const db = {
     submission_link?: string | null;
     deadline?: string | null;
     is_assignment?: boolean;
+    is_list?: boolean;
+    list_content?: string | null;
   }) => {
     const { data, error } = await supabase.from("materials").insert({
       ...material,
       archived: false,
       is_assignment: material.is_assignment || false,
+      is_list: material.is_list || false,
     }).select().single();
     if (error) throw error;
     return data as Material;
@@ -299,6 +304,8 @@ export const db = {
     submission_link?: string | null;
     deadline?: string | null;
     is_assignment?: boolean;
+    is_list?: boolean;
+    list_content?: string | null;
   }) => {
     const { error } = await supabase.from("materials").update(updates).eq("id", id);
     if (error) throw error;
