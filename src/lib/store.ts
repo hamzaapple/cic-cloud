@@ -254,6 +254,7 @@ export const db = {
   // Materials
   getMaterials: async (courseId?: string): Promise<Material[]> => {
     let query = supabase.from("materials").select("*")
+      .is("deleted_at", null)
       .order("sort_order", { ascending: true, nullsFirst: false })
       .order("created_at", { ascending: false });
     if (courseId) query = query.eq("course_id", courseId);
@@ -267,6 +268,7 @@ export const db = {
     const courseIds = courses.map(c => c.id);
     const { data } = await supabase.from("materials").select("*")
       .in("course_id", courseIds)
+      .is("deleted_at", null)
       .order("sort_order", { ascending: true, nullsFirst: false })
       .order("created_at", { ascending: false });
     return (data || []) as Material[];
@@ -314,9 +316,24 @@ export const db = {
     const { error } = await supabase.from("materials").update({ archived: true }).eq("id", id);
     if (error) throw error;
   },
-  deleteMaterial: async (id: string) => {
-    const { error } = await supabase.from("materials").delete().eq("id", id);
+  unarchiveMaterial: async (id: string) => {
+    const { error } = await supabase.from("materials").update({ archived: false }).eq("id", id);
     if (error) throw error;
+  },
+  deleteMaterial: async (id: string) => {
+    // Soft delete: set deleted_at timestamp instead of actual deletion
+    const { error } = await supabase.from("materials").update({ deleted_at: new Date().toISOString() }).eq("id", id);
+    if (error) throw error;
+  },
+  /** Restore a soft-deleted material by clearing deleted_at */
+  restoreMaterial: async (id: string) => {
+    const { error } = await supabase.from("materials").update({ deleted_at: null, archived: false }).eq("id", id);
+    if (error) throw error;
+  },
+  /** Get a single material by ID (including soft-deleted) */
+  getMaterialById: async (id: string): Promise<Material | null> => {
+    const { data } = await supabase.from("materials").select("*").eq("id", id).single();
+    return (data as Material) || null;
   },
   /** Batch-update sort_order for a list of material IDs (index = order). */
   reorderMaterials: async (orderedIds: string[]) => {
@@ -463,20 +480,40 @@ export const db = {
   },
 
   // Audit Logs
-  addAuditLog: async (action: string, details: string) => {
+  addAuditLog: async (
+    action: string,
+    details: string,
+    options?: {
+      action_type?: string;
+      related_material_id?: string;
+      material_snapshot?: Record<string, any>;
+    }
+  ) => {
     const user = auth.getCurrentUser();
-    if (!user || user.role !== "moderator") return; // For now owner isn't logged since owner is checking the logs
+    if (!user || !user.role) return;
     
     try {
       await supabase.from("audit_logs").insert({
-        admin_id: user.moderatorId,
-        admin_name: user.displayName || "Unknown",
+        admin_id: user.role === "owner" ? "00000000-0000-0000-0000-000000000000" : user.moderatorId,
+        admin_name: user.role === "owner" ? "المالك" : (user.displayName || "Unknown"),
         action,
-        details
+        details,
+        action_type: options?.action_type || "other",
+        related_material_id: options?.related_material_id || null,
+        material_snapshot: options?.material_snapshot || null,
       });
     } catch (e) {
       console.error("Audit log failed", e);
     }
+  },
+
+  getAuditLogs: async (limit = 200): Promise<any[]> => {
+    const { data } = await supabase
+      .from("audit_logs" as any)
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(limit);
+    return (data || []) as any[];
   },
 
   // Storage

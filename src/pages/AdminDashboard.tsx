@@ -248,6 +248,11 @@ const AdminDashboard = () => {
       // Auto notification (fire-and-forget — failure doesn't affect material upload)
       const course = courses.find(c => c.id === courseId);
       const courseName = course?.name || "";
+
+      // Audit log
+      db.addAuditLog(`رفع مادة: ${title}`, `في مقرر ${courseName}`, {
+        action_type: "upload",
+      }).catch(() => {});
       const catName = categories.find(c => c.id === categoryId);
       const typeLabel = catName ? (lang === "ar" ? catName.name_ar : catName.name_en) : "";
 
@@ -341,6 +346,11 @@ const AdminDashboard = () => {
     const courseName = course?.name || "";
     const catName = categories.find(c => c.id === categoryId);
     const typeLabel = catName ? (lang === "ar" ? catName.name_ar : catName.name_en) : "";
+
+    // Audit log for bulk upload
+    db.addAuditLog(`رفع مجموعة (${successCount} ملف)`, `في مقرر ${courseName} — ${typeLabel}`, {
+      action_type: "bulk_upload",
+    }).catch(() => {});
     db.addNotification({
       title: `تم رفع ${successCount} ${typeLabel} جديدة`,
       message: `في مقرر ${courseName}`,
@@ -363,24 +373,58 @@ const AdminDashboard = () => {
     await loadData();
     setLinkTitle(""); setLinkTitleAr(""); setLinkUrl("");
     toast.success(t("admin.linkAdded"));
+    db.addAuditLog(`إضافة رابط: ${linkTitle}`, linkUrl, {
+      action_type: "add_link",
+    }).catch(() => {});
   };
 
   const handleArchive = async (id: string) => {
+    const mat = materials.find(m => m.id === id);
     await db.archiveMaterial(id);
     await loadData();
     toast.success(t("admin.materialArchived"));
+    db.addAuditLog(`أرشفة مادة: ${mat?.title || id}`, ``, {
+      action_type: "archive",
+      related_material_id: id,
+    }).catch(() => {});
   };
 
   const handleDelete = async (id: string) => {
+    const mat = materials.find(m => m.id === id);
+    // Build snapshot before soft-deleting
+    const snapshot = mat ? { ...mat } : undefined;
     await db.deleteMaterial(id);
     await loadData();
     toast.success(t("admin.materialDeleted"));
+    db.addAuditLog(`حذف مادة: ${mat?.title || id}`, ``, {
+      action_type: "delete",
+      related_material_id: id,
+      material_snapshot: snapshot,
+    }).catch(() => {});
+  };
+
+  const handleRestore = async (materialId: string) => {
+    try {
+      await db.restoreMaterial(materialId);
+      await loadData();
+      toast.success(lang === "ar" ? "تم استعادة المادة بنجاح ✅" : "Material restored successfully ✅");
+      db.addAuditLog(`استعادة مادة`, `ID: ${materialId}`, {
+        action_type: "restore",
+        related_material_id: materialId,
+      }).catch(() => {});
+    } catch {
+      toast.error(lang === "ar" ? "فشل استعادة المادة" : "Failed to restore material");
+    }
   };
 
   const handleRemoveLink = async (id: string) => {
+    const link = links.find(l => l.id === id);
     await db.removeLink(id);
     await loadData();
     toast.success(t("admin.linkDeleted"));
+    db.addAuditLog(`حذف رابط: ${link?.title || id}`, ``, {
+      action_type: "delete_link",
+    }).catch(() => {});
   };
 
   const handleLogout = () => { auth.logout(); navigate("/"); toast.success(t("admin.loggedOut")); };

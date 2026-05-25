@@ -41,7 +41,9 @@ const AnnouncementManager = () => {
     try {
       const finalContent = isImportant ? `[URGENT] ${content}` : content;
       await db.addAnnouncement({ content: finalContent, expires_at: new Date(expiresAt).toISOString() });
-      await db.addAuditLog("Add Announcement", `${content.substring(0, 30)}...`);
+      await db.addAuditLog("إضافة إعلان", `${content.substring(0, 30)}...`, {
+        action_type: "add_announcement",
+      });
 
       // Send push notification with the same announcement text
       await db.addNotification({
@@ -69,7 +71,9 @@ const AnnouncementManager = () => {
   const handleDelete = async (id: string) => {
     try {
       await db.deleteAnnouncement(id);
-      await db.addAuditLog("Delete Announcement", `ID: ${id}`);
+      await db.addAuditLog("حذف إعلان", `ID: ${id}`, {
+        action_type: "delete_announcement",
+      });
       toast.success(lang === "ar" ? "تم الحذف" : "Deleted successfully");
       await loadAnnouncements();
     } catch (e) {

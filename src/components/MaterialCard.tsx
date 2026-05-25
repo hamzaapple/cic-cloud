@@ -136,6 +136,11 @@ const MaterialCard = ({
       toast.success(lang === "ar" ? "تم التعديل بنجاح ✅" : "Updated successfully ✅");
       setEditOpen(false);
       onUpdate?.();
+      // Audit log for edit
+      db.addAuditLog(`تعديل مادة: ${editTitle.trim()}`, `ID: ${material.id}`, {
+        action_type: "edit",
+        related_material_id: material.id,
+      }).catch(() => {});
     } catch {
       toast.error(lang === "ar" ? "فشل التعديل" : "Update failed");
     } finally {
@@ -174,6 +179,15 @@ const MaterialCard = ({
               <FileText className="w-4 h-4 text-primary shrink-0" />
               <h3 className={`font-display truncate ${material.is_list ? "font-bold text-base" : "font-semibold text-sm"}`}>{material.title}</h3>
             </div>
+
+            {/* Upload date */}
+            {material.created_at && (
+              <p className="text-[11px] text-muted-foreground/70 mb-1.5 flex items-center gap-1">
+                <Clock className="w-2.5 h-2.5" />
+                {lang === "ar" ? "تاريخ الرفع: " : "Uploaded: "}
+                {format(new Date(material.created_at), "dd MMM yyyy", { locale })}
+              </p>
+            )}
 
             {material.is_assignment && (
               <span className="inline-block text-xs font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary mb-2">
