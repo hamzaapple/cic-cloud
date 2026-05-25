@@ -223,7 +223,7 @@ const AdminDashboard = () => {
         pdfUrl = pdfExternalUrl;
       }
 
-      await db.addMaterial({
+      const newMaterial = await db.addMaterial({
         title,
         course_id: courseId,
         type: "lecture",
@@ -252,6 +252,7 @@ const AdminDashboard = () => {
       // Audit log
       db.addAuditLog(`رفع مادة: ${title}`, `في مقرر ${courseName}`, {
         action_type: "upload",
+        related_material_id: newMaterial.id,
       }).catch(() => {});
       const catName = categories.find(c => c.id === categoryId);
       const typeLabel = catName ? (lang === "ar" ? catName.name_ar : catName.name_en) : "";
