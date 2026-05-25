@@ -814,7 +814,7 @@ const AdminDashboard = () => {
         {activeSection === "announcements" && (isOwner || auth.hasPermission("announcements")) && <AnnouncementManager />}
         {activeSection === "categories" && (isOwner || auth.hasPermission("manage_categories")) && <CategoryManager />}
         {activeSection === "moderators" && isOwner && <ManageModerators departments={departments} />}
-        {activeSection === "audit_logs" && isOwner && <AuditLog />}
+        {activeSection === "audit_logs" && isOwner && <AuditLog courses={courses} categories={categories} onUpdate={loadData} />}
       </div>
     </div>
   );

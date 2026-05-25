@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { db } from "@/lib/store";
+import { db, type Course, type MaterialCategory, type Material } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
 import { auth } from "@/lib/store";
 import { motion, AnimatePresence } from "framer-motion";
@@ -17,6 +17,8 @@ import {
   Filter,
   FolderUp,
   RefreshCw,
+  X,
+  FileText
 } from "lucide-react";
 import { format } from "date-fns";
 import { ar, enUS } from "date-fns/locale";
@@ -124,13 +126,33 @@ const ACTION_CONFIG: Record<
   },
 };
 
-const AuditLog = () => {
+interface AuditLogProps {
+  courses?: Course[];
+  categories?: MaterialCategory[];
+  onUpdate?: () => void;
+}
+
+const AuditLog = ({ courses = [], categories = [], onUpdate }: AuditLogProps) => {
   const { lang } = useI18n();
   const locale = lang === "ar" ? ar : enUS;
   const [logs, setLogs] = useState<AuditLogEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("all");
   const [restoringId, setRestoringId] = useState<string | null>(null);
+
+  // Edit State
+  const [editOpen, setEditOpen] = useState(false);
+  const [editingMaterial, setEditingMaterial] = useState<Material | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editCourseId, setEditCourseId] = useState("");
+  const [editCategoryId, setEditCategoryId] = useState("");
+  const [editExternalLink, setEditExternalLink] = useState("");
+  const [editSubmissionLink, setEditSubmissionLink] = useState("");
+  const [editDeadline, setEditDeadline] = useState("");
+  const [editPdfDisplayName, setEditPdfDisplayName] = useState("");
+  const [editIsList, setEditIsList] = useState(false);
+  const [editListContent, setEditListContent] = useState("");
+  const [saving, setSaving] = useState(false);
 
   const user = auth.getCurrentUser();
   const isOwner = user.role === "owner";
@@ -169,12 +191,95 @@ const AuditLog = () => {
       }).catch(() => {});
       // Refresh logs
       await fetchLogs();
+      onUpdate?.();
     } catch {
       toast.error(
         lang === "ar" ? "فشل استعادة المادة" : "Failed to restore material"
       );
     } finally {
       setRestoringId(null);
+    }
+  };
+
+  const handleEditOpen = async (log: AuditLogEntry) => {
+    if (!log.related_material_id) return;
+    try {
+      const material = await db.getMaterialById(log.related_material_id);
+      if (!material) {
+        toast.error(lang === "ar" ? "المادة غير موجودة أو محذوفة نهائياً" : "Material not found");
+        return;
+      }
+      setEditingMaterial(material);
+      setEditTitle(material.title);
+      setEditCourseId(material.course_id);
+      setEditCategoryId(material.category_id || "");
+      setEditExternalLink(material.external_link || "");
+      setEditSubmissionLink(material.submission_link || "");
+      setEditDeadline(material.deadline ? material.deadline.slice(0, 16) : "");
+      setEditPdfDisplayName(material.pdf_display_name || "");
+      setEditIsList(material.is_list || false);
+      setEditListContent(material.list_content || "");
+      setEditOpen(true);
+    } catch (e) {
+      toast.error(lang === "ar" ? "خطأ في جلب بيانات المادة" : "Error fetching material");
+    }
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingMaterial) return;
+    if (!editTitle.trim()) {
+      toast.error(lang === "ar" ? "العنوان مطلوب" : "Title is required");
+      return;
+    }
+    setSaving(true);
+    try {
+      await db.updateMaterial(editingMaterial.id, {
+        title: editTitle.trim(),
+        course_id: editCourseId,
+        category_id: editCategoryId || null,
+        external_link: editExternalLink || null,
+        submission_link: editingMaterial.is_assignment ? (editSubmissionLink || null) : null,
+        deadline: editDeadline || null,
+        pdf_display_name: editPdfDisplayName || null,
+        is_list: editIsList,
+        list_content: editIsList ? editListContent : null,
+      });
+      toast.success(lang === "ar" ? "تم التعديل بنجاح ✅" : "Updated successfully ✅");
+      
+      db.addAuditLog(`تعديل مادة: ${editTitle.trim()}`, `ID: ${editingMaterial.id}`, {
+        action_type: "edit",
+        related_material_id: editingMaterial.id,
+      }).catch(() => {});
+
+      setEditOpen(false);
+      onUpdate?.();
+      fetchLogs();
+    } catch {
+      toast.error(lang === "ar" ? "فشل التعديل" : "Update failed");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (log: AuditLogEntry) => {
+    if (!log.related_material_id) return;
+    if (!confirm(lang === "ar" ? "تأكيد حذف هذه المادة؟" : "Confirm delete?")) return;
+    try {
+      const material = await db.getMaterialById(log.related_material_id);
+      const snapshot = material ? { ...material } : undefined;
+      await db.deleteMaterial(log.related_material_id);
+      toast.success(lang === "ar" ? "تم الحذف" : "Deleted successfully");
+      
+      db.addAuditLog(`حذف مادة من السجل`, `ID: ${log.related_material_id}`, {
+        action_type: "delete",
+        related_material_id: log.related_material_id,
+        material_snapshot: snapshot,
+      }).catch(() => {});
+
+      onUpdate?.();
+      fetchLogs();
+    } catch {
+      toast.error(lang === "ar" ? "حدث خطأ" : "An error occurred");
     }
   };
 
@@ -346,32 +451,53 @@ const AuditLog = () => {
                                 </div>
                               </div>
 
-                              {/* Restore button */}
-                              {canRestore && (
-                                <button
-                                  onClick={() => handleRestore(log)}
-                                  disabled={isRestoring}
-                                  className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-violet-500/10 text-violet-500 hover:bg-violet-500/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                  title={
-                                    lang === "ar"
-                                      ? "استعادة المادة"
-                                      : "Restore Material"
-                                  }
-                                >
-                                  <RotateCcw
-                                    className={`w-3.5 h-3.5 ${
-                                      isRestoring ? "animate-spin" : ""
-                                    }`}
-                                  />
-                                  {isRestoring
-                                    ? lang === "ar"
-                                      ? "جاري..."
-                                      : "..."
-                                    : lang === "ar"
-                                    ? "استعادة"
-                                    : "Restore"}
-                                </button>
-                              )}
+                              {/* Actions */}
+                              <div className="flex flex-col gap-2">
+                                {canRestore && (
+                                  <button
+                                    onClick={() => handleRestore(log)}
+                                    disabled={isRestoring}
+                                    className="shrink-0 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-violet-500/10 text-violet-500 hover:bg-violet-500/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    title={
+                                      lang === "ar"
+                                        ? "استعادة المادة"
+                                        : "Restore Material"
+                                    }
+                                  >
+                                    <RotateCcw
+                                      className={`w-3.5 h-3.5 ${
+                                        isRestoring ? "animate-spin" : ""
+                                      }`}
+                                    />
+                                    {isRestoring
+                                      ? lang === "ar"
+                                        ? "جاري..."
+                                        : "..."
+                                      : lang === "ar"
+                                      ? "استعادة"
+                                      : "Restore"}
+                                  </button>
+                                )}
+                                
+                                {log.action_type === "upload" && log.related_material_id && (
+                                  <div className="flex items-center gap-1.5">
+                                    <button
+                                      onClick={() => handleEditOpen(log)}
+                                      className="p-1.5 rounded-lg bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 transition-colors"
+                                      title={lang === "ar" ? "تعديل" : "Edit"}
+                                    >
+                                      <Pencil className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button
+                                      onClick={() => handleDelete(log)}
+                                      className="p-1.5 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors"
+                                      title={lang === "ar" ? "حذف" : "Delete"}
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </motion.div>
@@ -393,6 +519,192 @@ const AuditLog = () => {
             : `${filteredLogs.length} activities recorded`}
         </p>
       )}
+
+      {/* Edit Modal */}
+      <AnimatePresence>
+        {editOpen && editingMaterial && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-8">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+              onClick={() => setEditOpen(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-lg glass-card rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]"
+            >
+              <div className="p-4 border-b border-border/50 flex items-center justify-between sticky top-0 bg-background/50 backdrop-blur-xl z-10 shrink-0">
+                <h3 className="font-display font-semibold flex items-center gap-2">
+                  <Pencil className="w-4 h-4 text-primary" />
+                  {lang === "ar" ? "تعديل المادة" : "Edit Material"}
+                </h3>
+                <button
+                  onClick={() => setEditOpen(false)}
+                  className="p-2 rounded-lg hover:bg-secondary text-muted-foreground transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="p-4 md:p-6 overflow-y-auto custom-scrollbar flex-1 space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium">
+                    {lang === "ar" ? "العنوان" : "Title"} <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                    className="w-full bg-secondary/50 border border-border/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium">
+                      {lang === "ar" ? "المقرر" : "Course"} <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={editCourseId}
+                      onChange={(e) => setEditCourseId(e.target.value)}
+                      className="w-full bg-secondary/50 border border-border/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    >
+                      {courses.map(c => (
+                        <option key={c.id} value={c.id}>{c.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium">
+                      {lang === "ar" ? "القسم" : "Category"}
+                    </label>
+                    <select
+                      value={editCategoryId}
+                      onChange={(e) => setEditCategoryId(e.target.value)}
+                      className="w-full bg-secondary/50 border border-border/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    >
+                      <option value="">{lang === "ar" ? "بدون قسم" : "No Category"}</option>
+                      {categories.map(c => (
+                        <option key={c.id} value={c.id}>{lang === "ar" ? c.name_ar : c.name_en}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Assignment settings */}
+                {editingMaterial.is_assignment && (
+                  <>
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-medium">
+                        {lang === "ar" ? "رابط التسليم" : "Submission Link"}
+                      </label>
+                      <input
+                        type="url"
+                        value={editSubmissionLink}
+                        onChange={(e) => setEditSubmissionLink(e.target.value)}
+                        className="w-full bg-secondary/50 border border-border/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                        placeholder="https://docs.google.com/forms/..."
+                        dir="ltr"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-medium">
+                        {lang === "ar" ? "موعد التسليم" : "Deadline"}
+                      </label>
+                      <input
+                        type="datetime-local"
+                        value={editDeadline}
+                        onChange={(e) => setEditDeadline(e.target.value)}
+                        className="w-full bg-secondary/50 border border-border/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      />
+                    </div>
+                  </>
+                )}
+
+                {!editingMaterial.pdf_url && (
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium">
+                      {lang === "ar" ? "رابط خارجي" : "External Link"}
+                    </label>
+                    <input
+                      type="url"
+                      value={editExternalLink}
+                      onChange={(e) => setEditExternalLink(e.target.value)}
+                      className="w-full bg-secondary/50 border border-border/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      dir="ltr"
+                    />
+                  </div>
+                )}
+
+                {editingMaterial.pdf_url && (
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium">
+                      {lang === "ar" ? "اسم الملف (اختياري)" : "File Display Name"}
+                    </label>
+                    <input
+                      type="text"
+                      value={editPdfDisplayName}
+                      onChange={(e) => setEditPdfDisplayName(e.target.value)}
+                      className="w-full bg-secondary/50 border border-border/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      placeholder={lang === "ar" ? "مثال: تحميل المحاضرة" : "e.g., Download Lecture"}
+                    />
+                  </div>
+                )}
+
+                {/* List Mode toggle */}
+                <div className="flex items-center gap-2 pt-2 border-t border-border/50">
+                  <input
+                    type="checkbox"
+                    id="editIsList"
+                    checked={editIsList}
+                    onChange={(e) => setEditIsList(e.target.checked)}
+                    className="w-4 h-4 accent-primary rounded border-border"
+                  />
+                  <label htmlFor="editIsList" className="text-sm font-medium cursor-pointer">
+                    {lang === "ar" ? "عرض كنص قائمة" : "Display as List text"}
+                  </label>
+                </div>
+                {editIsList && (
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                      <FileText className="w-4 h-4" />
+                      {lang === "ar" ? "محتوى القائمة (يدعم Markdown)" : "List Content (Markdown supported)"}
+                    </label>
+                    <textarea
+                      value={editListContent}
+                      onChange={(e) => setEditListContent(e.target.value)}
+                      rows={5}
+                      className="w-full bg-secondary/50 border border-border/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 font-mono"
+                      placeholder="- Point 1&#10;- Point 2"
+                      dir="ltr"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="p-4 border-t border-border/50 flex gap-3 shrink-0 bg-secondary/20">
+                <button
+                  onClick={() => setEditOpen(false)}
+                  className="flex-1 py-2 rounded-lg text-sm font-medium bg-secondary/80 hover:bg-secondary text-foreground transition-colors"
+                >
+                  {lang === "ar" ? "إلغاء" : "Cancel"}
+                </button>
+                <button
+                  onClick={handleSaveEdit}
+                  disabled={saving}
+                  className="flex-1 py-2 rounded-lg text-sm font-medium bg-primary hover:bg-primary/90 text-primary-foreground transition-colors disabled:opacity-50"
+                >
+                  {saving ? (lang === "ar" ? "جاري الحفظ..." : "Saving...") : (lang === "ar" ? "حفظ التغييرات" : "Save Changes")}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

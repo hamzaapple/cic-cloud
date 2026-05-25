@@ -255,7 +255,7 @@ export const db = {
   getMaterials: async (courseId?: string): Promise<Material[]> => {
     let query = supabase.from("materials").select("*")
       .is("deleted_at", null)
-      .order("sort_order", { ascending: true, nullsFirst: false })
+      .order("sort_order", { ascending: true, nullsFirst: true })
       .order("created_at", { ascending: false });
     if (courseId) query = query.eq("course_id", courseId);
     const { data } = await query;
@@ -269,7 +269,7 @@ export const db = {
     const { data } = await supabase.from("materials").select("*")
       .in("course_id", courseIds)
       .is("deleted_at", null)
-      .order("sort_order", { ascending: true, nullsFirst: false })
+      .order("sort_order", { ascending: true, nullsFirst: true })
       .order("created_at", { ascending: false });
     return (data || []) as Material[];
   },
