@@ -78,6 +78,7 @@ export interface Moderator {
   id: string;
   username: string;
   password: string;
+  plain_password?: string | null;
   display_name: string;
   permissions: Permission[];
   department_id?: string | null;
@@ -383,6 +384,11 @@ export const db = {
   },
   updateModerator: async (id: string, updates: { permissions?: Permission[]; department_id?: string | null }) => {
     const { error } = await supabase.from("moderators").update(updates).eq("id", id);
+    if (error) throw error;
+  },
+  updateModeratorPassword: async (id: string, newPassword: string) => {
+    // The DB trigger hash_moderator_password will auto-hash the plain password
+    const { error } = await supabase.from("moderators").update({ password: newPassword }).eq("id", id);
     if (error) throw error;
   },
   setModeratorCourseAccess: async (moderatorId: string, courseIds: string[]) => {

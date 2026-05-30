@@ -239,6 +239,16 @@ const translations: Record<string, Record<Lang, string>> = {
   "mod.externalCourseAccess": { ar: "الوصول للمقررات الخارجية", en: "External Course Access" },
   "mod.addCourseAccess": { ar: "إضافة مقرر", en: "Add Course" },
   "mod.sharedCourses": { ar: "مقررات مشتركة", en: "Shared Courses" },
+  "mod.changePassword": { ar: "تغيير كلمة المرور", en: "Change Password" },
+  "mod.newPassword": { ar: "كلمة المرور الجديدة", en: "New Password" },
+  "mod.confirmPassword": { ar: "تأكيد كلمة المرور", en: "Confirm Password" },
+  "mod.passwordMismatch": { ar: "كلمات المرور غير متطابقة", en: "Passwords do not match" },
+  "mod.passwordTooShort": { ar: "كلمة المرور قصيرة جداً (4 أحرف على الأقل)", en: "Password is too short (min 4 characters)" },
+  "mod.passwordChanged": { ar: "تم تغيير كلمة المرور بنجاح ✅", en: "Password changed successfully ✅" },
+  "mod.passwordChangeFail": { ar: "فشل تغيير كلمة المرور", en: "Failed to change password" },
+  "mod.passwordHidden": { ar: "كلمة المرور مشفّرة ولا يمكن عرضها", en: "Password is encrypted and cannot be viewed" },
+  "mod.save": { ar: "حفظ", en: "Save" },
+  "mod.saving": { ar: "جاري الحفظ...", en: "Saving..." },
 
   // Schedule page
   "schedule.title": { ar: "إنشاء جدولي", en: "Create My Schedule" },

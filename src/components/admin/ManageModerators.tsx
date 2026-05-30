@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Trash2, UserPlus, Shield, ShieldCheck, Pencil } from "lucide-react";
+import { Trash2, UserPlus, Shield, ShieldCheck, Pencil, KeyRound, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -25,6 +25,47 @@ interface Props {
   departments: Department[];
 }
 
+// ─── Password Display Sub-Component ───
+const PasswordDisplay = ({ mod, t, lang, onChangePassword }: {
+  mod: Moderator;
+  t: (key: string) => string;
+  lang: string;
+  onChangePassword: () => void;
+}) => {
+  const [visible, setVisible] = useState(false);
+  const hasPlainPassword = !!mod.plain_password;
+
+  return (
+    <div className="flex items-center gap-2 mt-2 p-2 rounded-lg bg-secondary/40 border border-border/30">
+      <KeyRound className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+      {hasPlainPassword ? (
+        <>
+          <span className={`text-xs font-mono tracking-wider select-all ${visible ? "text-foreground" : "text-muted-foreground"}`}>
+            {visible ? mod.plain_password : "••••••••"}
+          </span>
+          <button
+            onClick={() => setVisible(!visible)}
+            className="p-1 rounded-md text-muted-foreground hover:text-foreground transition-colors"
+            title={visible ? (lang === "ar" ? "إخفاء" : "Hide") : (lang === "ar" ? "إظهار" : "Show")}
+          >
+            {visible ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+          </button>
+        </>
+      ) : (
+        <span className="text-[10px] text-muted-foreground italic">
+          {lang === "ar" ? "غير متوفرة — غيّر الباسورد لحفظها" : "Not available — change password to save it"}
+        </span>
+      )}
+      <button
+        onClick={onChangePassword}
+        className="text-[10px] px-2 py-0.5 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors font-medium ms-auto"
+      >
+        {t("mod.changePassword")}
+      </button>
+    </div>
+  );
+};
+
 const ManageModerators = ({ departments }: Props) => {
   const { t, lang } = useI18n();
   const [moderators, setModerators] = useState<Moderator[]>([]);
@@ -42,6 +83,13 @@ const ManageModerators = ({ departments }: Props) => {
   const [editDeptId, setEditDeptId] = useState<string>("");
   const [editSharedCourses, setEditSharedCourses] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
+
+  // Password change modal state
+  const [passwordMod, setPasswordMod] = useState<Moderator | null>(null);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [savingPassword, setSavingPassword] = useState(false);
 
   const loadMods = async () => {
     const [mods, courses, access] = await Promise.all([
@@ -107,6 +155,37 @@ const ManageModerators = ({ departments }: Props) => {
       toast.error(t("mod.editFail"));
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (!passwordMod) return;
+    if (newPassword.length < 4) {
+      toast.error(t("mod.passwordTooShort"));
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error(t("mod.passwordMismatch"));
+      return;
+    }
+    setSavingPassword(true);
+    try {
+      await db.updateModeratorPassword(passwordMod.id, newPassword);
+      toast.success(t("mod.passwordChanged"));
+      setPasswordMod(null);
+      setNewPassword("");
+      setConfirmPassword("");
+      setShowNewPassword(false);
+      // Audit log
+      db.addAuditLog(
+        `تغيير كلمة مرور المشرف: ${passwordMod.display_name}`,
+        `@${passwordMod.username}`,
+        { action_type: "change_password" }
+      ).catch(() => {});
+    } catch {
+      toast.error(t("mod.passwordChangeFail"));
+    } finally {
+      setSavingPassword(false);
     }
   };
 
@@ -185,6 +264,8 @@ const ManageModerators = ({ departments }: Props) => {
                     {mod.department_id && (
                       <p className="text-xs text-primary mt-1">{getDeptName(mod.department_id)}</p>
                     )}
+                    {/* Password info */}
+                    <PasswordDisplay mod={mod} t={t} lang={lang} onChangePassword={() => { setPasswordMod(mod); setNewPassword(""); setConfirmPassword(""); setShowNewPassword(false); }} />
                     <div className="flex flex-wrap gap-1.5 mt-3">
                       {mod.permissions.map(perm => (
                         <span key={perm} className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
@@ -210,7 +291,7 @@ const ManageModerators = ({ departments }: Props) => {
                     )}
                   </div>
                   <div className="flex gap-1">
-                    <button onClick={() => openEdit(mod)} className="p-2 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary">
+                    <button onClick={() => openEdit(mod)} className="p-2 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary" title={t("mod.editModerator")}>
                       <Pencil className="w-4 h-4" />
                     </button>
                     <AlertDialog>
@@ -304,6 +385,83 @@ const ManageModerators = ({ departments }: Props) => {
             <Button variant="outline" onClick={() => setEditMod(null)}>{t("mod.cancel")}</Button>
             <Button onClick={handleSaveEdit} disabled={saving}>
               {saving ? (lang === "ar" ? "جاري الحفظ..." : "Saving...") : (lang === "ar" ? "حفظ التعديلات" : "Save Changes")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Change Password Modal */}
+      <Dialog open={!!passwordMod} onOpenChange={(open) => { if (!open) { setPasswordMod(null); setNewPassword(""); setConfirmPassword(""); setShowNewPassword(false); } }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <KeyRound className="w-5 h-5 text-primary" />
+              {t("mod.changePassword")}
+            </DialogTitle>
+            <DialogDescription>
+              {passwordMod?.display_name} — @{passwordMod?.username}
+            </DialogDescription>
+          </DialogHeader>
+
+          {/* Info note */}
+          <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+            <Shield className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
+            <p className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed">
+              {t("mod.passwordHidden")}
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            {/* New password */}
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-muted-foreground">{t("mod.newPassword")}</label>
+              <div className="relative">
+                <Input
+                  type={showNewPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={newPassword}
+                  onChange={e => setNewPassword(e.target.value)}
+                  className="bg-secondary/50 pe-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className="absolute end-2 top-1/2 -translate-y-1/2 p-1 rounded-md text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Confirm password */}
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-muted-foreground">{t("mod.confirmPassword")}</label>
+              <Input
+                type={showNewPassword ? "text" : "password"}
+                placeholder="••••••••"
+                value={confirmPassword}
+                onChange={e => setConfirmPassword(e.target.value)}
+                className="bg-secondary/50"
+              />
+            </div>
+
+            {/* Mismatch warning */}
+            {confirmPassword && newPassword !== confirmPassword && (
+              <p className="text-xs text-destructive flex items-center gap-1">
+                ⚠️ {t("mod.passwordMismatch")}
+              </p>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setPasswordMod(null); setNewPassword(""); setConfirmPassword(""); setShowNewPassword(false); }}>
+              {t("mod.cancel")}
+            </Button>
+            <Button
+              onClick={handleChangePassword}
+              disabled={savingPassword || !newPassword || newPassword !== confirmPassword}
+            >
+              {savingPassword ? (t("mod.saving")) : (t("mod.save"))}
             </Button>
           </DialogFooter>
         </DialogContent>
