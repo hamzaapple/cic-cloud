@@ -40,9 +40,7 @@ const PdfViewerModal = ({
   const [isMaximized, setIsMaximized] = useState(false);
   const blobUrlRef = useRef<string | null>(null);
 
-  const fileName = displayName
-    ? `${displayName}.pdf`
-    : `${title}.pdf`;
+  const fileName = title ? `${title}.pdf` : (displayName ? `${displayName}.pdf` : `document.pdf`);
 
   const isMobileDevice =
     isMobile || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
