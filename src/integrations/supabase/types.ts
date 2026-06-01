@@ -41,27 +41,36 @@ export type Database = {
       audit_logs: {
         Row: {
           action: string
+          action_type: string | null
           admin_id: string | null
           admin_name: string
           created_at: string
           details: string | null
           id: string
+          material_snapshot: Json | null
+          related_material_id: string | null
         }
         Insert: {
           action: string
+          action_type?: string | null
           admin_id?: string | null
           admin_name: string
           created_at?: string
           details?: string | null
           id?: string
+          material_snapshot?: Json | null
+          related_material_id?: string | null
         }
         Update: {
           action?: string
+          action_type?: string | null
           admin_id?: string | null
           admin_name?: string
           created_at?: string
           details?: string | null
           id?: string
+          material_snapshot?: Json | null
+          related_material_id?: string | null
         }
         Relationships: []
       }
@@ -211,11 +220,15 @@ export type Database = {
           course_id: string
           created_at: string
           deadline: string | null
+          deleted_at: string | null
           external_link: string | null
           id: string
           is_assignment: boolean
+          is_list: boolean | null
+          list_content: string | null
           pdf_display_name: string | null
           pdf_url: string | null
+          sort_order: number | null
           submission_link: string | null
           title: string
           type: string
@@ -226,11 +239,15 @@ export type Database = {
           course_id: string
           created_at?: string
           deadline?: string | null
+          deleted_at?: string | null
           external_link?: string | null
           id?: string
           is_assignment?: boolean
+          is_list?: boolean | null
+          list_content?: string | null
           pdf_display_name?: string | null
           pdf_url?: string | null
+          sort_order?: number | null
           submission_link?: string | null
           title: string
           type: string
@@ -241,11 +258,15 @@ export type Database = {
           course_id?: string
           created_at?: string
           deadline?: string | null
+          deleted_at?: string | null
           external_link?: string | null
           id?: string
           is_assignment?: boolean
+          is_list?: boolean | null
+          list_content?: string | null
           pdf_display_name?: string | null
           pdf_url?: string | null
+          sort_order?: number | null
           submission_link?: string | null
           title?: string
           type?: string
@@ -311,6 +332,7 @@ export type Database = {
           id: string
           password: string
           permissions: string[]
+          plain_password: string | null
           username: string
         }
         Insert: {
@@ -320,6 +342,7 @@ export type Database = {
           id?: string
           password: string
           permissions?: string[]
+          plain_password?: string | null
           username: string
         }
         Update: {
@@ -329,6 +352,7 @@ export type Database = {
           id?: string
           password?: string
           permissions?: string[]
+          plain_password?: string | null
           username?: string
         }
         Relationships: [
