@@ -8,6 +8,7 @@ import { ar, enUS } from "date-fns/locale";
 import { playClickSfx } from "@/hooks/use-sfx";
 import { useState, lazy, Suspense } from "react";
 const PdfViewerModal = lazy(() => import("@/components/PdfViewerModal"));
+const VideoViewerModal = lazy(() => import("@/components/VideoViewerModal"));
 // const ExternalLinkModal = lazy(() => import("@/components/ExternalLinkModal"));
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -55,6 +56,7 @@ const MaterialCard = ({
 
   // Edit modal state
   const [pdfViewerOpen, setPdfViewerOpen] = useState(false);
+  const [videoViewerOpen, setVideoViewerOpen] = useState(false);
   // const [activeLinkUrl, setActiveLinkUrl] = useState<string | null>(null);
   const [editOpen, setEditOpen] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -210,32 +212,56 @@ const MaterialCard = ({
                 </span>
               )}
               {material.pdf_url && (
-                material.pdf_url.includes("supabase.co") ? (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      playClickSfx();
-                      setPdfViewerOpen(true);
-                    }}
-                    className="flex items-center gap-1 text-primary hover:underline cursor-pointer"
-                    id={`view-pdf-${material.id}`}
-                  >
-                    <FileText className="w-3 h-3" /> {material.pdf_display_name || t("pdfViewer.viewPdf")}
-                  </button>
-                ) : (
-                  <a
-                    href={material.pdf_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      playClickSfx();
-                    }}
-                    className="flex items-center gap-1 text-primary hover:underline cursor-pointer"
-                  >
-                    <PlayCircle className="w-3 h-3" /> {material.pdf_display_name || t("pdfViewer.viewPdf")}
-                  </a>
-                )
+                (() => {
+                  const isVideo = material.pdf_url.match(/\.(mp4|webm|ogg|mov|mkv|avi)$/i) || material.pdf_display_name?.match(/\.(mp4|webm|ogg|mov|mkv|avi)$/i);
+                  const isSupabaseDoc = material.pdf_url.includes("supabase.co") && !isVideo;
+                  
+                  if (isSupabaseDoc) {
+                    return (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          playClickSfx();
+                          setPdfViewerOpen(true);
+                        }}
+                        className="flex items-center gap-1 text-primary hover:underline cursor-pointer"
+                        id={`view-pdf-${material.id}`}
+                      >
+                        <FileText className="w-3 h-3" /> {material.pdf_display_name || t("pdfViewer.viewPdf")}
+                      </button>
+                    );
+                  }
+                  
+                  if (isVideo) {
+                    return (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          playClickSfx();
+                          setVideoViewerOpen(true);
+                        }}
+                        className="flex items-center gap-1 text-primary hover:underline cursor-pointer"
+                      >
+                        <PlayCircle className="w-3 h-3" /> {material.pdf_display_name || (lang === "ar" ? "مشاهدة الفيديو" : "View Video")}
+                      </button>
+                    );
+                  }
+
+                  return (
+                    <a
+                      href={material.pdf_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        playClickSfx();
+                      }}
+                      className="flex items-center gap-1 text-primary hover:underline cursor-pointer"
+                    >
+                      <FileText className="w-3 h-3" /> {material.pdf_display_name || t("pdfViewer.viewPdf")}
+                    </a>
+                  );
+                })()
               )}
               {material.external_link && (
                 <a
@@ -506,6 +532,13 @@ const MaterialCard = ({
             open={pdfViewerOpen}
             onOpenChange={setPdfViewerOpen}
             pdfUrl={material.pdf_url}
+            title={material.title}
+            displayName={material.pdf_display_name || undefined}
+          />
+          <VideoViewerModal
+            open={videoViewerOpen}
+            onOpenChange={setVideoViewerOpen}
+            videoUrl={material.pdf_url}
             title={material.title}
             displayName={material.pdf_display_name || undefined}
           />
