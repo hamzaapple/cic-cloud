@@ -22,19 +22,13 @@ async function getVapidPublicKey(): Promise<string | null> {
 
 async function saveSubscription(sub: PushSubscription) {
   const json = sub.toJSON();
-  // upsert on endpoint to avoid duplicate rows for the same device
-  await supabase
-    .from("push_subscriptions" as any)
-    .upsert(
-      {
-        endpoint: sub.endpoint,
-        p256dh: json.keys?.p256dh || null,
-        auth: json.keys?.auth || null,
-        user_agent: navigator.userAgent,
-        department: localStorage.getItem("cic_push_dept") || "all",
-      },
-      { onConflict: "endpoint" }
-    );
+  await supabase.rpc("register_push_subscription", {
+    p_endpoint: sub.endpoint,
+    p_p256dh: json.keys?.p256dh || null,
+    p_auth: json.keys?.auth || null,
+    p_user_agent: navigator.userAgent,
+    p_department: localStorage.getItem("cic_push_dept") || "all",
+  });
 }
 
 const lang = () => (typeof document !== "undefined" && document.documentElement.lang === "en" ? "en" : "ar");

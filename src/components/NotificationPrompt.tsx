@@ -96,16 +96,13 @@ const NotificationPrompt = () => {
       }
 
       const json = subscription.toJSON();
-      await supabase.from("push_subscriptions" as any).upsert(
-        {
-          endpoint: subscription.endpoint,
-          p256dh: json.keys?.p256dh || null,
-          auth: json.keys?.auth || null,
-          user_agent: navigator.userAgent,
-          department: localStorage.getItem("cic_push_dept") || "all",
-        },
-        { onConflict: "endpoint" } as any
-      );
+      await supabase.rpc("register_push_subscription", {
+        p_endpoint: subscription.endpoint,
+        p_p256dh: json.keys?.p256dh || null,
+        p_auth: json.keys?.auth || null,
+        p_user_agent: navigator.userAgent,
+        p_department: localStorage.getItem("cic_push_dept") || "all",
+      });
     };
 
     run();
