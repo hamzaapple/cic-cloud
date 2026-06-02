@@ -48,21 +48,4 @@ ON public.push_subscriptions
 FOR INSERT
 TO anon, authenticated
 WITH CHECK (true);
-
-DROP TRIGGER IF EXISTS notify_push_on_notification_insert ON public.notifications;
-CREATE TRIGGER notify_push_on_notification_insert
-AFTER INSERT ON public.notifications
-FOR EACH ROW
-EXECUTE FUNCTION public.notify_push_on_insert();
-
-DROP TRIGGER IF EXISTS notify_push_on_material_insert ON public.materials;
-CREATE TRIGGER notify_push_on_material_insert
-AFTER INSERT ON public.materials
-FOR EACH ROW
-EXECUTE FUNCTION public.notify_on_material_insert();
-
-DROP TRIGGER IF EXISTS notify_push_on_announcement_insert ON public.announcements;
-CREATE TRIGGER notify_push_on_announcement_insert
-AFTER INSERT ON public.announcements
-FOR EACH ROW
-EXECUTE FUNCTION public.notify_on_announcement_insert();
+
