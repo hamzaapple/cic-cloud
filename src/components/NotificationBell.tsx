@@ -1,24 +1,9 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Bell, BellOff, BellRing } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { useI18n } from "@/lib/i18n";
-
-async function getVapidPublicKey() {
-  const { data, error } = await supabase.functions.invoke("send-push", { method: "GET" } as any);
-  if (error || !data?.publicKey) throw error || new Error("Missing VAPID public key");
-  return data.publicKey as string;
-}
-
-function urlBase64ToUint8Array(base64String: string) {
-  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
-  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
-  const rawData = atob(base64);
-  const out = new Uint8Array(rawData.length);
-  for (let i = 0; i < rawData.length; i++) out[i] = rawData.charCodeAt(i);
-  return out;
-}
+import { getVapidPublicKey, registerPushSubscription, urlBase64ToUint8Array } from "@/lib/push-registration";
 
 const NotificationBell = () => {
   const { lang } = useI18n();
@@ -76,21 +61,7 @@ const NotificationBell = () => {
         applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
       });
 
-      const sub = subscription.toJSON();
-      const { error } = await supabase.from("push_subscriptions" as any).upsert(
-        {
-          endpoint: subscription.endpoint,
-          p256dh: sub.keys?.p256dh || null,
-          auth: sub.keys?.auth || null,
-          user_agent: navigator.userAgent,
-          department: "all",
-        },
-        { onConflict: "endpoint" }
-      );
-
-      if (error) {
-        console.error("Subscription save failed:", error);
-      }
+      await registerPushSubscription(subscription, "all");
 
       toast({
         title: lang === "ar" ? "تم تفعيل الإشعارات ✓" : "Notifications enabled ✓",
