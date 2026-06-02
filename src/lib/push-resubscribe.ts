@@ -1,35 +1,5 @@
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-
-function urlBase64ToUint8Array(base64String: string) {
-  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
-  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
-  const rawData = atob(base64);
-  const out = new Uint8Array(rawData.length);
-  for (let i = 0; i < rawData.length; i++) out[i] = rawData.charCodeAt(i);
-  return out;
-}
-
-async function getVapidPublicKey(): Promise<string | null> {
-  try {
-    const { data, error } = await supabase.functions.invoke("send-push", { method: "GET" } as any);
-    if (error || !data?.publicKey) return null;
-    return data.publicKey as string;
-  } catch {
-    return null;
-  }
-}
-
-async function saveSubscription(sub: PushSubscription) {
-  const json = sub.toJSON();
-  await supabase.rpc("register_push_subscription", {
-    p_endpoint: sub.endpoint,
-    p_p256dh: json.keys?.p256dh || null,
-    p_auth: json.keys?.auth || null,
-    p_user_agent: navigator.userAgent,
-    p_department: localStorage.getItem("cic_push_dept") || "all",
-  });
-}
+import { getVapidPublicKey, registerPushSubscription, urlBase64ToUint8Array } from "@/lib/push-registration";
 
 const lang = () => (typeof document !== "undefined" && document.documentElement.lang === "en" ? "en" : "ar");
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -74,7 +44,7 @@ export async function ensurePushSubscription(opts: { silent?: boolean } = {}) {
     if (Notification.permission !== "granted") return;
 
     const registration = await navigator.serviceWorker.ready;
-    const vapidPublicKey = await getVapidPublicKey();
+    const vapidPublicKey = await getVapidPublicKey().catch(() => null);
     if (!vapidPublicKey) return;
     const expectedKey = urlBase64ToUint8Array(vapidPublicKey);
 
@@ -86,7 +56,10 @@ export async function ensurePushSubscription(opts: { silent?: boolean } = {}) {
       const same =
         current.length === expectedKey.length &&
         current.every((b, i) => b === expectedKey[i]);
-      if (same) return; // already valid, do nothing
+      if (same) {
+        await registerPushSubscription(subscription);
+        return;
+      }
       await subscription.unsubscribe().catch(() => undefined);
       renewed = true;
     } else {
@@ -94,7 +67,7 @@ export async function ensurePushSubscription(opts: { silent?: boolean } = {}) {
     }
 
     subscription = await subscribeWithRetry(registration, expectedKey);
-    await saveSubscription(subscription);
+    await registerPushSubscription(subscription);
     console.log("[Push] Auto re-subscribed successfully");
 
     if (renewed && !opts.silent) {
