@@ -461,11 +461,11 @@ export type Database = {
       }
       register_push_subscription: {
         Args: {
+          p_auth: string
+          p_department?: string
           p_endpoint: string
-          p_p256dh: string | null
-          p_auth: string | null
-          p_user_agent: string | null
-          p_department: string | null
+          p_p256dh: string
+          p_user_agent: string
         }
         Returns: undefined
       }

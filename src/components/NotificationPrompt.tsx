@@ -1,22 +1,7 @@
 import { useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { useI18n } from "@/lib/i18n";
-
-async function getVapidPublicKey() {
-  const { data, error } = await supabase.functions.invoke("send-push", { method: "GET" } as any);
-  if (error || !data?.publicKey) throw error || new Error("Missing VAPID public key");
-  return data.publicKey as string;
-}
-
-function urlBase64ToUint8Array(base64String: string) {
-  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
-  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
-  const rawData = window.atob(base64);
-  const out = new Uint8Array(rawData.length);
-  for (let i = 0; i < rawData.length; ++i) out[i] = rawData.charCodeAt(i);
-  return out;
-}
+import { getVapidPublicKey, registerPushSubscription, urlBase64ToUint8Array } from "@/lib/push-registration";
 
 const DENIED_KEY = "cic_push_denied_at";
 const ASKED_KEY = "cic_push_asked";
@@ -95,14 +80,7 @@ const NotificationPrompt = () => {
         });
       }
 
-      const json = subscription.toJSON();
-      await supabase.rpc("register_push_subscription", {
-        p_endpoint: subscription.endpoint,
-        p_p256dh: json.keys?.p256dh || null,
-        p_auth: json.keys?.auth || null,
-        p_user_agent: navigator.userAgent,
-        p_department: localStorage.getItem("cic_push_dept") || "all",
-      });
+      await registerPushSubscription(subscription);
     };
 
     run();
