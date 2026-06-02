@@ -459,16 +459,6 @@ export type Database = {
           mod_permissions: string[]
         }[]
       }
-      register_push_subscription: {
-        Args: {
-          p_endpoint: string
-          p_p256dh: string | null
-          p_auth: string | null
-          p_user_agent: string | null
-          p_department: string | null
-        }
-        Returns: undefined
-      }
     }
     Enums: {
       [_ in never]: never
