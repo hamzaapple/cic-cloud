@@ -38,6 +38,35 @@ export type Database = {
         }
         Relationships: []
       }
+      assignment_reminders_sent: {
+        Row: {
+          id: string
+          material_id: string
+          reminder_type: string
+          sent_at: string
+        }
+        Insert: {
+          id?: string
+          material_id: string
+          reminder_type: string
+          sent_at?: string
+        }
+        Update: {
+          id?: string
+          material_id?: string
+          reminder_type?: string
+          sent_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assignment_reminders_sent_material_id_fkey"
+            columns: ["material_id"]
+            isOneToOne: false
+            referencedRelation: "materials"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
