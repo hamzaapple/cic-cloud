@@ -18,7 +18,7 @@ self.addEventListener("push", (event) => {
   let title = "CIC Cloud 🎓";
   let body = "";
   let icon = "/logo.png";
-  let badge = "/notification-badge.png";
+  let badge = "/logo.png";
   let url = "/";
 
   try {

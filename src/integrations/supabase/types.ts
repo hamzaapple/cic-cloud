@@ -436,6 +436,30 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_templates: {
+        Row: {
+          id: string
+          title_template: string
+          message_template: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          title_template: string
+          message_template: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          title_template?: string
+          message_template?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       push_subscriptions: {
         Row: {
           auth: string | null

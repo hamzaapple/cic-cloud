@@ -105,6 +105,14 @@ export interface Notification {
   created_at: string;
 }
 
+export interface NotificationTemplate {
+  id: string;
+  title_template: string;
+  message_template: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface Announcement {
   id: string;
   content: string;
@@ -477,6 +485,20 @@ export const db = {
     }
     
     return data as Notification;
+  },
+
+  // Notification Templates
+  getNotificationTemplates: async (): Promise<NotificationTemplate[]> => {
+    const { data } = await supabase.from("notification_templates").select("*");
+    return (data || []) as NotificationTemplate[];
+  },
+  updateNotificationTemplate: async (id: string, title_template: string, message_template: string) => {
+    const { error } = await supabase.from("notification_templates").update({ 
+      title_template, 
+      message_template,
+      updated_at: new Date().toISOString()
+    }).eq("id", id);
+    if (error) throw error;
   },
 
   // Announcements

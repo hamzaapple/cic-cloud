@@ -15,6 +15,7 @@ import CourseManager from "@/components/admin/CourseManager";
 import NotificationManager from "@/components/admin/NotificationManager";
 import CategoryManager from "@/components/admin/CategoryManager";
 import AnnouncementManager from "@/components/admin/AnnouncementManager";
+import NotificationTemplateManager from "@/components/admin/NotificationTemplateManager";
 import AuditLog from "./AuditLog";
 import { ShieldAlert, Megaphone } from "lucide-react";
 import {
@@ -156,6 +157,7 @@ const AdminDashboard = () => {
     sections.push({ key: "announcements", label: lang === "ar" ? "الإعلانات العامة" : "Announcements", icon: Megaphone });
   }
   if (isOwner) {
+    sections.push({ key: "notification_templates", label: lang === "ar" ? "قوالب الإشعارات" : "Notification Templates", icon: Layers });
     sections.push({ key: "moderators", label: t("admin.moderators"), icon: Users });
     sections.push({ key: "audit_logs", label: lang === "ar" ? "سجل الإدارة" : "Audit Logs", icon: ShieldAlert });
   }
@@ -257,9 +259,41 @@ const AdminDashboard = () => {
       const catName = categories.find(c => c.id === categoryId);
       const typeLabel = catName ? (lang === "ar" ? catName.name_ar : catName.name_en) : "";
 
+      // Fetch templates
+      let titleTemplate = `تم رفع {type}: {title}`;
+      let messageTemplate = `في مقرر {courseName}`;
+      
+      try {
+        const templates = await db.getNotificationTemplates();
+        let targetTemplateId = "material_upload";
+        if (isAssignment) {
+          targetTemplateId = isAssignmentOpenEnded ? "assignment_open" : "assignment_deadline";
+        }
+        
+        const template = templates.find(t => t.id === targetTemplateId);
+        if (template) {
+          titleTemplate = template.title_template;
+          messageTemplate = template.message_template;
+        }
+      } catch (e) {
+        console.error("Failed to fetch templates", e);
+      }
+
+      // Replace variables
+      const notifTitle = titleTemplate
+        .replace(/{type}/g, typeLabel)
+        .replace(/{title}/g, pdfDisplayName || title)
+        .replace(/{courseName}/g, courseName);
+
+      const notifMessage = messageTemplate
+        .replace(/{type}/g, typeLabel)
+        .replace(/{title}/g, pdfDisplayName || title)
+        .replace(/{courseName}/g, courseName)
+        .replace(/{deadline}/g, deadline || "");
+
       db.addNotification({
-        title: `تم رفع ${typeLabel}: ${pdfDisplayName || title}`,
-        message: isAssignment ? (isAssignmentOpenEnded ? `بدون موعد نهائي` : `موعد التسليم: ${deadline}`) : `في مقرر ${courseName}`,
+        title: notifTitle,
+        message: notifMessage,
         target_audience: "all",
         sent_by: "system",
       }).catch(err => console.warn("Auto-notification failed (material was uploaded):", err));
@@ -352,9 +386,34 @@ const AdminDashboard = () => {
     db.addAuditLog(`رفع مجموعة (${successCount} ملف)`, `في مقرر ${courseName} — ${typeLabel}`, {
       action_type: "bulk_upload",
     }).catch(() => {});
+    
+    // Fetch bulk template
+    let bulkTitleTemplate = `تم رفع {count} {type} جديدة`;
+    let bulkMessageTemplate = `في مقرر {courseName}`;
+    try {
+      const templates = await db.getNotificationTemplates();
+      const bulkTemplate = templates.find(t => t.id === "bulk_upload");
+      if (bulkTemplate) {
+        bulkTitleTemplate = bulkTemplate.title_template;
+        bulkMessageTemplate = bulkTemplate.message_template;
+      }
+    } catch (e) {
+      console.error("Failed to fetch templates", e);
+    }
+
+    const notifTitleBulk = bulkTitleTemplate
+      .replace(/{count}/g, successCount.toString())
+      .replace(/{type}/g, typeLabel)
+      .replace(/{courseName}/g, courseName);
+
+    const notifMessageBulk = bulkMessageTemplate
+      .replace(/{count}/g, successCount.toString())
+      .replace(/{type}/g, typeLabel)
+      .replace(/{courseName}/g, courseName);
+
     db.addNotification({
-      title: `تم رفع ${successCount} ${typeLabel} جديدة`,
-      message: `في مقرر ${courseName}`,
+      title: notifTitleBulk,
+      message: notifMessageBulk,
       target_audience: "all",
       sent_by: "system",
     }).catch(err => console.warn("Auto-notification failed (bulk upload):", err));
@@ -812,6 +871,7 @@ const AdminDashboard = () => {
         )}
 
         {activeSection === "notifications" && <NotificationManager />}
+        {activeSection === "notification_templates" && isOwner && <NotificationTemplateManager />}
         {activeSection === "announcements" && (isOwner || auth.hasPermission("announcements")) && <AnnouncementManager />}
         {activeSection === "categories" && (isOwner || auth.hasPermission("manage_categories")) && <CategoryManager />}
         {activeSection === "moderators" && isOwner && <ManageModerators departments={departments} />}
