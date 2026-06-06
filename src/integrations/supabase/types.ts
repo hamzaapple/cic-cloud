@@ -44,6 +44,7 @@ export type Database = {
           action_type: string | null
           admin_id: string | null
           admin_name: string
+          admin_year: string
           created_at: string
           details: string | null
           id: string
@@ -55,6 +56,7 @@ export type Database = {
           action_type?: string | null
           admin_id?: string | null
           admin_name: string
+          admin_year?: string
           created_at?: string
           details?: string | null
           id?: string
@@ -66,6 +68,7 @@ export type Database = {
           action_type?: string | null
           admin_id?: string | null
           admin_name?: string
+          admin_year?: string
           created_at?: string
           details?: string | null
           id?: string
@@ -76,6 +79,7 @@ export type Database = {
       }
       courses: {
         Row: {
+          academic_year: string
           code: string
           color: string
           created_at: string
@@ -84,8 +88,10 @@ export type Database = {
           description_ar: string
           id: string
           name: string
+          semester: string
         }
         Insert: {
+          academic_year?: string
           code: string
           color?: string
           created_at?: string
@@ -94,8 +100,10 @@ export type Database = {
           description_ar?: string
           id?: string
           name: string
+          semester?: string
         }
         Update: {
+          academic_year?: string
           code?: string
           color?: string
           created_at?: string
@@ -104,6 +112,7 @@ export type Database = {
           description_ar?: string
           id?: string
           name?: string
+          semester?: string
         }
         Relationships: [
           {
@@ -326,6 +335,7 @@ export type Database = {
       }
       moderators: {
         Row: {
+          academic_year: string
           created_at: string
           department_id: string | null
           display_name: string

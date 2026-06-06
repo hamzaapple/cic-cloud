@@ -13,7 +13,9 @@ import DhikrBanner from "./components/DhikrBanner";
 
 // Lazy load pages
 const Index = lazy(() => import("./pages/Index"));
-const DepartmentPage = lazy(() => import("./pages/DepartmentPage"));
+const YearDepartmentsPage = lazy(() => import("./pages/YearDepartmentsPage"));
+const YearSemestersPage = lazy(() => import("./pages/YearSemestersPage"));
+const YearCoursesPage = lazy(() => import("./pages/YearCoursesPage"));
 const CoursePage = lazy(() => import("./pages/CoursePage"));
 const CalendarPage = lazy(() => import("./pages/CalendarPage"));
 const LinksPage = lazy(() => import("./pages/LinksPage"));
@@ -46,7 +48,9 @@ const AppContent = () => {
         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/department/:id" element={<DepartmentPage />} />
+            <Route path="/year/:yearId/departments" element={<YearDepartmentsPage />} />
+            <Route path="/year/:yearId/semesters" element={<YearSemestersPage />} />
+            <Route path="/year/:yearId/courses" element={<YearCoursesPage />} />
             <Route path="/course/:id" element={<CoursePage />} />
             <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/links" element={<LinksPage />} />

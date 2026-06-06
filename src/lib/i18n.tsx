@@ -152,6 +152,23 @@ const translations: Record<string, Record<Lang, string>> = {
   "pdfViewer.fallbackTitle": { ar: "المتصفح لا يدعم عرض PDF المضمّن", en: "Your browser doesn't support embedded PDFs" },
   "pdfViewer.fallbackMessage": { ar: "يمكنك تحميل الملف مباشرة على جهازك.", en: "You can download the file directly to your device." },
 
+  // PDF Annotator tools
+  "pdfAnnotator.pen": { ar: "قلم", en: "Pen" },
+  "pdfAnnotator.highlighter": { ar: "تظليل", en: "Highlighter" },
+  "pdfAnnotator.eraser": { ar: "ممحاة", en: "Eraser" },
+  "pdfAnnotator.shapes": { ar: "أشكال", en: "Shapes" },
+  "pdfAnnotator.checkmark": { ar: "علامة صح", en: "Checkmark" },
+  "pdfAnnotator.circle": { ar: "دائرة", en: "Circle" },
+  "pdfAnnotator.pointer": { ar: "مؤشر", en: "Pointer" },
+  "pdfAnnotator.rotateCW": { ar: "تدوير ←", en: "Rotate CW" },
+  "pdfAnnotator.rotateCCW": { ar: "تدوير →", en: "Rotate CCW" },
+  "pdfAnnotator.undo": { ar: "تراجع", en: "Undo" },
+  "pdfAnnotator.redo": { ar: "إعادة", en: "Redo" },
+  "pdfAnnotator.clearPage": { ar: "مسح الصفحة", en: "Clear Page" },
+  "pdfAnnotator.zoomIn": { ar: "تكبير", en: "Zoom In" },
+  "pdfAnnotator.zoomOut": { ar: "تصغير", en: "Zoom Out" },
+  "pdfAnnotator.downloading": { ar: "جاري تجهيز PDF...", en: "Preparing PDF..." },
+  "pdfAnnotator.downloadDone": { ar: "تم تحميل PDF مع التعديلات!", en: "Annotated PDF downloaded!" },
 
   // External Link Modal
   "externalLink.openInNewTab": { ar: "فتح في تبويب جديد", en: "Open in new tab" },

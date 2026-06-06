@@ -1,37 +1,27 @@
 import { motion, type Variants } from "framer-motion";
 import { Link } from "react-router-dom";
-import { db, type Department } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
-import { ArrowLeft, ArrowRight, Monitor, Brain } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { ArrowLeft, ArrowRight, BookOpen, Layers, Monitor, Cpu } from "lucide-react";
 import { playClickSfx } from "@/hooks/use-sfx";
 
 const container: Variants = {
   hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.05 } }
+  show: { opacity: 1, transition: { staggerChildren: 0.1 } }
 };
 const item: Variants = {
-  hidden: { opacity: 0, y: 20, scale: 0.98 },
-  show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.3, ease: "easeOut" as const } }
+  hidden: { opacity: 0, y: 20, scale: 0.95 },
+  show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4, ease: "easeOut" } }
 };
 
-const DEPT_ICONS: Record<string, typeof Monitor> = {
-  CS: Monitor,
-  "AI, Cyber": Brain,
-};
-
-const DEPT_COLORS: Record<string, string> = {
-  CS: "190 80% 45%",
-  "AI, Cyber": "260 70% 55%",
-};
+const YEARS = [
+  { id: "1", name_ar: "الصف الدراسي الأول", name_en: "First Academic Year", iconSymbol: "1", color: "190 80% 45%", route: "departments" },
+  { id: "2", name_ar: "الصف الدراسي الثاني", name_en: "Second Academic Year", iconSymbol: "2", color: "260 70% 55%", route: "departments" },
+  { id: "3", name_ar: "الصف الدراسي الثالث", name_en: "Third Academic Year", iconSymbol: "3", color: "340 70% 55%", route: "semesters" },
+  { id: "4", name_ar: "الصف الدراسي الرابع", name_en: "Fourth Academic Year", iconSymbol: "4", color: "30 80% 50%", route: "semesters" },
+];
 
 const Index = () => {
   const { t, lang } = useI18n();
-  const { data: departments = [] } = useQuery({
-    queryKey: ["departments"],
-    queryFn: db.getDepartments
-  });
-
   const Arrow = lang === "ar" ? ArrowLeft : ArrowRight;
 
   return (
@@ -57,42 +47,52 @@ const Index = () => {
           className="text-center mb-8"
         >
           <h2 className="text-xl font-display font-semibold text-foreground">
-            {t("dept.selectDepartment")}
+            {lang === "ar" ? "اختر السنة الدراسية" : "Select Academic Year"}
           </h2>
         </motion.div>
 
-        <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
-          {departments.map((dept) => {
-            const Icon = DEPT_ICONS[dept.name_en] || Monitor;
-            const color = DEPT_COLORS[dept.name_en] || "190 80% 45%";
+        <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          {YEARS.map((year) => {
+            // Determine target route
+            // Years 1 & 2 -> /year/:yearId/departments
+            // Years 3, 4 -> /year/:yearId/semesters
+            const targetRoute = `/year/${year.id}/${year.route}`;
+
             return (
-              <motion.div key={dept.id} variants={item}>
-                <Link to={`/department/${dept.id}`} onClick={() => playClickSfx()}>
+              <motion.div key={year.id} variants={item}>
+                <Link to={targetRoute} onClick={() => playClickSfx()}>
                   <motion.div
-                    whileHover={{ y: -8, scale: 1.03 }}
+                    whileHover={{ y: -8, scale: 1.05 }}
                     whileTap={{ scale: 0.97 }}
-                    className="glass-card rounded-2xl p-8 h-full group relative overflow-hidden"
+                    className="glass-card rounded-2xl p-8 h-full group relative overflow-hidden shadow-sm"
                   >
                     {/* Glow background */}
                     <div
-                      className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity duration-500"
+                      className="absolute inset-0 opacity-10 group-hover:opacity-25 transition-all duration-500"
                       style={{
-                        background: `radial-gradient(circle at 30% 30%, hsl(${color} / 0.4), transparent 70%)`,
+                        background: `radial-gradient(circle at 50% 50%, hsl(${year.color} / 0.5), transparent 70%)`,
                       }}
                     />
 
-                    <div className="relative z-10">
+                    <div className="relative z-10 flex flex-col items-center text-center">
                       <div
-                        className="w-16 h-16 rounded-2xl mb-6 flex items-center justify-center"
-                        style={{ background: `hsl(${color} / 0.15)`, color: `hsl(${color})` }}
+                        className="mb-6 flex items-center justify-center transition-transform duration-500 group-hover:scale-110"
                       >
-                        <Icon className="w-8 h-8" />
+                        <span 
+                          className="text-7xl font-black"
+                          style={{ 
+                            color: `hsl(${year.color})`,
+                            textShadow: `0 0 40px hsl(${year.color} / 0.6), 0 0 80px hsl(${year.color} / 0.4)`
+                          }}
+                        >
+                          {year.iconSymbol}
+                        </span>
                       </div>
-                      <h3 className="font-display font-bold text-xl mb-2">
-                        {lang === "ar" ? dept.name_ar : dept.name_en}
+                      <h3 className="font-display font-bold text-2xl mb-2 text-foreground">
+                        {lang === "ar" ? year.name_ar : year.name_en}
                       </h3>
-                      <div className="flex items-center gap-1 text-primary text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity mt-4">
-                        {t("dept.viewCourses")} <Arrow className="w-4 h-4" />
+                      <div className="flex items-center gap-1 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity mt-4" style={{ color: `hsl(${year.color})` }}>
+                        {lang === "ar" ? "المتابعة" : "Continue"} <Arrow className="w-4 h-4" />
                       </div>
                     </div>
                   </motion.div>

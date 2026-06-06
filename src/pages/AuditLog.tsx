@@ -28,6 +28,7 @@ interface AuditLogEntry {
   id: string;
   admin_id: string;
   admin_name: string;
+  admin_year: string;
   action: string;
   details: string;
   action_type: string;
@@ -138,6 +139,7 @@ const AuditLog = ({ courses = [], categories = [], onUpdate }: AuditLogProps) =>
   const [logs, setLogs] = useState<AuditLogEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("all");
+  const [yearFilter, setYearFilter] = useState<string>("all");
   const [restoringId, setRestoringId] = useState<string | null>(null);
 
   // Edit State
@@ -283,8 +285,12 @@ const AuditLog = ({ courses = [], categories = [], onUpdate }: AuditLogProps) =>
     }
   };
 
-  const filteredLogs =
+  const filteredByType =
     filter === "all" ? logs : logs.filter((l) => l.action_type === filter);
+  
+  const filteredLogs = yearFilter === "all" 
+    ? filteredByType 
+    : filteredByType.filter((l) => l.admin_year === yearFilter);
 
   // Group logs by date
   const groupedLogs: Record<string, AuditLogEntry[]> = {};
@@ -302,6 +308,14 @@ const AuditLog = ({ courses = [], categories = [], onUpdate }: AuditLogProps) =>
     { value: "archive", labelAr: "أرشفة", labelEn: "Archive" },
     { value: "restore", labelAr: "استعادة", labelEn: "Restore" },
     { value: "add_link", labelAr: "روابط", labelEn: "Links" },
+  ];
+
+  const yearFilterOptions = [
+    { value: "all", labelAr: "كل الصفوف", labelEn: "All Years" },
+    { value: "1", labelAr: "الصف الأول", labelEn: "1st Year" },
+    { value: "2", labelAr: "الصف الثاني", labelEn: "2nd Year" },
+    { value: "3", labelAr: "الصف الثالث", labelEn: "3rd Year" },
+    { value: "4", labelAr: "الصف الرابع", labelEn: "4th Year" },
   ];
 
   if (!isOwner) {
@@ -335,9 +349,29 @@ const AuditLog = ({ courses = [], categories = [], onUpdate }: AuditLogProps) =>
         </button>
       </div>
 
-      {/* Filter chips */}
-      <div className="flex gap-1.5 overflow-x-auto pb-1">
-        <Filter className="w-4 h-4 text-muted-foreground shrink-0 mt-1.5" />
+      {/* Filters */}
+      <div className="flex flex-col gap-3">
+        {/* Year Filter */}
+        <div className="flex gap-1.5 overflow-x-auto pb-1">
+          <User className="w-4 h-4 text-muted-foreground shrink-0 mt-1.5" />
+          {yearFilterOptions.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => setYearFilter(opt.value)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
+                yearFilter === opt.value
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "bg-secondary/50 text-muted-foreground hover:bg-secondary hover:text-foreground"
+              }`}
+            >
+              {lang === "ar" ? opt.labelAr : opt.labelEn}
+            </button>
+          ))}
+        </div>
+
+        {/* Action Type Filter */}
+        <div className="flex gap-1.5 overflow-x-auto pb-1">
+          <Filter className="w-4 h-4 text-muted-foreground shrink-0 mt-1.5" />
         {filterOptions.map((opt) => (
           <button
             key={opt.value}
@@ -351,6 +385,7 @@ const AuditLog = ({ courses = [], categories = [], onUpdate }: AuditLogProps) =>
             {lang === "ar" ? opt.labelAr : opt.labelEn}
           </button>
         ))}
+        </div>
       </div>
 
       {/* Content */}

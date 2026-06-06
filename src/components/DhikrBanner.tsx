@@ -42,26 +42,28 @@ const DhikrBanner = () => {
   }, []);
 
   return (
-    <div className="fixed top-20 left-1/2 -translate-x-1/2 z-30 px-4 pointer-events-none w-full flex justify-center">
+    <div className="fixed z-30 pointer-events-none 
+      bottom-6 left-1/2 -translate-x-1/2 w-full flex justify-center px-4
+      md:bottom-auto md:top-36 md:right-8 md:left-auto md:translate-x-0 md:translate-y-0 md:w-auto md:justify-end">
       <AnimatePresence mode="wait">
         <motion.div
           key={index}
-          initial={{ opacity: 0, y: -20, scale: 0.9 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -10, scale: 0.95 }}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.9 }}
           transition={{ type: "spring", stiffness: 200, damping: 22 }}
           className="pointer-events-auto"
         >
           <motion.div
-            animate={{ y: [0, -3, 0] }}
+            animate={{ y: [0, -4, 0] }}
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            className="backdrop-blur-xl border-2 border-emerald-500/40 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 rounded-full px-6 py-2 flex items-center gap-3 shadow-[0_0_20px_rgba(16,185,129,0.25)] max-w-xl"
+            className="backdrop-blur-xl border-2 border-emerald-500/40 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 shadow-[0_0_20px_rgba(16,185,129,0.3)]
+            flex items-center justify-center
+            rounded-full px-6 py-3 max-w-[90vw]
+            md:w-40 md:h-40 md:p-6 md:flex-col md:text-center"
             dir="rtl"
           >
-            <div className="text-base leading-none" aria-hidden>
-              📿
-            </div>
-            <p className="text-sm font-semibold leading-tight whitespace-nowrap">
+            <p className="text-sm md:text-base font-bold leading-relaxed text-center">
               {DHIKR[index]}
             </p>
           </motion.div>

@@ -27,15 +27,22 @@ interface Props {
 
 const CourseManager = ({ courses, departments, deptFilter, onUpdate, canEdit, canDelete, canCreate }: Props) => {
   const { t, lang } = useI18n();
-  const isOwner = auth.isOwner();
+  const user = auth.getCurrentUser();
+  const isOwner = user.role === "owner";
+  const modYear = user.academicYear || "1";
+  
   const [courseName, setCourseName] = useState("");
   const [courseCode, setCourseCode] = useState("");
   const [courseDesc, setCourseDesc] = useState("");
   const [courseDeptId, setCourseDeptId] = useState(deptFilter !== "all" ? deptFilter : (departments[0]?.id || ""));
+  const [courseYear, setCourseYear] = useState(isOwner ? "1" : modYear);
+  const [courseSemester, setCourseSemester] = useState("2");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const [editCode, setEditCode] = useState("");
   const [editDesc, setEditDesc] = useState("");
+  const [editYear, setEditYear] = useState("1");
+  const [editSemester, setEditSemester] = useState("2");
 
   // Shared courses state
   const [showSharePanel, setShowSharePanel] = useState(false);
@@ -87,16 +94,16 @@ const CourseManager = ({ courses, departments, deptFilter, onUpdate, canEdit, ca
   const handleAddCourse = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!courseName || !courseCode) { toast.error(t("admin.titleAndCourseReq")); return; }
-    await db.addCourse({ name: courseName, code: courseCode, description: courseDesc, department_id: courseDeptId || undefined });
+    await db.addCourse({ name: courseName, code: courseCode, description: courseDesc, department_id: courseDeptId === "none" ? null : (courseDeptId || null), academic_year: courseYear, semester: courseSemester });
     onUpdate();
-    setCourseName(""); setCourseCode(""); setCourseDesc("");
+    setCourseName(""); setCourseCode(""); setCourseDesc(""); setCourseYear("1"); setCourseSemester("2");
     toast.success(t("admin.uploadSuccess"));
   };
 
-  const startEdit = (c: Course) => { setEditingId(c.id); setEditName(translateCourseName(c.name, lang)); setEditCode(c.code); setEditDesc(c.description); };
+  const startEdit = (c: Course) => { setEditingId(c.id); setEditName(translateCourseName(c.name, lang)); setEditCode(c.code); setEditDesc(c.description); setEditYear(c.academic_year || "1"); setEditSemester(c.semester || "2"); };
 
   const saveEdit = async (id: string) => {
-    await db.updateCourse(id, { name: editName, code: editCode, description: editDesc });
+    await db.updateCourse(id, { name: editName, code: editCode, description: editDesc, academic_year: editYear, semester: editSemester });
     onUpdate();
     setEditingId(null);
     toast.success(t("courseMgr.allCourses"));
@@ -187,11 +194,30 @@ const CourseManager = ({ courses, departments, deptFilter, onUpdate, canEdit, ca
                 <Select value={courseDeptId} onValueChange={setCourseDeptId}>
                   <SelectTrigger className="bg-secondary/50"><SelectValue placeholder={t("admin.selectDept")} /></SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="none">{lang === "ar" ? "بدون قسم" : "No Department"}</SelectItem>
                     {departments.map(d => (
                       <SelectItem key={d.id} value={d.id}>{lang === "ar" ? d.name_ar : d.name_en}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
+                <div className="grid grid-cols-2 gap-2">
+                  <Select value={courseYear} onValueChange={setCourseYear} disabled={!isOwner}>
+                    <SelectTrigger className="bg-secondary/50"><SelectValue placeholder="Year" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">{lang === "ar" ? "الصف الأول" : "1st Year"}</SelectItem>
+                      <SelectItem value="2">{lang === "ar" ? "الصف الثاني" : "2nd Year"}</SelectItem>
+                      <SelectItem value="3">{lang === "ar" ? "الصف الثالث" : "3rd Year"}</SelectItem>
+                      <SelectItem value="4">{lang === "ar" ? "الصف الرابع" : "4th Year"}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={courseSemester} onValueChange={setCourseSemester}>
+                    <SelectTrigger className="bg-secondary/50"><SelectValue placeholder="Semester" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">{lang === "ar" ? "الفصل الأول" : "1st Sem"}</SelectItem>
+                      <SelectItem value="2">{lang === "ar" ? "الفصل الثاني" : "2nd Sem"}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
                 <Button type="submit" className="w-full">{t("courseMgr.add")}</Button>
               </form>
             </div>
@@ -208,6 +234,24 @@ const CourseManager = ({ courses, departments, deptFilter, onUpdate, canEdit, ca
                     <Input value={editName} onChange={e => setEditName(e.target.value)} className="bg-secondary/50 text-sm" />
                     <Input value={editCode} onChange={e => setEditCode(e.target.value)} className="bg-secondary/50 text-sm" />
                     <Textarea value={editDesc} onChange={e => setEditDesc(e.target.value)} className="bg-secondary/50 text-sm min-h-[60px]" />
+                    <div className="grid grid-cols-2 gap-2">
+                      <Select value={editYear} onValueChange={setEditYear} disabled={!isOwner}>
+                        <SelectTrigger className="bg-secondary/50 h-8 text-xs"><SelectValue placeholder="Year" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="1">1</SelectItem>
+                          <SelectItem value="2">2</SelectItem>
+                          <SelectItem value="3">3</SelectItem>
+                          <SelectItem value="4">4</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Select value={editSemester} onValueChange={setEditSemester}>
+                        <SelectTrigger className="bg-secondary/50 h-8 text-xs"><SelectValue placeholder="Semester" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="1">S1</SelectItem>
+                          <SelectItem value="2">S2</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                     <div className="flex gap-2">
                       <Button size="sm" onClick={() => saveEdit(course.id)}><Check className="w-3 h-3 ml-1" /> {t("schedule.saveEdit")}</Button>
                       <Button size="sm" variant="ghost" onClick={() => setEditingId(null)}><X className="w-3 h-3 ml-1" /> {t("mod.cancel")}</Button>

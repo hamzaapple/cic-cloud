@@ -42,6 +42,8 @@ export interface Course {
   description_ar?: string;
   color: string;
   department_id?: string | null;
+  academic_year: string;
+  semester: string;
   created_at?: string;
 }
 
@@ -82,6 +84,7 @@ export interface Moderator {
   display_name: string;
   permissions: Permission[];
   department_id?: string | null;
+  academic_year: string;
   created_at: string;
 }
 
@@ -118,6 +121,7 @@ export interface CurrentUser {
   permissions?: Permission[];
   displayName?: string;
   departmentId?: string | null;
+  academicYear?: string;
 }
 
 const COURSE_COLORS = [
@@ -135,11 +139,12 @@ export const auth = {
       const permsStr = localStorage.getItem("lms_mod_perms") || "[]";
       const displayName = localStorage.getItem("lms_mod_name") || "مشرف";
       const departmentId = localStorage.getItem("lms_mod_dept") || null;
+      const academicYear = localStorage.getItem("lms_mod_year") || "1";
       try {
         const permissions = JSON.parse(permsStr) as Permission[];
-        return { role: "moderator", moderatorId: modId, permissions, displayName, departmentId };
+        return { role: "moderator", moderatorId: modId, permissions, displayName, departmentId, academicYear };
       } catch {
-        return { role: "moderator", moderatorId: modId, permissions: [], displayName, departmentId };
+        return { role: "moderator", moderatorId: modId, permissions: [], displayName, departmentId, academicYear };
       }
     }
     return { role: null };
@@ -178,11 +183,13 @@ export const auth = {
         localStorage.setItem("lms_mod_perms", JSON.stringify(data.permissions || []));
         localStorage.setItem("lms_mod_name", data.displayName || "مشرف");
         localStorage.setItem("lms_mod_dept", data.departmentId || "");
+        localStorage.setItem("lms_mod_year", data.academicYear || "1");
       } else {
         localStorage.removeItem("lms_mod_id");
         localStorage.removeItem("lms_mod_perms");
         localStorage.removeItem("lms_mod_name");
         localStorage.removeItem("lms_mod_dept");
+        localStorage.removeItem("lms_mod_year");
       }
 
       return { success: true };
@@ -196,6 +203,7 @@ export const auth = {
     localStorage.removeItem("lms_mod_perms");
     localStorage.removeItem("lms_mod_name");
     localStorage.removeItem("lms_mod_dept");
+    localStorage.removeItem("lms_mod_year");
     supabase.auth.signOut();
   },
 };
@@ -236,14 +244,14 @@ export const db = {
     const { data } = await supabase.from("courses").select("*").eq("department_id", departmentId).order("created_at");
     return (data || []) as Course[];
   },
-  addCourse: async (course: { name: string; code: string; description: string; description_ar?: string; department_id?: string }) => {
+  addCourse: async (course: { name: string; code: string; description: string; description_ar?: string; department_id?: string | null; academic_year: string; semester: string }) => {
     const { data: existing } = await supabase.from("courses").select("id");
     const color = COURSE_COLORS[(existing?.length || 0) % COURSE_COLORS.length];
     const { data, error } = await supabase.from("courses").insert({ ...course, color }).select().single();
     if (error) throw error;
     return data as Course;
   },
-  updateCourse: async (id: string, updates: Partial<Pick<Course, "name" | "code" | "description" | "description_ar" | "department_id">>) => {
+  updateCourse: async (id: string, updates: Partial<Pick<Course, "name" | "code" | "description" | "description_ar" | "department_id" | "academic_year" | "semester">>) => {
     const { error } = await supabase.from("courses").update(updates).eq("id", id);
     if (error) throw error;
   },
@@ -370,7 +378,7 @@ export const db = {
     const { data } = await supabase.from("moderators").select("*").order("created_at");
     return (data || []).map(m => ({ ...m, permissions: m.permissions as Permission[] })) as Moderator[];
   },
-  addModerator: async (mod: { username: string; password: string; display_name: string; permissions: Permission[]; department_id?: string | null }) => {
+  addModerator: async (mod: { username: string; password: string; display_name: string; permissions: Permission[]; department_id?: string | null; academic_year: string }) => {
     const { data, error } = await supabase.functions.invoke('create-moderator-auth', {
       body: mod,
     });
@@ -382,7 +390,7 @@ export const db = {
     const { error } = await supabase.from("moderators").delete().eq("id", id);
     if (error) throw error;
   },
-  updateModerator: async (id: string, updates: { permissions?: Permission[]; department_id?: string | null }) => {
+  updateModerator: async (id: string, updates: { permissions?: Permission[]; department_id?: string | null; academic_year?: string }) => {
     const { error } = await supabase.from("moderators").update(updates).eq("id", id);
     if (error) throw error;
   },
@@ -507,6 +515,7 @@ export const db = {
         action_type: options?.action_type || "other",
         related_material_id: options?.related_material_id || null,
         material_snapshot: options?.material_snapshot || null,
+        admin_year: user.role === "owner" ? "1" : (user.academicYear || "1"),
       });
     } catch (e) {
       console.error("Audit log failed", e);

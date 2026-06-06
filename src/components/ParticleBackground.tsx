@@ -19,9 +19,9 @@ const ParticleBackground = () => {
   const isMobile = useIsMobile();
 
   const initParticles = useCallback((w: number, h: number, mobile: boolean) => {
-    // Fewer particles on mobile for better performance
-    const maxCount = mobile ? 20 : 80;
-    const divisor = mobile ? 25000 : 12000;
+    // Fewer particles on mobile and desktop for better performance
+    const maxCount = mobile ? 15 : 40;
+    const divisor = mobile ? 30000 : 20000;
     const count = Math.min(Math.floor((w * h) / divisor), maxCount);
     particlesRef.current = Array.from({ length: count }, () => ({
       x: Math.random() * w,

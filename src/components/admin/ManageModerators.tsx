@@ -76,11 +76,14 @@ const ManageModerators = ({ departments }: Props) => {
   const [displayName, setDisplayName] = useState("");
   const [selectedPerms, setSelectedPerms] = useState<Permission[]>([]);
   const [selectedDeptId, setSelectedDeptId] = useState<string>("");
+  const [selectedYear, setSelectedYear] = useState<string>("1");
+  const [filterYear, setFilterYear] = useState<string>("all");
 
   // Edit modal state
   const [editMod, setEditMod] = useState<Moderator | null>(null);
   const [editPerms, setEditPerms] = useState<Permission[]>([]);
   const [editDeptId, setEditDeptId] = useState<string>("");
+  const [editYear, setEditYear] = useState<string>("1");
   const [editSharedCourses, setEditSharedCourses] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
 
@@ -118,10 +121,11 @@ const ManageModerators = ({ departments }: Props) => {
     await db.addModerator({
       username, password, display_name: displayName,
       permissions: selectedPerms,
-      department_id: selectedDeptId,
+      department_id: selectedDeptId || null,
+      academic_year: selectedYear,
     });
     await loadMods();
-    setUsername(""); setPassword(""); setDisplayName(""); setSelectedPerms([]); setSelectedDeptId("");
+    setUsername(""); setPassword(""); setDisplayName(""); setSelectedPerms([]); setSelectedDeptId(""); setSelectedYear("1");
     toast.success(t("mod.addedSuccess"));
   };
 
@@ -135,6 +139,7 @@ const ManageModerators = ({ departments }: Props) => {
     setEditMod(mod);
     setEditPerms([...mod.permissions]);
     setEditDeptId(mod.department_id || "");
+    setEditYear(mod.academic_year || "1");
     const modAccess = allAccess.filter(a => a.moderator_id === mod.id).map(a => a.course_id);
     setEditSharedCourses(modAccess);
   };
@@ -146,6 +151,7 @@ const ManageModerators = ({ departments }: Props) => {
       await db.updateModerator(editMod.id, {
         permissions: editPerms,
         department_id: editDeptId || null,
+        academic_year: editYear,
       });
       await db.setModeratorCourseAccess(editMod.id, editSharedCourses);
       await loadMods();
@@ -200,6 +206,8 @@ const ManageModerators = ({ departments }: Props) => {
 
   const editAllSelected = ALL_PERMISSIONS.every(p => editPerms.includes(p));
 
+  const filteredModerators = filterYear === "all" ? moderators : moderators.filter(m => m.academic_year === filterYear);
+
   return (
     <div className="grid lg:grid-cols-3 gap-8">
       <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="lg:col-span-1">
@@ -211,6 +219,19 @@ const ManageModerators = ({ departments }: Props) => {
             <Input placeholder={t("mod.displayName")} value={displayName} onChange={e => setDisplayName(e.target.value)} className="bg-secondary/50" />
             <Input placeholder={t("mod.username")} value={username} onChange={e => setUsername(e.target.value)} className="bg-secondary/50" />
             <Input type="password" placeholder={t("mod.password")} value={password} onChange={e => setPassword(e.target.value)} className="bg-secondary/50" />
+
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-muted-foreground">{lang === "ar" ? "الصف الدراسي" : "Academic Year"}</p>
+              <Select value={selectedYear} onValueChange={setSelectedYear}>
+                <SelectTrigger className="bg-secondary/50"><SelectValue placeholder={lang === "ar" ? "اختر الصف" : "Select Year"} /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">{lang === "ar" ? "الصف الأول" : "First Year"}</SelectItem>
+                  <SelectItem value="2">{lang === "ar" ? "الصف الثاني" : "Second Year"}</SelectItem>
+                  <SelectItem value="3">{lang === "ar" ? "الصف الثالث" : "Third Year"}</SelectItem>
+                  <SelectItem value="4">{lang === "ar" ? "الصف الرابع" : "Fourth Year"}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
             <div className="space-y-1">
               <p className="text-sm font-medium text-muted-foreground">{t("mod.department")}</p>
@@ -250,12 +271,26 @@ const ManageModerators = ({ departments }: Props) => {
       </motion.div>
 
       <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="lg:col-span-2">
-        <h2 className="font-display font-semibold text-lg mb-4">{t("mod.moderators")}</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-display font-semibold text-lg">{t("mod.moderators")}</h2>
+          <Select value={filterYear} onValueChange={setFilterYear}>
+            <SelectTrigger className="w-[140px] bg-secondary/50 h-8 text-xs">
+              <SelectValue placeholder={lang === "ar" ? "كل الصفوف" : "All Years"} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{lang === "ar" ? "كل الصفوف" : "All Years"}</SelectItem>
+              <SelectItem value="1">{lang === "ar" ? "الصف الأول" : "First Year"}</SelectItem>
+              <SelectItem value="2">{lang === "ar" ? "الصف الثاني" : "Second Year"}</SelectItem>
+              <SelectItem value="3">{lang === "ar" ? "الصف الثالث" : "Third Year"}</SelectItem>
+              <SelectItem value="4">{lang === "ar" ? "الصف الرابع" : "Fourth Year"}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
         <div className="space-y-3">
-          {moderators.length === 0 ? (
+          {filteredModerators.length === 0 ? (
             <p className="text-center py-12 text-muted-foreground">{t("mod.noModerators")}</p>
           ) : (
-            moderators.map((mod, i) => (
+            filteredModerators.map((mod, i) => (
               <motion.div key={mod.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="glass-card rounded-xl p-5">
                 <div className="flex items-start justify-between">
                   <div>
@@ -324,6 +359,20 @@ const ManageModerators = ({ departments }: Props) => {
             <DialogTitle>{t("mod.editModerator")} — {editMod?.display_name}</DialogTitle>
             <DialogDescription>@{editMod?.username}</DialogDescription>
           </DialogHeader>
+
+          {/* Year */}
+          <div className="space-y-1">
+            <p className="text-sm font-medium text-muted-foreground">{lang === "ar" ? "الصف الدراسي" : "Academic Year"}</p>
+            <Select value={editYear} onValueChange={setEditYear}>
+              <SelectTrigger className="bg-secondary/50"><SelectValue placeholder={lang === "ar" ? "اختر الصف" : "Select Year"} /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1">{lang === "ar" ? "الصف الأول" : "First Year"}</SelectItem>
+                <SelectItem value="2">{lang === "ar" ? "الصف الثاني" : "Second Year"}</SelectItem>
+                <SelectItem value="3">{lang === "ar" ? "الصف الثالث" : "Third Year"}</SelectItem>
+                <SelectItem value="4">{lang === "ar" ? "الصف الرابع" : "Fourth Year"}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
           {/* Department */}
           <div className="space-y-1">
