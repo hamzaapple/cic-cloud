@@ -346,6 +346,7 @@ export type Database = {
           username: string
         }
         Insert: {
+          academic_year?: string
           created_at?: string
           department_id?: string | null
           display_name: string
@@ -356,6 +357,7 @@ export type Database = {
           username: string
         }
         Update: {
+          academic_year?: string
           created_at?: string
           department_id?: string | null
           display_name?: string

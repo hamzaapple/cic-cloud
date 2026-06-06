@@ -16,23 +16,17 @@ export default defineConfig(({ mode }) => ({
     react(),
     mode === "development" && componentTagger(),
     VitePWA({
-      disable: mode === "development", // Disable in dev to dramatically improve performance
+      disable: mode === "development",
       registerType: "autoUpdate",
-      includeAssets: ["favicon.ico", "robots.txt"],
-      workbox: {
-        navigateFallbackDenylist: [/^\/~oauth/],
-        globPatterns: [], // Disable precaching to fix caching issues
-        runtimeCaching: [
-          {
-            urlPattern: /.*/,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'cic-runtime-cache',
-              networkTimeoutSeconds: 2,
-            }
-          }
-        ]
+      strategies: "injectManifest",
+      srcDir: "public",
+      filename: "sw-push.js",
+      injectRegister: null, // we register manually in main.tsx
+      injectManifest: {
+        globPatterns: [],
+        injectionPoint: undefined,
       },
+      includeAssets: ["favicon.ico", "robots.txt"],
       manifest: {
         name: "CIC — CA Interactive Cloud",
         short_name: "CIC",
