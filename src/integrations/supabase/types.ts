@@ -406,6 +406,30 @@ export type Database = {
           },
         ]
       }
+      notification_templates: {
+        Row: {
+          created_at: string
+          id: string
+          message_template: string
+          title_template: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          message_template: string
+          title_template: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message_template?: string
+          title_template?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string
@@ -433,30 +457,6 @@ export type Database = {
           sent_by?: string
           target_audience?: string
           title?: string
-        }
-        Relationships: []
-      }
-      notification_templates: {
-        Row: {
-          id: string
-          title_template: string
-          message_template: string
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id: string
-          title_template: string
-          message_template: string
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          title_template?: string
-          message_template?: string
-          created_at?: string
-          updated_at?: string
         }
         Relationships: []
       }
