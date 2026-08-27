@@ -28,10 +28,15 @@ const DEPT_COLORS: Record<string, string> = {
 const YearDepartmentsPage = () => {
   const { yearId } = useParams<{ yearId: string }>();
   const { t, lang } = useI18n();
-  const { data: departments = [] } = useQuery({
+  const { data: allDepartments = [] } = useQuery({
     queryKey: ["departments"],
     queryFn: db.getDepartments
   });
+
+  // "Bachelor" is a hidden section (used outside the university) — reachable
+  // only via its direct link, never listed in the public departments grid.
+  const departments = allDepartments.filter(d => d.name_en !== "Bachelor");
+
 
   const Arrow = lang === "ar" ? ArrowLeft : ArrowRight;
   const BackArrow = lang === "ar" ? ArrowRight : ArrowLeft;
