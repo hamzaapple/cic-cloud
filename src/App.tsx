@@ -23,6 +23,7 @@ const LoginPage = lazy(() => import("./pages/LoginPage"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const SchedulePage = lazy(() => import("./pages/SchedulePage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const BachelorTechPage = lazy(() => import("./pages/BachelorTechPage"));
 
 // Lazy load heavy visual components
 const ParticleBackground = lazy(() => import("./components/ParticleBackground"));
@@ -57,6 +58,7 @@ const AppContent = () => {
             <Route path="/schedule" element={<SchedulePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/bachelor-tech" element={<BachelorTechPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
