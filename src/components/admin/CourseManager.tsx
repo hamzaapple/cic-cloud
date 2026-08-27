@@ -94,10 +94,15 @@ const CourseManager = ({ courses, departments, deptFilter, onUpdate, canEdit, ca
   const handleAddCourse = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!courseName || !courseCode) { toast.error(t("admin.titleAndCourseReq")); return; }
-    await db.addCourse({ name: courseName, code: courseCode, description: courseDesc, department_id: courseDeptId === "none" ? null : (courseDeptId || null), academic_year: courseYear, semester: courseSemester });
-    onUpdate();
-    setCourseName(""); setCourseCode(""); setCourseDesc(""); setCourseYear("1"); setCourseSemester("2");
-    toast.success(t("admin.uploadSuccess"));
+    try {
+      await db.addCourse({ name: courseName, code: courseCode, description: courseDesc, department_id: courseDeptId === "none" ? null : (courseDeptId || null), academic_year: courseYear, semester: courseSemester });
+      onUpdate();
+      setCourseName(""); setCourseCode(""); setCourseDesc(""); setCourseYear("1"); setCourseSemester("2");
+      toast.success(t("admin.uploadSuccess"));
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || "Failed to add course");
+    }
   };
 
   const startEdit = (c: Course) => { setEditingId(c.id); setEditName(translateCourseName(c.name, lang)); setEditCode(c.code); setEditDesc(c.description); setEditYear(c.academic_year || "1"); setEditSemester(c.semester || "2"); };
