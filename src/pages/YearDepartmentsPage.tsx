@@ -33,9 +33,11 @@ const YearDepartmentsPage = () => {
     queryFn: db.getDepartments
   });
 
-  // "Bachelor" is a hidden section (used outside the university) — reachable
-  // only via its direct link, never listed in the public departments grid.
-  const departments = allDepartments.filter(d => d.name_en !== "Bachelor");
+  // "Bachelor" is a hidden section (used outside the university) — listed only
+  // inside the hidden "2b" year, never in the public departments grid.
+  const departments = yearId === "2b"
+    ? allDepartments.filter(d => d.name_en === "Bachelor")
+    : allDepartments.filter(d => d.name_en !== "Bachelor");
 
 
   const Arrow = lang === "ar" ? ArrowLeft : ArrowRight;
