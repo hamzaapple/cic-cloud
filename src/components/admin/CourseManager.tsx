@@ -213,6 +213,7 @@ const CourseManager = ({ courses, departments, deptFilter, onUpdate, canEdit, ca
                       <SelectItem value="2">{lang === "ar" ? "الصف الثاني" : "2nd Year"}</SelectItem>
                       <SelectItem value="3">{lang === "ar" ? "الصف الثالث" : "3rd Year"}</SelectItem>
                       <SelectItem value="4">{lang === "ar" ? "الصف الرابع" : "4th Year"}</SelectItem>
+                      {isOwner && <SelectItem value="2b">{lang === "ar" ? "الصف الثاني - بكالوريا (مخفي)" : "2nd Year - Bachelor (hidden)"}</SelectItem>}
                     </SelectContent>
                   </Select>
                   <Select value={courseSemester} onValueChange={setCourseSemester}>
@@ -247,6 +248,7 @@ const CourseManager = ({ courses, departments, deptFilter, onUpdate, canEdit, ca
                           <SelectItem value="2">2</SelectItem>
                           <SelectItem value="3">3</SelectItem>
                           <SelectItem value="4">4</SelectItem>
+                          {isOwner && <SelectItem value="2b">2 - بكالوريا</SelectItem>}
                         </SelectContent>
                       </Select>
                       <Select value={editSemester} onValueChange={setEditSemester}>

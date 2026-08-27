@@ -33,16 +33,18 @@ const YearDepartmentsPage = () => {
     queryFn: db.getDepartments
   });
 
-  // "Bachelor" is a hidden section (used outside the university) — reachable
-  // only via its direct link, never listed in the public departments grid.
-  const departments = allDepartments.filter(d => d.name_en !== "Bachelor");
+  // "Bachelor" is a hidden section (used outside the university) — listed only
+  // inside the hidden "2b" year, never in the public departments grid.
+  const departments = yearId === "2b"
+    ? allDepartments.filter(d => d.name_en === "Bachelor")
+    : allDepartments.filter(d => d.name_en !== "Bachelor");
 
 
   const Arrow = lang === "ar" ? ArrowLeft : ArrowRight;
   const BackArrow = lang === "ar" ? ArrowRight : ArrowLeft;
 
-  const yearNamesAr: Record<string, string> = { "1": "الصف الأول", "2": "الصف الثاني", "3": "الصف الثالث", "4": "الصف الرابع" };
-  const yearNamesEn: Record<string, string> = { "1": "First Year", "2": "Second Year", "3": "Third Year", "4": "Fourth Year" };
+  const yearNamesAr: Record<string, string> = { "1": "الصف الأول", "2": "الصف الثاني", "3": "الصف الثالث", "4": "الصف الرابع", "2b": "الصف الدراسي الثاني - بكالوريا" };
+  const yearNamesEn: Record<string, string> = { "1": "First Year", "2": "Second Year", "3": "Third Year", "4": "Fourth Year", "2b": "Second Year - Bachelor" };
   const yearName = lang === "ar" ? yearNamesAr[yearId || ""] : yearNamesEn[yearId || ""];
 
   return (
