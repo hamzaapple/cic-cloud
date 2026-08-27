@@ -14,7 +14,11 @@ const CalendarPage = () => {
   const { data: courses = [] } = useQuery({ queryKey: ["courses"], queryFn: db.getCourses });
 
   const locale = lang === "ar" ? ar : enUS;
-  const materials = allMaterials.filter(m => m.deadline && !m.archived);
+  const materials = allMaterials.filter(m => {
+    if (!m.deadline || m.archived) return false;
+    const course = courses.find(c => c.id === m.course_id);
+    return !course || course.code !== "BACHELOR-PROG";
+  });
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
   const days = eachDayOfInterval({ start: monthStart, end: monthEnd });

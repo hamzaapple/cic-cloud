@@ -36,6 +36,10 @@ const AnnouncementBanner = () => {
         const now = new Date();
         const urgent = materials
           .filter(m => m.is_assignment && m.deadline && !m.archived)
+          .filter(m => {
+            const course = courses.find(c => c.id === m.course_id);
+            return !course || course.code !== "BACHELOR-PROG";
+          })
           .map(m => {
             // Force Cairo/Local time end-of-day for date-only strings from DB
             const deadlineStr = m.deadline!.includes("T") ? m.deadline! : `${m.deadline!}T23:59:59`;

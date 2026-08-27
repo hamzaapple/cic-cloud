@@ -54,7 +54,11 @@ const YearCoursesPage = () => {
   const rawCourses = deptId ? [...deptCourses, ...sharedCourses] : allCourses;
   
   // Filter by year and semester (with fallbacks for older data)
-  const courses = rawCourses.filter(c => (c.academic_year || "1") === yearId && (c.semester || "2") === semesterId);
+  const courses = rawCourses.filter(c => 
+    (c.academic_year || "1") === yearId && 
+    (c.semester || "2") === semesterId &&
+    c.code !== "BACHELOR-PROG"
+  );
 
   const department = departments.find(d => d.id === deptId);
 
