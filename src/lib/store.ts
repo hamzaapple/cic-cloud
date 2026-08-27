@@ -161,7 +161,18 @@ export const auth = {
     const role = localStorage.getItem("lms_role");
     return role === "owner" || role === "moderator";
   },
+  // Verifies that a valid Supabase session with an admin role still exists.
+  // localStorage can say "logged in" long after the JWT expired, which makes
+  // every write fail with an RLS error instead of a clear "session expired".
+  hasValidSession: async (): Promise<boolean> => {
+    const { data } = await supabase.auth.getSession();
+    const session = data.session;
+    if (!session) return false;
+    const role = (session.user?.app_metadata as any)?.app_role;
+    return role === "owner" || role === "moderator";
+  },
   isOwner: (): boolean => localStorage.getItem("lms_role") === "owner",
+
   hasPermission: (perm: Permission): boolean => {
     const user = auth.getCurrentUser();
     if (user.role === "owner") return true;

@@ -130,6 +130,23 @@ const AdminDashboard = () => {
 
   useEffect(() => { loadData(); }, [loadData]);
 
+  // Session guard: the backend JWT expires long before the localStorage flag,
+  // which otherwise surfaces as "row-level security policy" errors on save.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (!auth.isLoggedIn()) return;
+      const ok = await auth.hasValidSession();
+      if (!ok && !cancelled) {
+        auth.logout();
+        toast.error("انتهت صلاحية الجلسة، من فضلك سجّل الدخول مرة أخرى");
+        navigate("/login");
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [navigate]);
+
+
   // If moderator has department_id, lock filter
   useEffect(() => {
     if (user.role === "moderator" && user.departmentId) {
