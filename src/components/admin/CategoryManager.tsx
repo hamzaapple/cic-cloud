@@ -48,7 +48,7 @@ const CategoryManager = () => {
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!nameAr || !nameEn) { toast.error(t("cat.fieldsRequired")); return; }
-    await db.addCategory({ name_ar: nameAr, name_en: nameEn });
+    await db.addCategory({ name_ar: nameAr, name_en: nameEn, department_id: deptId === GLOBAL ? null : deptId });
     await load();
     setNameAr(""); setNameEn("");
     toast.success(t("cat.added"));
@@ -58,14 +58,16 @@ const CategoryManager = () => {
     setEditingId(cat.id);
     setEditNameAr(cat.name_ar);
     setEditNameEn(cat.name_en);
+    setEditDeptId(cat.department_id || GLOBAL);
   };
 
   const saveEdit = async (id: string) => {
-    await db.updateCategory(id, { name_ar: editNameAr, name_en: editNameEn });
+    await db.updateCategory(id, { name_ar: editNameAr, name_en: editNameEn, department_id: editDeptId === GLOBAL ? null : editDeptId });
     await load();
     setEditingId(null);
     toast.success(t("cat.updated"));
   };
+
 
   const handleDelete = async (id: string) => {
     await db.deleteCategory(id);
