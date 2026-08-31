@@ -1,35 +1,54 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { db, type MaterialCategory } from "@/lib/store";
+import { db, type MaterialCategory, type Department } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Layers, Plus, Pencil, Trash2, X, Check } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Layers, Plus, Pencil, Trash2, X, Check, Globe } from "lucide-react";
 import { toast } from "sonner";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
+const GLOBAL = "__global__";
+
 const CategoryManager = () => {
   const { t, lang } = useI18n();
   const [categories, setCategories] = useState<MaterialCategory[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [nameAr, setNameAr] = useState("");
   const [nameEn, setNameEn] = useState("");
+  const [deptId, setDeptId] = useState<string>(GLOBAL);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editNameAr, setEditNameAr] = useState("");
   const [editNameEn, setEditNameEn] = useState("");
+  const [editDeptId, setEditDeptId] = useState<string>(GLOBAL);
+  const [filterDept, setFilterDept] = useState<string>("all");
 
   const load = async () => {
-    const data = await db.getCategories();
+    const [data, depts] = await Promise.all([db.getCategories(), db.getDepartments()]);
     setCategories(data);
+    setDepartments(depts);
   };
   useEffect(() => { load(); }, []);
+
+  const deptLabel = (id?: string | null) => {
+    if (!id) return lang === "ar" ? "موحد (كل الأقسام)" : "Unified (all departments)";
+    const d = departments.find(x => x.id === id);
+    return d ? (lang === "ar" ? d.name_ar : d.name_en) : "—";
+  };
+
+  const visibleCategories = categories.filter(c =>
+    filterDept === "all" ? true : filterDept === GLOBAL ? !c.department_id : c.department_id === filterDept
+  );
+
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!nameAr || !nameEn) { toast.error(t("cat.fieldsRequired")); return; }
-    await db.addCategory({ name_ar: nameAr, name_en: nameEn });
+    await db.addCategory({ name_ar: nameAr, name_en: nameEn, department_id: deptId === GLOBAL ? null : deptId });
     await load();
     setNameAr(""); setNameEn("");
     toast.success(t("cat.added"));
@@ -39,14 +58,16 @@ const CategoryManager = () => {
     setEditingId(cat.id);
     setEditNameAr(cat.name_ar);
     setEditNameEn(cat.name_en);
+    setEditDeptId(cat.department_id || GLOBAL);
   };
 
   const saveEdit = async (id: string) => {
-    await db.updateCategory(id, { name_ar: editNameAr, name_en: editNameEn });
+    await db.updateCategory(id, { name_ar: editNameAr, name_en: editNameEn, department_id: editDeptId === GLOBAL ? null : editDeptId });
     await load();
     setEditingId(null);
     toast.success(t("cat.updated"));
   };
+
 
   const handleDelete = async (id: string) => {
     await db.deleteCategory(id);
@@ -64,25 +85,61 @@ const CategoryManager = () => {
           <form onSubmit={handleAdd} className="space-y-3">
             <Input placeholder={t("cat.nameAr")} value={nameAr} onChange={e => setNameAr(e.target.value)} className="bg-secondary/50" />
             <Input placeholder={t("cat.nameEn")} value={nameEn} onChange={e => setNameEn(e.target.value)} className="bg-secondary/50" />
+            <div>
+              <label className="text-xs text-muted-foreground mb-1 block">
+                {lang === "ar" ? "نطاق القسم الداخلي" : "Category scope"}
+              </label>
+              <Select value={deptId} onValueChange={setDeptId}>
+                <SelectTrigger className="bg-secondary/50"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={GLOBAL}>{lang === "ar" ? "موحد (كل الأقسام)" : "Unified (all departments)"}</SelectItem>
+                  {departments.map(d => (
+                    <SelectItem key={d.id} value={d.id}>{lang === "ar" ? d.name_ar : d.name_en}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <Button type="submit" className="w-full">{t("cat.add")}</Button>
           </form>
         </div>
       </motion.div>
 
       <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="lg:col-span-2">
-        <h2 className="font-display font-semibold text-lg mb-4 flex items-center gap-2">
-          <Layers className="w-5 h-5" /> {t("cat.allCategories")}
-        </h2>
+        <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
+          <h2 className="font-display font-semibold text-lg flex items-center gap-2">
+            <Layers className="w-5 h-5" /> {t("cat.allCategories")}
+          </h2>
+          <Select value={filterDept} onValueChange={setFilterDept}>
+            <SelectTrigger className="bg-secondary/50 w-56 h-9 text-sm"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{lang === "ar" ? "كل النطاقات" : "All scopes"}</SelectItem>
+              <SelectItem value={GLOBAL}>{lang === "ar" ? "موحد فقط" : "Unified only"}</SelectItem>
+              {departments.map(d => (
+                <SelectItem key={d.id} value={d.id}>{lang === "ar" ? d.name_ar : d.name_en}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         <div className="space-y-3">
-          {categories.length === 0 ? (
+          {visibleCategories.length === 0 ? (
             <p className="text-center py-12 text-muted-foreground">{t("cat.noCategories")}</p>
           ) : (
-            categories.map((cat, i) => (
+            visibleCategories.map((cat, i) => (
               <motion.div key={cat.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="glass-card rounded-xl p-5">
                 {editingId === cat.id ? (
+
                   <div className="space-y-2">
                     <Input value={editNameAr} onChange={e => setEditNameAr(e.target.value)} className="bg-secondary/50 text-sm" placeholder={t("cat.nameAr")} />
                     <Input value={editNameEn} onChange={e => setEditNameEn(e.target.value)} className="bg-secondary/50 text-sm" placeholder={t("cat.nameEn")} />
+                    <Select value={editDeptId} onValueChange={setEditDeptId}>
+                      <SelectTrigger className="bg-secondary/50 h-9 text-sm"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={GLOBAL}>{lang === "ar" ? "موحد (كل الأقسام)" : "Unified (all departments)"}</SelectItem>
+                        {departments.map(d => (
+                          <SelectItem key={d.id} value={d.id}>{lang === "ar" ? d.name_ar : d.name_en}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <div className="flex gap-2">
                       <Button size="sm" onClick={() => saveEdit(cat.id)}><Check className="w-3 h-3 me-1" /> {t("schedule.saveEdit")}</Button>
                       <Button size="sm" variant="ghost" onClick={() => setEditingId(null)}><X className="w-3 h-3 me-1" /> {t("mod.cancel")}</Button>
@@ -93,7 +150,12 @@ const CategoryManager = () => {
                     <div>
                       <p className="font-semibold text-sm">{lang === "ar" ? cat.name_ar : cat.name_en}</p>
                       <p className="text-xs text-muted-foreground">{lang === "ar" ? cat.name_en : cat.name_ar}</p>
+                      <span className="mt-1 inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-secondary text-muted-foreground">
+                        {!cat.department_id && <Globe className="w-3 h-3" />}
+                        {deptLabel(cat.department_id)}
+                      </span>
                     </div>
+
                     <div className="flex gap-1">
                       <button onClick={() => startEdit(cat)} className="p-1.5 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground">
                         <Pencil className="w-3.5 h-3.5" />

@@ -3,7 +3,7 @@ import { Info, ArrowDownToLine } from "lucide-react"; // أيقونة للتنب
 import { useParams, Link, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
-import { db } from "@/lib/store";
+import { db, categoriesForDepartment } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
 import { useQuery } from "@tanstack/react-query";
 import MaterialCard from "@/components/MaterialCard";
@@ -35,12 +35,15 @@ const CoursePage = () => {
 
   const { data: courses = [] } = useQuery({ queryKey: ["courses"], queryFn: db.getCourses });
   const { data: allMaterials = [] } = useQuery({ queryKey: ["materials", id], queryFn: () => db.getMaterials(id) });
-  const { data: categories = [] } = useQuery({
+  const { data: allCategories = [] } = useQuery({
     queryKey: ["material_categories"],
     queryFn: db.getCategories,
   });
 
   const course = courses.find(c => c.id === id);
+
+  // Categories scoped to this course's department (unified + department-specific)
+  const categories = categoriesForDepartment(allCategories, course?.department_id ?? null);
 
   // Set default active category
   const activeCategory = activeCategoryId || categories[0]?.id || "";

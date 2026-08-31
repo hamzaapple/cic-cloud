@@ -31,6 +31,8 @@ export interface MaterialCategory {
   id: string;
   name_ar: string;
   name_en: string;
+  /** null = unified category shown in every department */
+  department_id?: string | null;
   created_at?: string;
 }
 
@@ -240,12 +242,12 @@ export const db = {
     const { data } = await supabase.from("material_categories").select("*").order("created_at");
     return (data || []) as MaterialCategory[];
   },
-  addCategory: async (cat: { name_ar: string; name_en: string }) => {
+  addCategory: async (cat: { name_ar: string; name_en: string; department_id?: string | null }) => {
     const { data, error } = await supabase.from("material_categories").insert(cat).select().single();
     if (error) throw error;
     return data as MaterialCategory;
   },
-  updateCategory: async (id: string, updates: Partial<Pick<MaterialCategory, "name_ar" | "name_en">>) => {
+  updateCategory: async (id: string, updates: Partial<Pick<MaterialCategory, "name_ar" | "name_en" | "department_id">>) => {
     const { error } = await supabase.from("material_categories").update(updates).eq("id", id);
     if (error) throw error;
   },
@@ -602,3 +604,11 @@ export const store = {
   ...auth,
   isAdmin: () => auth.isLoggedIn(),
 };
+
+/** Categories visible for a given department: unified ones (department_id null) + department-specific ones. */
+export function categoriesForDepartment(
+  categories: MaterialCategory[],
+  departmentId?: string | null
+): MaterialCategory[] {
+  return categories.filter(c => !c.department_id || (departmentId && c.department_id === departmentId));
+}

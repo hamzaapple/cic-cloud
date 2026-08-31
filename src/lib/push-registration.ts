@@ -27,3 +27,20 @@ export async function registerPushSubscription(subscription: PushSubscription, d
 
   if (error) throw error;
 }
+/**
+ * Tag this device's push subscription with an audience (e.g. "bachelor" or "all").
+ * Bachelor devices only get bachelor notifications, and university notifications skip them.
+ */
+export async function setPushAudience(department: string) {
+  const current = localStorage.getItem("cic_push_dept");
+  localStorage.setItem("cic_push_dept", department);
+  if (current === department) return;
+  try {
+    if (!("serviceWorker" in navigator)) return;
+    const reg = await navigator.serviceWorker.ready;
+    const sub = await reg.pushManager.getSubscription();
+    if (sub) await registerPushSubscription(sub, department);
+  } catch (e) {
+    console.warn("[push] failed to update audience", e);
+  }
+}
