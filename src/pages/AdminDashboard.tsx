@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { auth, db, type Course, type Material, type ImportantLink, type Department, type MaterialCategory } from "@/lib/store";
+import { auth, db, categoriesForDepartment, type Course, type Material, type ImportantLink, type Department, type MaterialCategory } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
 import { translateCourseName } from "@/lib/subject-translations";
 import { Button } from "@/components/ui/button";
@@ -201,6 +201,12 @@ const AdminDashboard = () => {
   const [isFolderMode, setIsFolderMode] = useState(false);
   const [bulkProgress, setBulkProgress] = useState(0);
   const [bulkTotal, setBulkTotal] = useState(0);
+
+  // Categories scoped to the department of the selected/filtered course
+  const uploadCourseDeptId = courses.find(c => c.id === courseId)?.department_id ?? null;
+  const uploadCategories = categoriesForDepartment(categories, uploadCourseDeptId);
+  const filterCourseDeptId = courses.find(c => c.id === materialCourseFilter)?.department_id ?? null;
+  const filterCategories = materialCourseFilter === "all" ? categories : categoriesForDepartment(categories, filterCourseDeptId);
 
   // Find assignment category
   const assignmentCategory = categories.find(c => c.name_en === "Assignments");
@@ -621,7 +627,7 @@ const AdminDashboard = () => {
                       <Select value={categoryId} onValueChange={setCategoryId}>
                         <SelectTrigger className="bg-secondary/50"><SelectValue placeholder={t("admin.selectCategory")} /></SelectTrigger>
                         <SelectContent>
-                          {categories.map(cat => (
+                          {uploadCategories.map(cat => (
                             <SelectItem key={cat.id} value={cat.id}>{lang === "ar" ? cat.name_ar : cat.name_en}</SelectItem>
                           ))}
                         </SelectContent>
@@ -792,7 +798,7 @@ const AdminDashboard = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">{lang === "ar" ? "كل الأنواع" : "All Types"}</SelectItem>
-                      {categories.map(cat => (
+                      {filterCategories.map(cat => (
                         <SelectItem key={cat.id} value={cat.id}>{lang === "ar" ? cat.name_ar : cat.name_en}</SelectItem>
                       ))}
                     </SelectContent>

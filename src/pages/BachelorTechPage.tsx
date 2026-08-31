@@ -3,7 +3,7 @@ import { Info, ArrowDownToLine, ArrowRight, ArrowLeft, FolderDown, Share2 } from
 import { Link, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
-import { db } from "@/lib/store";
+import { db, categoriesForDepartment } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
 import { useQuery } from "@tanstack/react-query";
 import MaterialCard from "@/components/MaterialCard";
@@ -38,7 +38,7 @@ const BachelorTechPage = () => {
   const id = course?.id || "";
 
   const { data: allMaterials = [] } = useQuery({ queryKey: ["materials", id], queryFn: () => db.getMaterials(id), enabled: !!id });
-  const { data: categories = [] } = useQuery({
+  const { data: allCategories = [] } = useQuery({
     queryKey: ["material_categories"],
     queryFn: db.getCategories,
   });
