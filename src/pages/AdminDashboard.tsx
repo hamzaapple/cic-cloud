@@ -205,8 +205,6 @@ const AdminDashboard = () => {
   // Categories scoped to the department of the selected/filtered course
   const uploadCourseDeptId = courses.find(c => c.id === courseId)?.department_id ?? null;
   const uploadCategories = categoriesForDepartment(categories, uploadCourseDeptId);
-  const filterCourseDeptId = courses.find(c => c.id === materialCourseFilter)?.department_id ?? null;
-  const filterCategories = materialCourseFilter === "all" ? categories : categoriesForDepartment(categories, filterCourseDeptId);
 
   // Find assignment category
   const assignmentCategory = categories.find(c => c.name_en === "Assignments");
@@ -219,6 +217,8 @@ const AdminDashboard = () => {
 
   const [showArchived, setShowArchived] = useState(false);
   const [materialCourseFilter, setMaterialCourseFilter] = useState<string>("all");
+  const filterCourseDeptId = courses.find(c => c.id === materialCourseFilter)?.department_id ?? null;
+  const filterCategories = materialCourseFilter === "all" ? categories : categoriesForDepartment(categories, filterCourseDeptId);
   const [materialCategoryFilter, setMaterialCategoryFilter] = useState<string>("all");
 
   if (!auth.isLoggedIn()) { navigate("/login"); return null; }

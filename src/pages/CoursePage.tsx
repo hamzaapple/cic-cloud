@@ -42,6 +42,9 @@ const CoursePage = () => {
 
   const course = courses.find(c => c.id === id);
 
+  // Categories scoped to this course's department (unified + department-specific)
+  const categories = categoriesForDepartment(allCategories, course?.department_id ?? null);
+
   // Set default active category
   const activeCategory = activeCategoryId || categories[0]?.id || "";
 
