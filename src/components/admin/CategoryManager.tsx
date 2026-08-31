@@ -1,30 +1,49 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { db, type MaterialCategory } from "@/lib/store";
+import { db, type MaterialCategory, type Department } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Layers, Plus, Pencil, Trash2, X, Check } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Layers, Plus, Pencil, Trash2, X, Check, Globe } from "lucide-react";
 import { toast } from "sonner";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
+const GLOBAL = "__global__";
+
 const CategoryManager = () => {
   const { t, lang } = useI18n();
   const [categories, setCategories] = useState<MaterialCategory[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [nameAr, setNameAr] = useState("");
   const [nameEn, setNameEn] = useState("");
+  const [deptId, setDeptId] = useState<string>(GLOBAL);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editNameAr, setEditNameAr] = useState("");
   const [editNameEn, setEditNameEn] = useState("");
+  const [editDeptId, setEditDeptId] = useState<string>(GLOBAL);
+  const [filterDept, setFilterDept] = useState<string>("all");
 
   const load = async () => {
-    const data = await db.getCategories();
+    const [data, depts] = await Promise.all([db.getCategories(), db.getDepartments()]);
     setCategories(data);
+    setDepartments(depts);
   };
   useEffect(() => { load(); }, []);
+
+  const deptLabel = (id?: string | null) => {
+    if (!id) return lang === "ar" ? "موحد (كل الأقسام)" : "Unified (all departments)";
+    const d = departments.find(x => x.id === id);
+    return d ? (lang === "ar" ? d.name_ar : d.name_en) : "—";
+  };
+
+  const visibleCategories = categories.filter(c =>
+    filterDept === "all" ? true : filterDept === GLOBAL ? !c.department_id : c.department_id === filterDept
+  );
+
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
