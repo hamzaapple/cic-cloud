@@ -31,6 +31,8 @@ export interface MaterialCategory {
   id: string;
   name_ar: string;
   name_en: string;
+  /** null = unified category shown in every department */
+  department_id?: string | null;
   created_at?: string;
 }
 
