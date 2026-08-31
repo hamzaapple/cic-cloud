@@ -233,23 +233,34 @@ export type Database = {
       material_categories: {
         Row: {
           created_at: string
+          department_id: string | null
           id: string
           name_ar: string
           name_en: string
         }
         Insert: {
           created_at?: string
+          department_id?: string | null
           id?: string
           name_ar: string
           name_en: string
         }
         Update: {
           created_at?: string
+          department_id?: string | null
           id?: string
           name_ar?: string
           name_en?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "material_categories_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       materials: {
         Row: {
