@@ -604,3 +604,11 @@ export const store = {
   ...auth,
   isAdmin: () => auth.isLoggedIn(),
 };
+
+/** Categories visible for a given department: unified ones (department_id null) + department-specific ones. */
+export function categoriesForDepartment(
+  categories: MaterialCategory[],
+  departmentId?: string | null
+): MaterialCategory[] {
+  return categories.filter(c => !c.department_id || (departmentId && c.department_id === departmentId));
+}
