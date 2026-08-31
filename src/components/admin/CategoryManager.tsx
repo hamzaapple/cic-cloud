@@ -85,22 +85,49 @@ const CategoryManager = () => {
           <form onSubmit={handleAdd} className="space-y-3">
             <Input placeholder={t("cat.nameAr")} value={nameAr} onChange={e => setNameAr(e.target.value)} className="bg-secondary/50" />
             <Input placeholder={t("cat.nameEn")} value={nameEn} onChange={e => setNameEn(e.target.value)} className="bg-secondary/50" />
+            <div>
+              <label className="text-xs text-muted-foreground mb-1 block">
+                {lang === "ar" ? "نطاق القسم الداخلي" : "Category scope"}
+              </label>
+              <Select value={deptId} onValueChange={setDeptId}>
+                <SelectTrigger className="bg-secondary/50"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={GLOBAL}>{lang === "ar" ? "موحد (كل الأقسام)" : "Unified (all departments)"}</SelectItem>
+                  {departments.map(d => (
+                    <SelectItem key={d.id} value={d.id}>{lang === "ar" ? d.name_ar : d.name_en}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <Button type="submit" className="w-full">{t("cat.add")}</Button>
           </form>
         </div>
       </motion.div>
 
       <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="lg:col-span-2">
-        <h2 className="font-display font-semibold text-lg mb-4 flex items-center gap-2">
-          <Layers className="w-5 h-5" /> {t("cat.allCategories")}
-        </h2>
+        <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
+          <h2 className="font-display font-semibold text-lg flex items-center gap-2">
+            <Layers className="w-5 h-5" /> {t("cat.allCategories")}
+          </h2>
+          <Select value={filterDept} onValueChange={setFilterDept}>
+            <SelectTrigger className="bg-secondary/50 w-56 h-9 text-sm"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{lang === "ar" ? "كل النطاقات" : "All scopes"}</SelectItem>
+              <SelectItem value={GLOBAL}>{lang === "ar" ? "موحد فقط" : "Unified only"}</SelectItem>
+              {departments.map(d => (
+                <SelectItem key={d.id} value={d.id}>{lang === "ar" ? d.name_ar : d.name_en}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         <div className="space-y-3">
-          {categories.length === 0 ? (
+          {visibleCategories.length === 0 ? (
             <p className="text-center py-12 text-muted-foreground">{t("cat.noCategories")}</p>
           ) : (
-            categories.map((cat, i) => (
+            visibleCategories.map((cat, i) => (
               <motion.div key={cat.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="glass-card rounded-xl p-5">
                 {editingId === cat.id ? (
+
                   <div className="space-y-2">
                     <Input value={editNameAr} onChange={e => setEditNameAr(e.target.value)} className="bg-secondary/50 text-sm" placeholder={t("cat.nameAr")} />
                     <Input value={editNameEn} onChange={e => setEditNameEn(e.target.value)} className="bg-secondary/50 text-sm" placeholder={t("cat.nameEn")} />
