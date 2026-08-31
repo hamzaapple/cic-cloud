@@ -131,6 +131,15 @@ const CategoryManager = () => {
                   <div className="space-y-2">
                     <Input value={editNameAr} onChange={e => setEditNameAr(e.target.value)} className="bg-secondary/50 text-sm" placeholder={t("cat.nameAr")} />
                     <Input value={editNameEn} onChange={e => setEditNameEn(e.target.value)} className="bg-secondary/50 text-sm" placeholder={t("cat.nameEn")} />
+                    <Select value={editDeptId} onValueChange={setEditDeptId}>
+                      <SelectTrigger className="bg-secondary/50 h-9 text-sm"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={GLOBAL}>{lang === "ar" ? "موحد (كل الأقسام)" : "Unified (all departments)"}</SelectItem>
+                        {departments.map(d => (
+                          <SelectItem key={d.id} value={d.id}>{lang === "ar" ? d.name_ar : d.name_en}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <div className="flex gap-2">
                       <Button size="sm" onClick={() => saveEdit(cat.id)}><Check className="w-3 h-3 me-1" /> {t("schedule.saveEdit")}</Button>
                       <Button size="sm" variant="ghost" onClick={() => setEditingId(null)}><X className="w-3 h-3 me-1" /> {t("mod.cancel")}</Button>
@@ -141,7 +150,12 @@ const CategoryManager = () => {
                     <div>
                       <p className="font-semibold text-sm">{lang === "ar" ? cat.name_ar : cat.name_en}</p>
                       <p className="text-xs text-muted-foreground">{lang === "ar" ? cat.name_en : cat.name_ar}</p>
+                      <span className="mt-1 inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-secondary text-muted-foreground">
+                        {!cat.department_id && <Globe className="w-3 h-3" />}
+                        {deptLabel(cat.department_id)}
+                      </span>
                     </div>
+
                     <div className="flex gap-1">
                       <button onClick={() => startEdit(cat)} className="p-1.5 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground">
                         <Pencil className="w-3.5 h-3.5" />
