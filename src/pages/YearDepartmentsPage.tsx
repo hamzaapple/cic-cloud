@@ -5,6 +5,8 @@ import { useI18n } from "@/lib/i18n";
 import { ArrowLeft, ArrowRight, Monitor, Brain } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { playClickSfx } from "@/hooks/use-sfx";
+import { useEffect } from "react";
+import { setPushAudience } from "@/lib/push-registration";
 
 const container: Variants = {
   hidden: { opacity: 0 },
@@ -28,6 +30,10 @@ const DEPT_COLORS: Record<string, string> = {
 const YearDepartmentsPage = () => {
   const { yearId } = useParams<{ yearId: string }>();
   const { t, lang } = useI18n();
+
+  useEffect(() => {
+    setPushAudience(yearId === "2b" ? "bachelor" : "all");
+  }, [yearId]);
   const { data: allDepartments = [] } = useQuery({
     queryKey: ["departments"],
     queryFn: db.getDepartments

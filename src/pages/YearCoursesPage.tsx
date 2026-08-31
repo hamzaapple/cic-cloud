@@ -5,6 +5,8 @@ import { useI18n } from "@/lib/i18n";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { playClickSfx } from "@/hooks/use-sfx";
+import { useEffect } from "react";
+import { setPushAudience } from "@/lib/push-registration";
 
 const container: Variants = {
   hidden: { opacity: 0 },
@@ -21,6 +23,10 @@ const YearCoursesPage = () => {
   const deptId = searchParams.get("dept");
   const semesterId = searchParams.get("semester") || "2"; // Default to 2 for backward compatibility
   const { t, tCourse, lang } = useI18n();
+
+  useEffect(() => {
+    setPushAudience(yearId === "2b" ? "bachelor" : "all");
+  }, [yearId]);
 
   const { data: departments = [] } = useQuery({
     queryKey: ["departments"],

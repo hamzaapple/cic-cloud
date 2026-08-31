@@ -72,6 +72,7 @@ const NotificationManager = () => {
                 <SelectItem value="all">الكل (طالب/مشرف)</SelectItem>
                 <SelectItem value="cs">علوم الحاسب (CS)</SelectItem>
                 <SelectItem value="ai_cyber">الذكاء الاصطناعي (AI & Cyber)</SelectItem>
+                <SelectItem value="bachelor">بكالوريا (Bachelor)</SelectItem>
               </SelectContent>
             </Select>
             <Input placeholder={t("notif.optionalLink")} value={link} onChange={e => setLink(e.target.value)} className="bg-secondary/50" />

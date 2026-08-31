@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { ArrowLeft, ArrowRight, BookOpen, Layers, Monitor, Cpu } from "lucide-react";
 import { playClickSfx } from "@/hooks/use-sfx";
+import { useEffect } from "react";
+import { setPushAudience } from "@/lib/push-registration";
 
 const container: Variants = {
   hidden: { opacity: 0 },
@@ -23,6 +25,10 @@ const YEARS = [
 const Index = () => {
   const { t, lang } = useI18n();
   const Arrow = lang === "ar" ? ArrowLeft : ArrowRight;
+
+  useEffect(() => {
+    setPushAudience("all");
+  }, []);
 
   return (
     <div className="min-h-screen pt-24 pb-12 px-4">

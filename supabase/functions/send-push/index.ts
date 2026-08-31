@@ -96,14 +96,22 @@ serve(async (req: Request) => {
     // Use Promise.allSettled to handle multiple requests without failing the whole process
     const results = await Promise.allSettled(subs.map(async (sub) => {
       // Filter by department if target_audience is provided
-      if (
-        target_audience &&
-        target_audience !== "all" &&
-        sub.department &&
-        sub.department !== "all" &&
-        sub.department !== target_audience
-      ) {
-        return { skipped: true };
+      if (target_audience === "bachelor") {
+        if (sub.department !== "bachelor") return { skipped: true };
+      } else {
+        // Any other target (including "all") skips bachelor devices
+        if (sub.department === "bachelor") return { skipped: true };
+        
+        // Existing filtering for other departments
+        if (
+          target_audience &&
+          target_audience !== "all" &&
+          sub.department &&
+          sub.department !== "all" &&
+          sub.department !== target_audience
+        ) {
+          return { skipped: true };
+        }
       }
 
       if (!sub.endpoint || !sub.p256dh || !sub.auth) {

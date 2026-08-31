@@ -3,6 +3,8 @@ import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { ArrowLeft, ArrowRight, CalendarDays } from "lucide-react";
 import { playClickSfx } from "@/hooks/use-sfx";
+import { useEffect } from "react";
+import { setPushAudience } from "@/lib/push-registration";
 
 const container: Variants = {
   hidden: { opacity: 0 },
@@ -23,6 +25,10 @@ const YearSemestersPage = () => {
   const [searchParams] = useSearchParams();
   const deptId = searchParams.get("dept");
   const { lang } = useI18n();
+
+  useEffect(() => {
+    setPushAudience(yearId === "2b" ? "bachelor" : "all");
+  }, [yearId]);
 
   const Arrow = lang === "ar" ? ArrowLeft : ArrowRight;
   const BackArrow = lang === "ar" ? ArrowRight : ArrowLeft;

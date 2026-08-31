@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import MaterialCard from "@/components/MaterialCard";
 import { toast } from "sonner";
 import JSZip from "jszip";
+import { setPushAudience } from "@/lib/push-registration";
 
 const BachelorTechPage = () => {
   const { t, tCourse, lang } = useI18n();
@@ -17,6 +18,10 @@ const BachelorTechPage = () => {
     () => searchParams.get("category") || null
   );
   const [highlightedMaterialId, setHighlightedMaterialId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setPushAudience("bachelor");
+  }, []);
 
   // Wrapper that keeps the URL in sync with the active tab
   const setActiveCategoryId = (catId: string) => {
