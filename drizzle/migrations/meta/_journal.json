@@ -8,6 +8,13 @@
       "when": 1788156193063,
       "tag": "0000_category_department_scope",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790001670396,
+      "tag": "0001_year_scoped_notifications",
+      "breakpoints": true
     }
   ]
 }
