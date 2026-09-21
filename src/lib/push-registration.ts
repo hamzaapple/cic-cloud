@@ -15,7 +15,11 @@ export function urlBase64ToUint8Array(base64String: string) {
   return out;
 }
 
-export async function registerPushSubscription(subscription: PushSubscription, department?: string | null) {
+export async function registerPushSubscription(
+  subscription: PushSubscription,
+  department?: string | null,
+  academicYear?: string | null,
+) {
   const json = subscription.toJSON();
   const { error } = await (supabase.rpc as any)("register_push_subscription", {
     p_endpoint: subscription.endpoint,
@@ -23,6 +27,7 @@ export async function registerPushSubscription(subscription: PushSubscription, d
     p_auth: json.keys?.auth || null,
     p_user_agent: navigator.userAgent,
     p_department: department || localStorage.getItem("cic_push_dept") || "all",
+    p_academic_year: academicYear ?? localStorage.getItem("cic_year"),
   });
 
   if (error) throw error;
@@ -42,5 +47,17 @@ export async function setPushAudience(department: string) {
     if (sub) await registerPushSubscription(sub, department);
   } catch (e) {
     console.warn("[push] failed to update audience", e);
+  }
+}
+
+/** Re-tag this device with the visitor's academic year so it only gets that year's alerts. */
+export async function setPushYear(academicYear: string) {
+  try {
+    if (!("serviceWorker" in navigator)) return;
+    const reg = await navigator.serviceWorker.ready;
+    const sub = await reg.pushManager.getSubscription();
+    if (sub) await registerPushSubscription(sub, null, academicYear);
+  } catch (e) {
+    console.warn("[push] failed to update year", e);
   }
 }
