@@ -449,6 +449,7 @@ export type Database = {
           message: string
           sent_by: string
           target_audience: string
+          target_year: string | null
           title: string
         }
         Insert: {
@@ -458,6 +459,7 @@ export type Database = {
           message: string
           sent_by?: string
           target_audience?: string
+          target_year?: string | null
           title: string
         }
         Update: {
@@ -467,12 +469,14 @@ export type Database = {
           message?: string
           sent_by?: string
           target_audience?: string
+          target_year?: string | null
           title?: string
         }
         Relationships: []
       }
       push_subscriptions: {
         Row: {
+          academic_year: string | null
           auth: string | null
           created_at: string
           department: string | null
@@ -482,6 +486,7 @@ export type Database = {
           user_agent: string | null
         }
         Insert: {
+          academic_year?: string | null
           auth?: string | null
           created_at?: string
           department?: string | null
@@ -491,6 +496,7 @@ export type Database = {
           user_agent?: string | null
         }
         Update: {
+          academic_year?: string | null
           auth?: string | null
           created_at?: string
           department?: string | null
@@ -537,6 +543,7 @@ export type Database = {
       }
       register_push_subscription: {
         Args: {
+          p_academic_year?: string
           p_auth: string
           p_department?: string
           p_endpoint: string
