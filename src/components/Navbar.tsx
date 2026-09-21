@@ -1,12 +1,13 @@
 import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Calendar, Link2, Menu, X, BookOpen, CalendarDays, Globe, Volume2, VolumeX } from "lucide-react";
+import { Calendar, Link2, Menu, X, BookOpen, CalendarDays, Globe, Volume2, VolumeX, Home } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import NotificationBell from "./NotificationBell";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useI18n } from "@/lib/i18n";
 import { useSfx } from "@/hooks/use-sfx";
+import { useYear } from "@/hooks/use-year";
 
 const Navbar = () => {
   const location = useLocation();
@@ -14,12 +15,19 @@ const Navbar = () => {
   const isMobile = useIsMobile();
   const { t, lang, setLang } = useI18n();
   const { muted, toggleMute } = useSfx();
+  const { year } = useYear();
+
+  const coursesRoute = useMemo(() => {
+    if (!year) return "/";
+    return ["1", "2"].includes(year) ? `/year/${year}/departments` : `/year/${year}/semesters`;
+  }, [year]);
 
   const navItems = [
-    { to: "/", label: t("nav.courses"), icon: BookOpen },
-    { to: "/calendar", label: t("nav.calendar"), icon: Calendar },
-    { to: "/links", label: t("nav.links"), icon: Link2 },
-    { to: "/schedule", label: t("nav.schedule"), icon: CalendarDays },
+    { to: "/", label: t("nav.home") || "الرئيسية", icon: Home, exact: true },
+    { to: coursesRoute, label: t("nav.courses"), icon: BookOpen, exact: false },
+    { to: "/calendar", label: t("nav.calendar"), icon: Calendar, exact: false },
+    { to: "/links", label: t("nav.links"), icon: Link2, exact: false },
+    { to: "/schedule", label: t("nav.schedule"), icon: CalendarDays, exact: false },
   ];
 
   return (
@@ -31,14 +39,20 @@ const Navbar = () => {
         </Link>
 
         <div className="hidden md:flex items-center gap-1">
-          {navItems.map((item) =>
-            <Link key={item.to} to={item.to}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                location.pathname === item.to ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-              }`}>
-              <item.icon className="w-4 h-4" /> {item.label}
-            </Link>
-          )}
+          {navItems.map((item) => {
+            const isActive = item.exact 
+              ? location.pathname === item.to 
+              : location.pathname.startsWith(item.to) && item.to !== "/";
+              
+            return (
+              <Link key={item.label} to={item.to}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                }`}>
+                <item.icon className="w-4 h-4" /> {item.label}
+              </Link>
+            );
+          })}
         </div>
 
         <div className="flex items-center gap-1.5">
@@ -76,14 +90,20 @@ const Navbar = () => {
 
       {open && isMobile &&
         <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="md:hidden border-t border-border bg-card px-4 pb-4">
-          {navItems.map((item) =>
-            <Link key={item.to} to={item.to} onClick={() => setOpen(false)}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium ${
-                location.pathname === item.to ? "bg-primary/10 text-primary" : "text-muted-foreground"
-              }`}>
-              <item.icon className="w-4 h-4" /> {item.label}
-            </Link>
-          )}
+          {navItems.map((item) => {
+            const isActive = item.exact 
+              ? location.pathname === item.to 
+              : location.pathname.startsWith(item.to) && item.to !== "/";
+              
+            return (
+              <Link key={item.label} to={item.to} onClick={() => setOpen(false)}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium ${
+                  isActive ? "bg-primary/10 text-primary" : "text-muted-foreground"
+                }`}>
+                <item.icon className="w-4 h-4" /> {item.label}
+              </Link>
+            );
+          })}
         </motion.div>
       }
     </motion.nav>

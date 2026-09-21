@@ -227,7 +227,13 @@ const AdminDashboard = () => {
   const filterCategories = materialCourseFilter === "all" ? categories : categoriesForDepartment(categories, filterCourseDeptId);
   const [materialCategoryFilter, setMaterialCategoryFilter] = useState<string>("all");
 
-  if (!auth.isLoggedIn()) { navigate("/login"); return null; }
+  useEffect(() => {
+    if (!auth.isLoggedIn()) {
+      navigate("/login");
+    }
+  }, [navigate]);
+
+  if (!auth.isLoggedIn()) return null;
 
   const canAddMaterials = isOwner || auth.hasPermission("add_courses") || auth.hasPermission("add_pdf_existing") || auth.hasPermission("strict_add_only");
   const canDelete = isOwner || (auth.hasPermission("edit_content") && !auth.hasPermission("strict_add_only"));

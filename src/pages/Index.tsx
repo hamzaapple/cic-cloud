@@ -1,25 +1,16 @@
-import { motion, type Variants } from "framer-motion";
+import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
-import { ArrowLeft, ArrowRight, BookOpen, Layers, Monitor, Cpu } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, Layers, Monitor, Cpu, GraduationCap, Network } from "lucide-react";
 import { playClickSfx } from "@/hooks/use-sfx";
 import { useEffect } from "react";
 import { setPushAudience } from "@/lib/push-registration";
 
-const container: Variants = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.1 } }
-};
-const item: Variants = {
-  hidden: { opacity: 0, y: 20, scale: 0.95 },
-  show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4, ease: "easeOut" } }
-};
-
 const YEARS = [
-  { id: "1", name_ar: "الصف الدراسي الأول", name_en: "First Academic Year", iconSymbol: "1", color: "190 80% 45%", route: "departments" },
-  { id: "2", name_ar: "الصف الدراسي الثاني", name_en: "Second Academic Year", iconSymbol: "2", color: "260 70% 55%", route: "departments" },
-  { id: "3", name_ar: "الصف الدراسي الثالث", name_en: "Third Academic Year", iconSymbol: "3", color: "340 70% 55%", route: "semesters" },
-  { id: "4", name_ar: "الصف الدراسي الرابع", name_en: "Fourth Academic Year", iconSymbol: "4", color: "30 80% 50%", route: "semesters" },
+  { id: "1", name_ar: "الفرقة الأولى", name_en: "First Year", icon: GraduationCap, color: "190 80% 45%", route: "departments", desc_ar: "المواد العامة والأساسية", desc_en: "General & Basic Courses" },
+  { id: "2", name_ar: "الفرقة الثانية", name_en: "Second Year", icon: Layers, color: "260 70% 55%", route: "departments", desc_ar: "التخصصات التقنية الأساسية", desc_en: "Core Technical Depts" },
+  { id: "3", name_ar: "الفرقة الثالثة", name_en: "Third Year", icon: Monitor, color: "340 70% 55%", route: "semesters", desc_ar: "دراسات متقدمة في التخصص", desc_en: "Advanced Studies" },
+  { id: "4", name_ar: "الفرقة الرابعة", name_en: "Fourth Year", icon: Cpu, color: "30 80% 50%", route: "semesters", desc_ar: "مشاريع التخرج والتطبيقات", desc_en: "Graduation Projects" },
 ];
 
 const Index = () => {
@@ -31,77 +22,79 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-4">
+    <div className="min-h-screen pt-24 pb-12 px-4 relative z-10">
       <div className="container mx-auto max-w-5xl">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16">
-          <h1 className="text-4xl md:text-6xl font-display font-bold mb-4">
-            <span className="text-gradient">CIC</span>
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-md mx-auto">
-            CA Interactive Cloud
-          </p>
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="text-center mb-16"
+        >
+          <div className="text-center mb-16">
+            <h1 className="text-4xl md:text-6xl font-display font-bold mb-4 tracking-tight">
+              <span className="text-gradient">CIC</span>
+            </h1>
+            <p className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto font-medium">
+              CA Interactive Cloud
+            </p>
+          </div>
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="text-center mb-8"
+          transition={{ delay: 0.2, duration: 0.4 }}
+          className="mb-8 flex items-center justify-between"
         >
-          <h2 className="text-xl font-display font-semibold text-foreground">
+          <h2 className="text-2xl font-display font-bold text-foreground">
             {lang === "ar" ? "اختر السنة الدراسية" : "Select Academic Year"}
           </h2>
+          <div className="h-px flex-1 bg-gradient-to-r from-border/50 to-transparent ml-6 rtl:mr-6 rtl:ml-0 hidden sm:block" />
         </motion.div>
 
-        <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
-          {YEARS.map((year) => {
-            // Determine target route
-            // Years 1 & 2 -> /year/:yearId/departments
-            // Years 3, 4 -> /year/:yearId/semesters
+        <motion.div 
+          initial={{ opacity: 0 }} 
+          animate={{ opacity: 1 }} 
+          transition={{ delay: 0.3, duration: 0.5 }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 max-w-4xl mx-auto"
+        >
+          {YEARS.map((year, idx) => {
             const targetRoute = `/year/${year.id}/${year.route}`;
-
+            const Icon = year.icon;
+            
             return (
-              <motion.div key={year.id} variants={item}>
-                <Link to={targetRoute} onClick={() => playClickSfx()}>
-                  <motion.div
-                    whileHover={{ y: -8, scale: 1.05 }}
-                    whileTap={{ scale: 0.97 }}
-                    className="glass-card rounded-2xl p-8 h-full group relative overflow-hidden shadow-sm"
-                  >
-                    {/* Glow background */}
+              <motion.div 
+                key={year.id} 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 + (idx * 0.1), duration: 0.4, ease: "easeOut" }}
+              >
+                <Link 
+                  to={targetRoute} 
+                  onClick={() => playClickSfx()} 
+                  className="block h-full outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-2xl group"
+                  style={{ "--year-color": `hsl(${year.color})` } as React.CSSProperties}
+                >
+                  <div className="glass-card rounded-2xl py-8 px-6 h-full relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-white/20 flex flex-col items-center justify-center text-center group">
+                    
+                    {/* Centered Number Glow */}
                     <div
-                      className="absolute inset-0 opacity-10 group-hover:opacity-25 transition-all duration-500"
-                      style={{
-                        background: `radial-gradient(circle at 50% 50%, hsl(${year.color} / 0.5), transparent 70%)`,
-                      }}
+                      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full blur-2xl opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity duration-500"
+                      style={{ background: `hsl(${year.color})` }}
                     />
 
-                    <div className="relative z-10 flex flex-col items-center text-center">
-                      <div
-                        className="mb-6 flex items-center justify-center transition-transform duration-500 group-hover:scale-110"
+                    <div className="relative z-10">
+                      <h2 
+                        className="text-6xl font-display font-black mb-2 transition-transform group-hover:scale-110 duration-300"
+                        style={{ color: `hsl(${year.color})` }}
                       >
-                        <span 
-                          className="text-7xl font-black"
-                          style={{ 
-                            color: `hsl(${year.color})`,
-                            textShadow: `0 0 40px hsl(${year.color} / 0.6), 0 0 80px hsl(${year.color} / 0.4)`
-                          }}
-                        >
-                          {year.iconSymbol}
-                        </span>
-                      </div>
-                      <h3 className="font-display font-bold text-2xl mb-2 text-foreground">
+                        {year.id}
+                      </h2>
+                      <h3 className="font-display font-bold text-xl text-foreground group-hover:text-[var(--year-color)] transition-colors duration-300">
                         {lang === "ar" ? year.name_ar : year.name_en}
                       </h3>
-                      <div className="flex items-center gap-1 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity mt-4" style={{ color: `hsl(${year.color})` }}>
-                        {lang === "ar" ? "المتابعة" : "Continue"} <Arrow className="w-4 h-4" />
-                      </div>
                     </div>
-                  </motion.div>
+                  </div>
                 </Link>
               </motion.div>
             );

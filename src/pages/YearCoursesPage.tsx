@@ -4,7 +4,7 @@ import { db } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { playClickSfx } from "@/hooks/use-sfx";
+import { playBackSfx, playClickSfx } from "@/hooks/use-sfx";
 import { useEffect } from "react";
 import { setPushAudience } from "@/lib/push-registration";
 
@@ -89,11 +89,11 @@ const YearCoursesPage = () => {
       <div className="container mx-auto max-w-5xl">
         <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
           {deptId ? (
-            <Link to={`/year/${yearId}/semesters?dept=${deptId}`} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6">
+            <Link to={`/year/${yearId}/semesters?dept=${deptId}`} onClick={playBackSfx} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors">
               <BackArrow className="w-4 h-4" /> {lang === "ar" ? "العودة للفصول" : "Back to Semesters"}
             </Link>
           ) : (
-            <Link to={`/year/${yearId}/semesters`} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6">
+            <Link to={`/year/${yearId}/semesters`} onClick={playBackSfx} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors">
               <BackArrow className="w-4 h-4" /> {lang === "ar" ? "العودة للفصول" : "Back to Semesters"}
             </Link>
           )}
@@ -118,32 +118,38 @@ const YearCoursesPage = () => {
                   <motion.div
                     whileHover={{ y: -6, scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="glass-card rounded-2xl p-6 h-full group relative overflow-hidden">
+                    className="glass-card rounded-2xl p-6 md:p-8 h-full group relative overflow-hidden flex flex-col">
                     <div
-                      className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity duration-500"
+                      className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-500"
                       style={{
-                        background: `radial-gradient(circle at 30% 30%, hsl(${course.color} / 0.4), transparent 70%)`,
+                        background: `radial-gradient(circle at top right, hsl(${course.color}), transparent 70%)`,
                       }}
                     />
-                    <div className="relative z-10">
-                      <div className="flex items-center gap-2 mb-4">
+                    <div className="relative z-10 flex-1 flex flex-col h-full">
+                      <div className="flex justify-end mb-6">
                         <div
-                          className="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold"
+                          className="px-4 py-1.5 rounded-full flex items-center justify-center text-xs font-bold shadow-sm"
                           style={{ background: `hsl(${course.color} / 0.15)`, color: `hsl(${course.color})` }}>
-                          {course.code.slice(0, 2)}
+                          {course.code}
                         </div>
                         {deptId && course.department_id !== deptId && (
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium ml-2 rtl:mr-2">
                             {lang === "ar" ? "مشترك" : "Shared"}
                           </span>
                         )}
                       </div>
-                      <h3 className="font-display font-semibold text-lg mb-1">{tCourse(course.name)}</h3>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        {lang === "ar" ? (course as any).description_ar || course.description : course.description}
-                      </p>
-                      <div className="flex items-center gap-1 text-primary text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                        {t("index.openCourse")} <Arrow className="w-4 h-4" />
+                      
+                      <div className="text-start flex-1 mb-8">
+                        <h3 className="font-display font-semibold text-xl mb-3 text-foreground leading-tight">
+                          {tCourse(course.name)}
+                        </h3>
+                        <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+                          {lang === "ar" ? (course as any).description_ar || course.description : course.description}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center justify-end gap-1.5 text-sm font-medium transition-colors mt-auto opacity-80 group-hover:opacity-100" style={{ color: `hsl(${course.color})` }}>
+                         <Arrow className="w-4 h-4 rtl:rotate-180" /> {t("index.openCourse")}
                       </div>
                     </div>
                   </motion.div>

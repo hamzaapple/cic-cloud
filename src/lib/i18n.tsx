@@ -17,7 +17,8 @@ const translations: Record<string, Record<Lang, string>> = {
   "nav.courses": { ar: "المقررات", en: "Courses" },
   "nav.calendar": { ar: "التقويم", en: "Calendar" },
   "nav.links": { ar: "روابط مهمة", en: "Important Links" },
-  "nav.schedule": { ar: "إنشاء جدولي", en: "My Schedule" },
+  "nav.schedule": { ar: "إنشاء جدول", en: "Schedule Builder" },
+  "nav.home": { ar: "الرئيسية", en: "Home" },
   
   // Departments
   "dept.selectDepartment": { ar: "اختر القسم", en: "Select Department" },

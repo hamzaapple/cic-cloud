@@ -7,7 +7,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Download, CalendarDays, Merge, Sparkles, Pencil, X, Check, Trash2, Monitor, Brain, Shield } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import html2canvas from "html2canvas";
 
 interface MergedEntry extends ScheduleEntry {
   sections: string[];
@@ -331,6 +330,7 @@ const SchedulePage = () => {
     if (!ref.current) return;
     try {
       const isMobileDevice = window.innerWidth < 768;
+      const html2canvas = (await import("html2canvas")).default;
       const canvas = await html2canvas(ref.current, {
         scale: isMobileDevice ? 1 : 2,
         backgroundColor: "#ffffff",

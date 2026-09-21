@@ -32,11 +32,21 @@ const NotificationBell = () => {
 
     if (permission === "denied") {
       toast({
-        title: lang === "ar" ? "الإشعارات مرفوضة" : "Notifications blocked",
+        title: lang === "ar" ? "الإشعارات محظورة" : "Notifications blocked",
         description: lang === "ar"
-          ? "افتح إعدادات المتصفح وفعّل الإشعارات لهذا الموقع."
+          ? "افتح إعدادات المتصفح واسمح للإشعارات لهذا الموقع."
           : "Open your browser settings and allow notifications for this site.",
         variant: "destructive",
+      });
+      return;
+    }
+
+    if (permission === "granted") {
+      toast({
+        title: lang === "ar" ? "الإشعارات مفعلة بالفعل ✔️" : "Already enabled",
+        description: lang === "ar" 
+          ? "أنت تتلقى التنبيهات بنجاح. لإيقافها، قم بتغيير إعدادات المتصفح." 
+          : "You are already receiving alerts.",
       });
       return;
     }

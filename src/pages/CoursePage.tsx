@@ -1,6 +1,6 @@
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Info, ArrowDownToLine } from "lucide-react"; // أيقونة للتنبيه
-import { useParams, Link, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import { db, categoriesForDepartment } from "@/lib/store";
@@ -9,11 +9,13 @@ import { useQuery } from "@tanstack/react-query";
 import MaterialCard from "@/components/MaterialCard";
 import { ArrowRight, ArrowLeft, FolderDown, Share2 } from "lucide-react";
 import { toast } from "sonner";
-import JSZip from "jszip";
+import { playBackSfx, playClickSfx } from "@/hooks/use-sfx";
+
 
 const CoursePage = () => {
   const { id } = useParams<{ id: string }>();
   const { t, tCourse, lang } = useI18n();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeCategoryId, setActiveCategoryIdRaw] = useState<string | null>(
     () => searchParams.get("category") || null
@@ -66,6 +68,7 @@ const CoursePage = () => {
     const toastId = "zip-download";
     toast.loading(t("material.downloading"), { id: toastId });
     try {
+      const JSZip = (await import("jszip")).default;
       const zip = new JSZip();
       let done = 0;
       const usedNames = new Set<string>();
@@ -221,9 +224,9 @@ const CoursePage = () => {
     <div className="min-h-screen pt-24 pb-12 px-4">
       <div className="container mx-auto max-w-4xl">
         <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-          <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6">
+          <button onClick={() => { playBackSfx(); navigate(-1); }} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors">
             <BackArrow className="w-4 h-4" /> {t("course.back")}
-          </Link>
+          </button>
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
@@ -243,7 +246,7 @@ const CoursePage = () => {
             {categories.map(cat => (
               <button
                 key={cat.id}
-                onClick={() => setActiveCategoryId(cat.id)}
+                onClick={() => { playClickSfx(); setActiveCategoryId(cat.id); }}
                 className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
                   activeCategory === cat.id ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
                 }`}

@@ -15,13 +15,35 @@ const createClickSound = (ctx: AudioContext) => {
   const gain = ctx.createGain();
   osc.connect(gain);
   gain.connect(ctx.destination);
-  osc.frequency.setValueAtTime(800, ctx.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(400, ctx.currentTime + 0.06);
-  gain.gain.setValueAtTime(0.3, ctx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+  
+  // High pitched soft pop
+  osc.frequency.setValueAtTime(600, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.03);
+  
+  gain.gain.setValueAtTime(0.08, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+  
   osc.type = "sine";
   osc.start(ctx.currentTime);
-  osc.stop(ctx.currentTime + 0.08);
+  osc.stop(ctx.currentTime + 0.05);
+};
+
+const createBackSound = (ctx: AudioContext) => {
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  
+  // Low pitched soft boop for going back
+  osc.frequency.setValueAtTime(400, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.04);
+  
+  gain.gain.setValueAtTime(0.08, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.06);
+  
+  osc.type = "sine";
+  osc.start(ctx.currentTime);
+  osc.stop(ctx.currentTime + 0.06);
 };
 
 const createWhooshSound = (ctx: AudioContext) => {
@@ -75,5 +97,12 @@ export const playClickSfx = () => {
   try {
     if (localStorage.getItem(SFX_KEY) === "true") return;
     createClickSound(getCtx());
+  } catch {}
+};
+
+export const playBackSfx = () => {
+  try {
+    if (localStorage.getItem(SFX_KEY) === "true") return;
+    createBackSound(getCtx());
   } catch {}
 };

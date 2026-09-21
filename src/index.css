@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Noto+Naskh+Arabic:wght@400;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -94,7 +93,7 @@
 
 @layer utilities {
   .glass-card {
-    @apply bg-card/70 backdrop-blur-xl border border-border/50 shadow-lg;
+    @apply bg-card/80 backdrop-blur-md border border-white/[0.08] shadow-sm transition-all duration-300;
   }
 
   .glow-border {
@@ -104,6 +103,15 @@
   .text-gradient {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-[hsl(170,70%,50%)];
   }
+
+  .ambient-mesh {
+    background: radial-gradient(circle at 15% 50%, hsl(var(--primary)/0.08), transparent 25%),
+                radial-gradient(circle at 85% 30%, hsl(var(--primary)/0.12), transparent 25%);
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+  }
+
 }
 
 
@@ -125,3 +133,30 @@
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--muted-foreground) / 0.5);
 }
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+.transition-to-dark::view-transition-old(root) {
+  z-index: 1;
+}
+.transition-to-dark::view-transition-new(root) {
+  z-index: 2;
+  clip-path: circle(0px at 0% 0%);
+  animation: theme-reveal 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+.transition-to-light::view-transition-old(root) {
+  z-index: 1;
+}
+.transition-to-light::view-transition-new(root) {
+  z-index: 2;
+  clip-path: circle(0px at 100% 100%);
+  animation: theme-reveal 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+@keyframes theme-reveal {
+  to {
+    clip-path: circle(250vw at center);
+  }
+}
+

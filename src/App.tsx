@@ -2,9 +2,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { I18nProvider } from "@/lib/i18n";
 import { lazy, Suspense } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import Navbar from "./components/Navbar";
 import NotificationPrompt from "./components/NotificationPrompt";
 import InstallPrompt from "./components/InstallPrompt";
@@ -12,30 +13,53 @@ import AnnouncementBanner from "./components/AnnouncementBanner";
 import DhikrBanner from "./components/DhikrBanner";
 import YearPickerModal from "./components/YearPickerModal";
 
-// Lazy load pages
-const Index = lazy(() => import("./pages/Index"));
-const YearDepartmentsPage = lazy(() => import("./pages/YearDepartmentsPage"));
-const YearSemestersPage = lazy(() => import("./pages/YearSemestersPage"));
-const YearCoursesPage = lazy(() => import("./pages/YearCoursesPage"));
-const CoursePage = lazy(() => import("./pages/CoursePage"));
-const CalendarPage = lazy(() => import("./pages/CalendarPage"));
-const LinksPage = lazy(() => import("./pages/LinksPage"));
-const LoginPage = lazy(() => import("./pages/LoginPage"));
-const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
-const SchedulePage = lazy(() => import("./pages/SchedulePage"));
-const NotFound = lazy(() => import("./pages/NotFound"));
-const BachelorTechPage = lazy(() => import("./pages/BachelorTechPage"));
+import Index from "./pages/Index";
+import YearDepartmentsPage from "./pages/YearDepartmentsPage";
+import YearSemestersPage from "./pages/YearSemestersPage";
+import YearCoursesPage from "./pages/YearCoursesPage";
+import CoursePage from "./pages/CoursePage";
+import CalendarPage from "./pages/CalendarPage";
+import LinksPage from "./pages/LinksPage";
+import LoginPage from "./pages/LoginPage";
+import AdminDashboard from "./pages/AdminDashboard";
+import SchedulePage from "./pages/SchedulePage";
+import NotFound from "./pages/NotFound";
+import BachelorTechPage from "./pages/BachelorTechPage";
 
 // Lazy load heavy visual components
 const ParticleBackground = lazy(() => import("./components/ParticleBackground"));
 
 const queryClient = new QueryClient();
 
-const PageLoader = () => (
-  <div className="min-h-screen flex items-center justify-center">
-    <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-  </div>
-);
+const AnimatedRoutes = () => {
+  const location = useLocation();
+  return (
+    <AnimatePresence mode="wait" initial={false}>
+      <motion.div
+        key={location.pathname}
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -15 }}
+        transition={{ duration: 0.25, ease: "easeOut" }}
+      >
+        <Routes location={location}>
+          <Route path="/" element={<Index />} />
+          <Route path="/year/:yearId/departments" element={<YearDepartmentsPage />} />
+          <Route path="/year/:yearId/semesters" element={<YearSemestersPage />} />
+          <Route path="/year/:yearId/courses" element={<YearCoursesPage />} />
+          <Route path="/course/:id" element={<CoursePage />} />
+          <Route path="/calendar" element={<CalendarPage />} />
+          <Route path="/links" element={<LinksPage />} />
+          <Route path="/schedule" element={<SchedulePage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/bachelor-tech" element={<BachelorTechPage />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
 
 const AppContent = () => {
   return (
@@ -48,22 +72,7 @@ const AppContent = () => {
       <InstallPrompt />
       <YearPickerModal />
       <div className="relative z-10">
-        <Suspense fallback={<PageLoader />}>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/year/:yearId/departments" element={<YearDepartmentsPage />} />
-            <Route path="/year/:yearId/semesters" element={<YearSemestersPage />} />
-            <Route path="/year/:yearId/courses" element={<YearCoursesPage />} />
-            <Route path="/course/:id" element={<CoursePage />} />
-            <Route path="/calendar" element={<CalendarPage />} />
-            <Route path="/links" element={<LinksPage />} />
-            <Route path="/schedule" element={<SchedulePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/bachelor-tech" element={<BachelorTechPage />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
+        <AnimatedRoutes />
       </div>
     </>
   );
