@@ -3,6 +3,7 @@ import { GraduationCap } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { YEARS, yearLabel } from "@/lib/year-context";
 import { useYear } from "@/hooks/use-year";
+import { setPushYear } from "@/lib/push-registration";
 
 interface Props {
   /** Force the picker open even when a year is already saved */
@@ -21,6 +22,7 @@ const YearPickerModal = ({ open, onClose }: Props) => {
 
   const choose = (y: string) => {
     setYear(y);
+    setPushYear(y);
     onClose?.();
   };
 
