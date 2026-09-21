@@ -538,7 +538,7 @@ const AdminDashboard = () => {
   // Sync local order state when query data or filters change
   useEffect(() => {
     setOrderedFiltered(filtered);
-  }, [materials, materialCourseFilter, materialCategoryFilter, showArchived]);
+  }, [materials, materialCourseFilter, materialCategoryFilter, showArchived, yearFilter, deptFilter, courses]);
 
   const dndSensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),

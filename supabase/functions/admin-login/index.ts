@@ -72,6 +72,7 @@ Deno.serve(async (req) => {
     let displayName = ''
     let authEmail = ''
     let departmentId: string | null = null
+    let academicYear: string = '1'
 
     // Check owner credentials
     if (username === ownerUsername && password === ownerPassword) {
@@ -93,14 +94,15 @@ Deno.serve(async (req) => {
         displayName = mod.mod_display_name
         authEmail = `mod-${mod.mod_id}@admin.internal`
 
-        // Fetch department_id from moderators table
+        // Fetch department_id and academic_year from moderators table
         const { data: modRow } = await adminClient
           .from('moderators')
-          .select('department_id')
+          .select('department_id, academic_year')
           .eq('id', mod.mod_id)
           .single()
         if (modRow) {
           departmentId = modRow.department_id
+          academicYear = modRow.academic_year || '1'
         }
       }
     }
@@ -210,6 +212,7 @@ Deno.serve(async (req) => {
         permissions,
         displayName,
         departmentId,
+        academicYear,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
