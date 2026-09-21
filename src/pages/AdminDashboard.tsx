@@ -148,12 +148,17 @@ const AdminDashboard = () => {
   }, [navigate]);
 
 
-  // If moderator has department_id, lock filter
+  // If moderator has department_id or academic_year, lock filters
   useEffect(() => {
-    if (user.role === "moderator" && user.departmentId) {
-      setDeptFilter(user.departmentId);
+    if (user.role === "moderator") {
+      if (user.departmentId) {
+        setDeptFilter(user.departmentId);
+      }
+      if (user.academicYear) {
+        setYearFilter(user.academicYear);
+      }
     }
-  }, [user.role, user.departmentId]);
+  }, [user.role, user.departmentId, user.academicYear]);
 
   const sections: { key: string; label: string; icon: any }[] = [];
   if (isOwner || auth.hasPermission("add_courses") || auth.hasPermission("add_pdf_existing") || auth.hasPermission("strict_add_only")) {
@@ -516,10 +521,13 @@ const AdminDashboard = () => {
 
   const handleLogout = () => { auth.logout(); navigate("/"); toast.success(t("admin.loggedOut")); };
 
+  const validCourseIds = new Set(filteredCourses.map(c => c.id));
+
   const filtered = materials
     .filter(m => showArchived ? m.archived : !m.archived)
     .filter(m => materialCourseFilter === "all" ? true : m.course_id === materialCourseFilter)
-    .filter(m => materialCategoryFilter === "all" ? true : m.category_id === materialCategoryFilter);
+    .filter(m => materialCategoryFilter === "all" ? true : m.category_id === materialCategoryFilter)
+    .filter(m => validCourseIds.has(m.course_id));
 
   // ─── DnD reordering for admin materials ───
   const canReorder = materialCourseFilter !== "all" && materialCategoryFilter !== "all";
@@ -585,7 +593,30 @@ const AdminDashboard = () => {
 
         {/* Filters */}
         {isOwner && (
-          <div className="flex flex-wrap gap-4 mb-6">
+          <div className="flex flex-col gap-4 mb-8">
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+              {[
+                { id: "all", label: lang === "ar" ? "كل الصفوف" : "All Years" },
+                { id: "1", label: lang === "ar" ? "الصف الأول" : "1st Year" },
+                { id: "2", label: lang === "ar" ? "الصف الثاني" : "2nd Year" },
+                { id: "3", label: lang === "ar" ? "الصف الثالث" : "3rd Year" },
+                { id: "4", label: lang === "ar" ? "الصف الرابع" : "4th Year" },
+                { id: "2b", label: lang === "ar" ? "الثاني - بكالوريا" : "2nd Year - Bachelor" },
+              ].map((y) => (
+                <button
+                  key={y.id}
+                  onClick={() => setYearFilter(y.id)}
+                  className={`px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
+                    yearFilter === y.id
+                      ? "bg-primary text-primary-foreground shadow-md scale-[1.02]"
+                      : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                  }`}
+                >
+                  {y.label}
+                </button>
+              ))}
+            </div>
+
             {departments.length > 0 && (
               <Select value={deptFilter} onValueChange={setDeptFilter}>
                 <SelectTrigger className="w-64 bg-secondary/50">
@@ -599,20 +630,6 @@ const AdminDashboard = () => {
                 </SelectContent>
               </Select>
             )}
-
-            <Select value={yearFilter} onValueChange={setYearFilter}>
-              <SelectTrigger className="w-64 bg-secondary/50">
-                <SelectValue placeholder={lang === "ar" ? "تصفية بالصف الدراسي" : "Filter by Academic Year"} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{lang === "ar" ? "كل الصفوف" : "All Years"}</SelectItem>
-                <SelectItem value="1">{lang === "ar" ? "الصف الأول" : "1st Year"}</SelectItem>
-                <SelectItem value="2">{lang === "ar" ? "الصف الثاني" : "2nd Year"}</SelectItem>
-                <SelectItem value="3">{lang === "ar" ? "الصف الثالث" : "3rd Year"}</SelectItem>
-                <SelectItem value="4">{lang === "ar" ? "الصف الرابع" : "4th Year"}</SelectItem>
-                <SelectItem value="2b">{lang === "ar" ? "الصف الثاني - بكالوريا" : "2nd Year - Bachelor"}</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
         )}
 
