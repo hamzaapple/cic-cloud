@@ -1,9 +1,21 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
+// ─── Allowed origins (add your production domain here) ───
+const ALLOWED_ORIGINS = [
+  'https://cic-cloud.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:4173',
+];
+
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get('origin') || '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
+    'Vary': 'Origin',
+  };
 }
 
 const RATE_LIMIT_MAX = 5       // max attempts
@@ -11,7 +23,7 @@ const RATE_LIMIT_WINDOW = 15 * 60 * 1000  // 15 minutes in ms
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response(null, { headers: getCorsHeaders(req) })
   }
 
   try {
@@ -20,7 +32,7 @@ Deno.serve(async (req) => {
     if (!username || !password) {
       return new Response(
         JSON.stringify({ error: 'Username and password required' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       )
     }
 
@@ -28,13 +40,13 @@ Deno.serve(async (req) => {
     if (typeof username !== 'string' || typeof password !== 'string') {
       return new Response(
         JSON.stringify({ error: 'Invalid input' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       )
     }
     if (username.length > 100 || password.length > 200) {
       return new Response(
         JSON.stringify({ error: 'Invalid input' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       )
     }
 
@@ -62,7 +74,7 @@ Deno.serve(async (req) => {
     if ((attemptCount ?? 0) >= RATE_LIMIT_MAX) {
       return new Response(
         JSON.stringify({ error: 'Too many login attempts. Please wait 15 minutes before trying again.' }),
-        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 429, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       )
     }
 
@@ -120,7 +132,7 @@ Deno.serve(async (req) => {
 
       return new Response(
         JSON.stringify({ error: 'اسم المستخدم أو كلمة المرور غير صحيحة' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 401, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       )
     }
 
@@ -149,7 +161,7 @@ Deno.serve(async (req) => {
         console.error('Failed to create auth user:', createError.message)
         return new Response(
           JSON.stringify({ error: 'Authentication setup failed' }),
-          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 500, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
         )
       }
 
@@ -163,7 +175,7 @@ Deno.serve(async (req) => {
         console.error('Failed to sign in after creation:', newSignInError.message)
         return new Response(
           JSON.stringify({ error: 'Authentication failed' }),
-          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 500, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
         )
       }
 
@@ -189,7 +201,7 @@ Deno.serve(async (req) => {
             console.error('Failed to refresh sign in after role update:', refreshedSignInError.message)
             return new Response(
               JSON.stringify({ error: 'Authentication failed' }),
-              { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+              { status: 500, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
             )
           }
 
@@ -214,13 +226,13 @@ Deno.serve(async (req) => {
         departmentId,
         academicYear,
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
     )
   } catch (error) {
     console.error('Login error:', error)
     return new Response(
       JSON.stringify({ error: 'Server error' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
     )
   }
 })

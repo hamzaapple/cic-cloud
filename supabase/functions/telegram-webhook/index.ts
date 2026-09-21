@@ -1,10 +1,21 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-telegram-bot-secret",
-};
+// ─── Allowed origins ───
+const ALLOWED_ORIGINS = [
+  'https://cic-cloud.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:4173',
+];
+
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get('origin') || '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-telegram-bot-secret',
+    'Vary': 'Origin',
+  };
+}
 
 // Map Arabic type names to DB values
 const TYPE_MAP: Record<string, { type: string; is_assignment: boolean }> = {
@@ -70,7 +81,7 @@ function findCourseMatch(subject: string, courses: any[]): any | null {
 Deno.serve(async (req) => {
   return new Response(
     JSON.stringify({ status: "error", message: "Telegram integration is currently disabled." }),
-    { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    { status: 503, headers: { ...getCorsHeaders(req), "Content-Type": "application/json" } }
   );
 });
 

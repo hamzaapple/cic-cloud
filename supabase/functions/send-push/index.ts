@@ -2,13 +2,25 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 import webpush from "npm:web-push@3.6.7";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+// ─── Allowed origins (add your production domain here) ───
+const ALLOWED_ORIGINS = [
+  'https://cic-cloud.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:4173',
+];
+
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get('origin') || '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Vary': 'Origin',
+  };
+}
 
 serve(async (req: Request) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (req.method === "OPTIONS") return new Response(null, { headers: getCorsHeaders(req) });
 
   try {
     const vapidPrivateKey = Deno.env.get("VAPID_PRIVATE_KEY");
@@ -22,7 +34,7 @@ serve(async (req: Request) => {
 
     if (!vapidPrivateKey || !vapidPublicKey) {
       console.error("VAPID keys not configured in Edge Function env");
-      return new Response(JSON.stringify({ error: "VAPID keys missing" }), { status: 500, headers: corsHeaders });
+      return new Response(JSON.stringify({ error: "VAPID keys missing" }), { status: 500, headers: getCorsHeaders(req) });
     }
 
     webpush.setVapidDetails(
@@ -34,7 +46,7 @@ serve(async (req: Request) => {
     // Get VAPID public key for frontend
     if (req.method === "GET") {
       return new Response(JSON.stringify({ publicKey: vapidPublicKey }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...getCorsHeaders(req), "Content-Type": "application/json" },
       });
     }
 
@@ -57,16 +69,16 @@ serve(async (req: Request) => {
 
     const body = await req.json().catch(() => ({}));
     if (body.action === "get_vapid_key") {
-      return new Response(JSON.stringify({ publicKey: vapidPublicKey }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ publicKey: vapidPublicKey }), { headers: { ...getCorsHeaders(req), "Content-Type": "application/json" } });
     }
 
     if (!authorized) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: corsHeaders });
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: getCorsHeaders(req) });
     }
 
     const { title, message, target_audience, target_year, link } = body;
     if (!title || !message) {
-      return new Response(JSON.stringify({ error: "Missing title or message" }), { status: 400, headers: corsHeaders });
+      return new Response(JSON.stringify({ error: "Missing title or message" }), { status: 400, headers: getCorsHeaders(req) });
     }
 
     const supabase = createClient(Deno.env.get("SUPABASE_URL")!, serviceKey);
@@ -77,7 +89,7 @@ serve(async (req: Request) => {
     if (subsError || !subs || subs.length === 0) {
       console.log("No subscriptions found or error fetching them:", subsError);
       return new Response(JSON.stringify({ sent: 0, failed: 0, total: 0 }), { 
-        headers: { ...corsHeaders, "Content-Type": "application/json" } 
+        headers: { ...getCorsHeaders(req), "Content-Type": "application/json" } 
       });
     }
 
@@ -165,11 +177,11 @@ serve(async (req: Request) => {
       cleaned: staleIds.length,
       total: subs.length
     }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...getCorsHeaders(req), "Content-Type": "application/json" },
     });
   } catch (err) {
     console.error("Global edge function error:", err);
-    return new Response(JSON.stringify({ error: String(err) }), { status: 500, headers: corsHeaders });
+    return new Response(JSON.stringify({ error: String(err) }), { status: 500, headers: getCorsHeaders(req) });
   }
 });
 

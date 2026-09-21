@@ -1,13 +1,25 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
+// ─── Allowed origins (add your production domain here) ───
+const ALLOWED_ORIGINS = [
+  'https://cic-cloud.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:4173',
+];
+
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get('origin') || '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
+    'Vary': 'Origin',
+  };
 }
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response(null, { headers: getCorsHeaders(req) })
   }
 
   try {
@@ -24,27 +36,27 @@ Deno.serve(async (req) => {
     
     if (!caller || caller.app_metadata?.app_role !== 'owner') {
       return new Response(JSON.stringify({ error: 'Unauthorized - only owner can create moderators' }), {
-        status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        status: 403, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' }
       })
     }
 
-    const { username, password, display_name, permissions, department_id } = await req.json()
+    const { username, password, display_name, permissions, department_id, academic_year } = await req.json()
     if (!username || !password || !display_name) {
       return new Response(JSON.stringify({ error: 'Missing fields' }), {
-        status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        status: 400, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' }
       })
     }
 
     // 1. Insert moderator into DB (password will be hashed by trigger)
     const { data: mod, error: modErr } = await adminClient
       .from('moderators')
-      .insert({ username, password, display_name, permissions: permissions || [], department_id: department_id || null })
+      .insert({ username, password, display_name, permissions: permissions || [], department_id: department_id || null, academic_year: academic_year || '1' })
       .select()
       .single()
 
     if (modErr) {
       return new Response(JSON.stringify({ error: modErr.message }), {
-        status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        status: 400, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' }
       })
     }
 
@@ -63,16 +75,16 @@ Deno.serve(async (req) => {
       // Rollback: delete the moderator row
       await adminClient.from('moderators').delete().eq('id', mod.id)
       return new Response(JSON.stringify({ error: 'Failed to create auth account: ' + createErr.message }), {
-        status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        status: 500, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' }
       })
     }
 
     return new Response(JSON.stringify({ success: true, moderator: mod }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' }
     })
   } catch (err) {
     return new Response(JSON.stringify({ error: String(err) }), {
-      status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      status: 500, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' }
     })
   }
 })

@@ -382,7 +382,6 @@ export type Database = {
           id: string
           password: string
           permissions: string[]
-          plain_password: string | null
           username: string
         }
         Insert: {
@@ -393,7 +392,6 @@ export type Database = {
           id?: string
           password: string
           permissions?: string[]
-          plain_password?: string | null
           username: string
         }
         Update: {
@@ -404,7 +402,6 @@ export type Database = {
           id?: string
           password?: string
           permissions?: string[]
-          plain_password?: string | null
           username?: string
         }
         Relationships: [

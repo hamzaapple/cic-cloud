@@ -24,7 +24,8 @@ dist-ssr
 *.sw?
 
 # Environment variables (secrets)
-# (Public Supabase keys allowed in .env)
+# (Public Supabase keys allowed in .env.example)
+.env
 .env.local
 .env.*.local
 .vercel

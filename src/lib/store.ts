@@ -82,7 +82,6 @@ export interface Moderator {
   id: string;
   username: string;
   password: string;
-  plain_password?: string | null;
   display_name: string;
   permissions: Permission[];
   department_id?: string | null;
@@ -581,16 +580,26 @@ export const db = {
     return `${Date.now()}-${clean}${ext}`;
   },
 
+  /** Allowed file MIME types for upload */
+  ALLOWED_UPLOAD_TYPES: ['application/pdf', 'video/mp4', 'video/webm', 'video/ogg', 'video/quicktime'] as const,
+
   uploadPdf: async (file: File): Promise<string> => {
-    const fileName = `${Date.now()}-${file.name}`;
-    const { error } = await supabase.storage.from("materials").upload(fileName, file);
-    if (error) throw error;
-    const { data: urlData } = supabase.storage.from("materials").getPublicUrl(fileName);
-    return urlData.publicUrl;
+    // Validate file type
+    const allowedTypes: readonly string[] = db.ALLOWED_UPLOAD_TYPES;
+    if (!allowedTypes.includes(file.type) && !file.name.toLowerCase().endsWith('.pdf')) {
+      throw new Error('نوع الملف غير مسموح به. يُسمح فقط بملفات PDF والفيديو.');
+    }
+    // Use sanitized upload path
+    return db.uploadPdfSanitized(file);
   },
 
   /** Upload a PDF with a sanitized storage path. Returns the public URL. */
   uploadPdfSanitized: async (file: File): Promise<string> => {
+    // Validate file type
+    const allowedTypes: readonly string[] = db.ALLOWED_UPLOAD_TYPES;
+    if (!allowedTypes.includes(file.type) && !file.name.toLowerCase().endsWith('.pdf')) {
+      throw new Error('نوع الملف غير مسموح به. يُسمح فقط بملفات PDF والفيديو.');
+    }
     const safeName = db.sanitizeFileName(file.name);
     const { error } = await supabase.storage.from("materials").upload(safeName, file);
     if (error) throw error;

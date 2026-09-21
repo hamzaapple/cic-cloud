@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Trash2, UserPlus, Shield, ShieldCheck, Pencil, KeyRound, Eye, EyeOff } from "lucide-react";
+import { Trash2, UserPlus, Shield, ShieldCheck, Pencil, KeyRound } from "lucide-react";
 import { toast } from "sonner";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -25,37 +25,19 @@ interface Props {
   departments: Department[];
 }
 
-// ─── Password Display Sub-Component ───
-const PasswordDisplay = ({ mod, t, lang, onChangePassword }: {
+// ─── Change Password Button (no plain password display for security) ───
+const ChangePasswordButton = ({ mod, t, lang, onChangePassword }: {
   mod: Moderator;
   t: (key: string) => string;
   lang: string;
   onChangePassword: () => void;
 }) => {
-  const [visible, setVisible] = useState(false);
-  const hasPlainPassword = !!mod.plain_password;
-
   return (
     <div className="flex items-center gap-2 mt-2 p-2 rounded-lg bg-secondary/40 border border-border/30">
       <KeyRound className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
-      {hasPlainPassword ? (
-        <>
-          <span className={`text-xs font-mono tracking-wider select-all ${visible ? "text-foreground" : "text-muted-foreground"}`}>
-            {visible ? mod.plain_password : "••••••••"}
-          </span>
-          <button
-            onClick={() => setVisible(!visible)}
-            className="p-1 rounded-md text-muted-foreground hover:text-foreground transition-colors"
-            title={visible ? (lang === "ar" ? "إخفاء" : "Hide") : (lang === "ar" ? "إظهار" : "Show")}
-          >
-            {visible ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-          </button>
-        </>
-      ) : (
-        <span className="text-[10px] text-muted-foreground italic">
-          {lang === "ar" ? "غير متوفرة — غيّر الباسورد لحفظها" : "Not available — change password to save it"}
-        </span>
-      )}
+      <span className="text-[10px] text-muted-foreground italic">
+        {lang === "ar" ? "كلمة المرور مشفرة ومحمية" : "Password is encrypted and secure"}
+      </span>
       <button
         onClick={onChangePassword}
         className="text-[10px] px-2 py-0.5 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors font-medium ms-auto"
@@ -166,8 +148,12 @@ const ManageModerators = ({ departments }: Props) => {
 
   const handleChangePassword = async () => {
     if (!passwordMod) return;
-    if (newPassword.length < 4) {
-      toast.error(t("mod.passwordTooShort"));
+    if (newPassword.length < 8) {
+      toast.error(lang === "ar" ? "كلمة المرور يجب أن تكون 8 أحرف على الأقل" : "Password must be at least 8 characters");
+      return;
+    }
+    if (!/[A-Z]/.test(newPassword) || !/[0-9]/.test(newPassword)) {
+      toast.error(lang === "ar" ? "كلمة المرور يجب أن تحتوي على حرف كبير ورقم على الأقل" : "Password must contain at least one uppercase letter and one number");
       return;
     }
     if (newPassword !== confirmPassword) {
@@ -300,7 +286,7 @@ const ManageModerators = ({ departments }: Props) => {
                       <p className="text-xs text-primary mt-1">{getDeptName(mod.department_id)}</p>
                     )}
                     {/* Password info */}
-                    <PasswordDisplay mod={mod} t={t} lang={lang} onChangePassword={() => { setPasswordMod(mod); setNewPassword(""); setConfirmPassword(""); setShowNewPassword(false); }} />
+                    <ChangePasswordButton mod={mod} t={t} lang={lang} onChangePassword={() => { setPasswordMod(mod); setNewPassword(""); setConfirmPassword(""); setShowNewPassword(false); }} />
                     <div className="flex flex-wrap gap-1.5 mt-3">
                       {mod.permissions.map(perm => (
                         <span key={perm} className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
