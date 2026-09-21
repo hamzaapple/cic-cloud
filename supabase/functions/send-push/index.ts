@@ -64,7 +64,7 @@ serve(async (req: Request) => {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: corsHeaders });
     }
 
-    const { title, message, target_audience, link } = body;
+    const { title, message, target_audience, target_year, link } = body;
     if (!title || !message) {
       return new Response(JSON.stringify({ error: "Missing title or message" }), { status: 400, headers: corsHeaders });
     }
@@ -110,6 +110,13 @@ serve(async (req: Request) => {
           sub.department !== "all" &&
           sub.department !== target_audience
         ) {
+          return { skipped: true };
+        }
+      }
+
+      // Filter by academic year if target_year is provided
+      if (target_year && target_year !== "all") {
+        if (!sub.academic_year || sub.academic_year !== target_year) {
           return { skipped: true };
         }
       }

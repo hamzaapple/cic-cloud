@@ -5,11 +5,14 @@ import { useQuery } from "@tanstack/react-query";
 import { format, isSameDay, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths } from "date-fns";
 import { ar, enUS } from "date-fns/locale";
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, Clock } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, Filter } from "lucide-react";
+import { useYear } from "@/hooks/use-year";
 
 const CalendarPage = () => {
   const { t, lang } = useI18n();
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [showAllYears, setShowAllYears] = useState(false);
+  const { year } = useYear();
   const { data: allMaterials = [] } = useQuery({ queryKey: ["materials"], queryFn: () => db.getMaterials() });
   const { data: courses = [] } = useQuery({ queryKey: ["courses"], queryFn: db.getCourses });
 
@@ -17,7 +20,9 @@ const CalendarPage = () => {
   const materials = allMaterials.filter(m => {
     if (!m.deadline || m.archived) return false;
     const course = courses.find(c => c.id === m.course_id);
-    return !course || course.code !== "BACHELOR-PROG";
+    if (!course || course.code === "BACHELOR-PROG") return false;
+    if (!showAllYears && year && course.academic_year !== year) return false;
+    return true;
   });
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
@@ -34,9 +39,22 @@ const CalendarPage = () => {
   return (
     <div className="min-h-screen pt-24 pb-12 px-4">
       <div className="container mx-auto max-w-4xl">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="text-3xl font-display font-bold mb-2">{t("calendar.title")}</h1>
-          <p className="text-muted-foreground mb-8">{t("calendar.subtitle")}</p>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+          <div>
+            <h1 className="text-3xl font-display font-bold mb-2">{t("calendar.title")}</h1>
+            <p className="text-muted-foreground">{t("calendar.subtitle")}</p>
+          </div>
+          {year && (
+            <button
+              onClick={() => setShowAllYears(!showAllYears)}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-secondary/50 text-sm font-medium hover:bg-secondary transition-colors"
+            >
+              <Filter className="w-4 h-4" />
+              {showAllYears
+                ? (lang === "ar" ? "عرض صفي فقط" : "Show my year only")
+                : (lang === "ar" ? "عرض كل الصفوف" : "Show all years")}
+            </button>
+          )}
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-card rounded-2xl p-6">

@@ -85,6 +85,7 @@ const AdminDashboard = () => {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [categories, setCategories] = useState<MaterialCategory[]>([]);
   const [deptFilter, setDeptFilter] = useState<string>("all");
+  const [yearFilter, setYearFilter] = useState<string>("all");
 
   const loadData = useCallback(async () => {
     const deptId = user.role === "moderator" ? user.departmentId : undefined;
@@ -230,8 +231,11 @@ const AdminDashboard = () => {
   const isPdfOnly = !isOwner && auth.hasPermission("add_pdf_existing") && !auth.hasPermission("add_courses");
   const canAddExtLinks = isOwner || auth.hasPermission("add_external_resources");
 
-  // Filter courses by department
-  const filteredCourses = deptFilter === "all" ? courses : courses.filter(c => c.department_id === deptFilter);
+  // Filter courses by department and year
+  const filteredCourses = courses.filter(c => 
+    (deptFilter === "all" || c.department_id === deptFilter) &&
+    (yearFilter === "all" || c.academic_year === yearFilter)
+  );
 
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -579,18 +583,34 @@ const AdminDashboard = () => {
           <Button variant="ghost" size="sm" onClick={handleLogout}><LogOut className="w-4 h-4 me-1" /> {t("admin.logout")}</Button>
         </motion.div>
 
-        {/* Department filter */}
-        {isOwner && departments.length > 0 && (
-          <div className="mb-6">
-            <Select value={deptFilter} onValueChange={setDeptFilter}>
+        {/* Filters */}
+        {isOwner && (
+          <div className="flex flex-wrap gap-4 mb-6">
+            {departments.length > 0 && (
+              <Select value={deptFilter} onValueChange={setDeptFilter}>
+                <SelectTrigger className="w-64 bg-secondary/50">
+                  <SelectValue placeholder={t("admin.filterDept")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t("admin.allDepts")}</SelectItem>
+                  {departments.map(d => (
+                    <SelectItem key={d.id} value={d.id}>{lang === "ar" ? d.name_ar : d.name_en}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+
+            <Select value={yearFilter} onValueChange={setYearFilter}>
               <SelectTrigger className="w-64 bg-secondary/50">
-                <SelectValue placeholder={t("admin.filterDept")} />
+                <SelectValue placeholder={lang === "ar" ? "تصفية بالصف الدراسي" : "Filter by Academic Year"} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{t("admin.allDepts")}</SelectItem>
-                {departments.map(d => (
-                  <SelectItem key={d.id} value={d.id}>{lang === "ar" ? d.name_ar : d.name_en}</SelectItem>
-                ))}
+                <SelectItem value="all">{lang === "ar" ? "كل الصفوف" : "All Years"}</SelectItem>
+                <SelectItem value="1">{lang === "ar" ? "الصف الأول" : "1st Year"}</SelectItem>
+                <SelectItem value="2">{lang === "ar" ? "الصف الثاني" : "2nd Year"}</SelectItem>
+                <SelectItem value="3">{lang === "ar" ? "الصف الثالث" : "3rd Year"}</SelectItem>
+                <SelectItem value="4">{lang === "ar" ? "الصف الرابع" : "4th Year"}</SelectItem>
+                <SelectItem value="2b">{lang === "ar" ? "الصف الثاني - بكالوريا" : "2nd Year - Bachelor"}</SelectItem>
               </SelectContent>
             </Select>
           </div>

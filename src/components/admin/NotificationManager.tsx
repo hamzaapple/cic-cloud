@@ -16,8 +16,8 @@ const NotificationManager = () => {
   const locale = lang === "ar" ? ar : enUS;
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [title, setTitle] = useState("");
-  const [message, setMessage] = useState("");
   const [targetAudience, setTargetAudience] = useState("all");
+  const [targetYear, setTargetYear] = useState("all");
   const [link, setLink] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -36,6 +36,7 @@ const NotificationManager = () => {
     try {
       await db.addNotification({
         title, message, target_audience: targetAudience,
+        target_year: targetYear === "all" ? null : targetYear,
         link: link || null, sent_by: "owner",
       });
 
@@ -66,15 +67,28 @@ const NotificationManager = () => {
           <form onSubmit={handleSend} className="space-y-3">
             <Input placeholder={t("notif.title")} value={title} onChange={e => setTitle(e.target.value)} className="bg-secondary/50" />
             <Textarea placeholder={t("notif.message")} value={message} onChange={e => setMessage(e.target.value)} className="bg-secondary/50 min-h-[80px]" />
-            <Select value={targetAudience} onValueChange={setTargetAudience}>
-              <SelectTrigger className="bg-secondary/50"><SelectValue placeholder={t("notif.targetAudience")} /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">الكل (طالب/مشرف)</SelectItem>
-                <SelectItem value="cs">علوم الحاسب (CS)</SelectItem>
-                <SelectItem value="ai_cyber">الذكاء الاصطناعي (AI & Cyber)</SelectItem>
-                <SelectItem value="bachelor">بكالوريا (Bachelor)</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="grid grid-cols-2 gap-2">
+              <Select value={targetAudience} onValueChange={setTargetAudience}>
+                <SelectTrigger className="bg-secondary/50"><SelectValue placeholder={t("notif.targetAudience")} /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">الكل (طالب/مشرف)</SelectItem>
+                  <SelectItem value="cs">علوم الحاسب (CS)</SelectItem>
+                  <SelectItem value="ai_cyber">الذكاء الاصطناعي (AI & Cyber)</SelectItem>
+                  <SelectItem value="bachelor">بكالوريا (Bachelor)</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={targetYear} onValueChange={setTargetYear}>
+                <SelectTrigger className="bg-secondary/50"><SelectValue placeholder={lang === "ar" ? "الصف المستهدف" : "Target Year"} /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{lang === "ar" ? "كل الصفوف" : "All Years"}</SelectItem>
+                  <SelectItem value="1">{lang === "ar" ? "الصف الأول" : "1st Year"}</SelectItem>
+                  <SelectItem value="2">{lang === "ar" ? "الصف الثاني" : "2nd Year"}</SelectItem>
+                  <SelectItem value="3">{lang === "ar" ? "الصف الثالث" : "3rd Year"}</SelectItem>
+                  <SelectItem value="4">{lang === "ar" ? "الصف الرابع" : "4th Year"}</SelectItem>
+                  <SelectItem value="2b">{lang === "ar" ? "الصف الثاني - بكالوريا" : "2nd Year - Bachelor"}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <Input placeholder={t("notif.optionalLink")} value={link} onChange={e => setLink(e.target.value)} className="bg-secondary/50" />
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? t("notif.sending") : t("notif.send")}
@@ -105,6 +119,7 @@ const NotificationManager = () => {
                       </span>
                       <span className="px-2 py-0.5 rounded-full bg-secondary text-xs">
                         {notif.target_audience === "all" ? t("notif.everyone") : notif.target_audience}
+                        {notif.target_year && ` - ${lang === "ar" ? "الصف" : "Year"} ${notif.target_year}`}
                       </span>
                     </div>
                     {notif.link && (

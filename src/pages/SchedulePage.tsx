@@ -1,6 +1,7 @@
 import { useState, useRef, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useI18n } from "@/lib/i18n";
+import { useYear } from "@/hooks/use-year";
 import { csScheduleData, cyberScheduleData, aiScheduleData, DAYS_ORDER, PERIODS_ORDER, ScheduleEntry, AllSchedules } from "@/lib/schedule-data";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
@@ -30,6 +31,7 @@ const DEPT_SCHEDULES: Record<ScheduleDept, AllSchedules> = {
 
 const SchedulePage = () => {
   const { t, tSubject, lang } = useI18n();
+  const { year } = useYear();
   const deptContext = localStorage.getItem("cic_dept_context"); // "cs" or "ai_cyber"
   const isCSOnly = deptContext === "cs";
   const isAICyber = deptContext === "ai_cyber";
@@ -563,8 +565,17 @@ const SchedulePage = () => {
           <p className="text-muted-foreground mb-8">{t("schedule.subtitle")}</p>
         </motion.div>
 
-        {/* Department Toggle - Hidden for CS-only context */}
-        {!isCSOnly && (
+        {year && year !== "1" ? (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card rounded-2xl p-12 text-center mt-8">
+            <CalendarDays className="w-16 h-16 mx-auto mb-4 text-primary/30" />
+            <p className="text-lg font-display font-semibold text-muted-foreground">
+              {lang === "ar" ? "الجدول لسه مش متاح لصفك الدراسي" : "Schedule is not available yet for your year"}
+            </p>
+          </motion.div>
+        ) : (
+          <>
+            {/* Department Toggle - Hidden for CS-only context */}
+            {!isCSOnly && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
             className="glass-card rounded-2xl p-4 mb-6">
             <p className="text-sm font-medium text-muted-foreground mb-3">{t("schedule.selectDept")}</p>
@@ -1034,6 +1045,8 @@ const SchedulePage = () => {
             )}
           </TabsContent>
         </Tabs>
+          )}
+          </>
         )}
       </div>
     </div>

@@ -474,7 +474,7 @@ export const db = {
     const { data } = await supabase.from("notifications").select("*").order("created_at", { ascending: false });
     return (data || []) as Notification[];
   },
-  addNotification: async (notif: { title: string; message: string; target_audience: string; link?: string | null; sent_by?: string }) => {
+  addNotification: async (notif: { title: string; message: string; target_audience: string; target_year?: string | null; link?: string | null; sent_by?: string }) => {
     // Ensure we have a fresh session before insert (RLS requires authenticated user)
     const { data: sessionData } = await supabase.auth.refreshSession().catch(() => ({ data: null }));
     const session = sessionData?.session ?? (await supabase.auth.getSession()).data.session;
@@ -488,7 +488,7 @@ export const db = {
       headers['Authorization'] = `Bearer ${session.access_token}`;
     }
     const { error: pushError } = await supabase.functions.invoke('send-push', {
-      body: { title: notif.title, message: notif.message, target_audience: notif.target_audience },
+      body: { title: notif.title, message: notif.message, target_audience: notif.target_audience, target_year: notif.target_year },
       headers,
     });
     

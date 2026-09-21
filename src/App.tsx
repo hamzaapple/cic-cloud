@@ -10,6 +10,7 @@ import NotificationPrompt from "./components/NotificationPrompt";
 import InstallPrompt from "./components/InstallPrompt";
 import AnnouncementBanner from "./components/AnnouncementBanner";
 import DhikrBanner from "./components/DhikrBanner";
+import YearPickerModal from "./components/YearPickerModal";
 
 // Lazy load pages
 const Index = lazy(() => import("./pages/Index"));
@@ -45,6 +46,7 @@ const AppContent = () => {
       <DhikrBanner />
       <NotificationPrompt />
       <InstallPrompt />
+      <YearPickerModal />
       <div className="relative z-10">
         <Suspense fallback={<PageLoader />}>
           <Routes>

@@ -27,7 +27,7 @@ serve(async (req: Request) => {
 
     const { data: assignments, error } = await supabase
       .from("materials")
-      .select("id, title, deadline, course_id, courses(name, departments(name_en))")
+      .select("id, title, deadline, course_id, courses(name, academic_year, departments(name_en))")
       .eq("is_assignment", true)
       .eq("archived", false)
       .is("deleted_at", null)
@@ -63,6 +63,7 @@ serve(async (req: Request) => {
     for (const { material, type } of toSend) {
       const courseName = (material as any).courses?.name || "";
       const dept = (material as any).courses?.departments?.name_en || "all";
+      const targetYear = (material as any).courses?.academic_year || "all";
       const label = type === "24h" ? "خلال 24 ساعة ⏰" : type === "6h" ? "خلال 6 ساعات ⚠️" : "خلال ساعة واحدة 🚨";
 
       const pushRes = await fetch(`${SUPABASE_URL}/functions/v1/send-push`, {
@@ -75,6 +76,7 @@ serve(async (req: Request) => {
           title: `📝 تذكير تسليم: ${courseName}`,
           message: `${material.title} — ${label}`,
           target_audience: dept,
+          target_year: targetYear,
         }),
       });
 
