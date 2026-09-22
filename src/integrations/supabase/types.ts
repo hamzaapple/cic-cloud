@@ -21,6 +21,7 @@ export type Database = {
           created_by: string | null
           expires_at: string
           id: string
+          link: string | null
         }
         Insert: {
           content: string
@@ -28,6 +29,7 @@ export type Database = {
           created_by?: string | null
           expires_at: string
           id?: string
+          link?: string | null
         }
         Update: {
           content?: string
@@ -35,6 +37,7 @@ export type Database = {
           created_by?: string | null
           expires_at?: string
           id?: string
+          link?: string | null
         }
         Relationships: []
       }
@@ -382,6 +385,7 @@ export type Database = {
           id: string
           password: string
           permissions: string[]
+          plain_password: string | null
           username: string
         }
         Insert: {
@@ -392,6 +396,7 @@ export type Database = {
           id?: string
           password: string
           permissions?: string[]
+          plain_password?: string | null
           username: string
         }
         Update: {
@@ -402,6 +407,7 @@ export type Database = {
           id?: string
           password?: string
           permissions?: string[]
+          plain_password?: string | null
           username?: string
         }
         Relationships: [
