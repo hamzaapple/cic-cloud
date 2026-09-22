@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Megaphone, Trash2, Clock } from "lucide-react";
 import { toast } from "sonner";
-import { format } from "date-fns";
+import { safeFormatDate } from "@/lib/utils";
 import { ar, enUS } from "date-fns/locale";
 
 const AnnouncementManager = () => {
@@ -152,7 +152,7 @@ const AnnouncementManager = () => {
                   </p>
                   <div className="flex items-center gap-2 text-xs text-muted-foreground bg-secondary/30 w-fit px-2 py-1 rounded-md">
                     <Clock className="w-3 h-3" />
-                    <span>{lang === "ar" ? "ينتهي في:" : "Expires:"} {format(new Date(ann.expires_at), "dd MMM yyyy - hh:mm a", { locale })}</span>
+                    <span>{lang === "ar" ? "ينتهي في:" : "Expires:"} {safeFormatDate(ann.expires_at, "dd MMM yyyy - hh:mm a", { locale })}</span>
                   </div>
                   {ann.link && (
                     <a href={ann.link} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline mt-2 inline-block">

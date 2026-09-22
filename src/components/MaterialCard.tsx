@@ -3,7 +3,8 @@ import { FileText, ExternalLink, Clock, Archive, Trash2, Download, Pencil, X, Sa
 import type { Material, MaterialCategory, Course } from "@/lib/store";
 import { db } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
-import { format, isPast } from "date-fns";
+import { isPast } from "date-fns";
+import { safeFormatDate } from "@/lib/utils";
 import { ar, enUS } from "date-fns/locale";
 import { playClickSfx } from "@/hooks/use-sfx";
 import { useState, lazy, Suspense } from "react";
@@ -187,7 +188,7 @@ const MaterialCard = ({
               <p className="text-[11px] text-muted-foreground/70 mb-1.5 flex items-center gap-1">
                 <Clock className="w-2.5 h-2.5" />
                 {lang === "ar" ? "تاريخ الرفع: " : "Uploaded: "}
-                {format(new Date(material.created_at), "dd MMM yyyy", { locale })}
+                {safeFormatDate(material.created_at, "dd MMM yyyy", { locale })}
               </p>
             )}
 
@@ -207,7 +208,7 @@ const MaterialCard = ({
               {material.deadline && (
                 <span className={`flex items-center gap-1 ${deadlinePast ? "text-destructive" : ""}`}>
                   <Clock className="w-3 h-3" />
-                  {format(new Date(material.deadline), "dd MMM yyyy - hh:mm a", { locale })}
+                  {safeFormatDate(material.deadline, "dd MMM yyyy - hh:mm a", { locale })}
                   {deadlinePast && ` (${t("material.expired")})`}
                 </span>
               )}

@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Bell, Send, Clock } from "lucide-react";
 import { toast } from "sonner";
-import { format } from "date-fns";
+import { safeFormatDate } from "@/lib/utils";
 import { ar, enUS } from "date-fns/locale";
 
 const NotificationManager = () => {
@@ -116,7 +116,7 @@ const NotificationManager = () => {
                     <div className="flex items-center gap-3 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <Clock className="w-3 h-3" />
-                        {format(new Date(notif.created_at), "dd MMM yyyy - HH:mm", { locale })}
+                        {safeFormatDate(notif.created_at, "dd MMM yyyy - HH:mm", { locale })}
                       </span>
                       <span className="px-2 py-0.5 rounded-full bg-secondary text-xs">
                         {notif.target_audience === "all" ? t("notif.everyone") : notif.target_audience}

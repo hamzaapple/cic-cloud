@@ -2,8 +2,9 @@ import { motion } from "framer-motion";
 import { db } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
 import { useQuery } from "@tanstack/react-query";
-import { format, isSameDay, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths } from "date-fns";
+import { isSameDay, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths } from "date-fns";
 import { ar, enUS } from "date-fns/locale";
+import { safeFormatDate } from "@/lib/utils";
 import { useState } from "react";
 import { ChevronLeft, ChevronRight, Clock, Filter } from "lucide-react";
 import { useYear } from "@/hooks/use-year";
@@ -62,7 +63,7 @@ const CalendarPage = () => {
             <button onClick={() => setCurrentMonth(d => addMonths(d, 1))} className="p-2 rounded-lg hover:bg-secondary">
               <ChevronRight className="w-5 h-5" />
             </button>
-            <h2 className="font-display font-semibold text-lg">{format(currentMonth, "MMMM yyyy", { locale })}</h2>
+            <h2 className="font-display font-semibold text-lg">{safeFormatDate(currentMonth, "MMMM yyyy", { locale })}</h2>
             <button onClick={() => setCurrentMonth(d => subMonths(d, 1))} className="p-2 rounded-lg hover:bg-secondary">
               <ChevronLeft className="w-5 h-5" />
             </button>
@@ -88,7 +89,7 @@ const CalendarPage = () => {
                   }`}
                 >
                   <span className={`text-xs font-medium ${isToday ? "text-primary" : "text-muted-foreground"}`}>
-                    {format(day, "d")}
+                    {safeFormatDate(day, "d")}
                   </span>
                   {events.map(ev => {
                     const course = courses.find(c => c.id === ev.course_id);
@@ -120,7 +121,7 @@ const CalendarPage = () => {
                     className="glass-card rounded-xl p-4 flex items-center gap-4">
                     <div className="flex items-center gap-1 text-xs text-muted-foreground shrink-0">
                       <Clock className="w-3 h-3" />
-                      {format(new Date(m.deadline!), "dd MMM", { locale })}
+                      {safeFormatDate(m.deadline, "dd MMM", { locale })}
                     </div>
                     <div className="min-w-0">
                       <p className="text-sm font-medium truncate">{m.title}</p>

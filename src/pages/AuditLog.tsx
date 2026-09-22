@@ -20,7 +20,7 @@ import {
   X,
   FileText
 } from "lucide-react";
-import { format } from "date-fns";
+import { safeFormatDate } from "@/lib/utils";
 import { ar, enUS } from "date-fns/locale";
 import { toast } from "sonner";
 
@@ -295,7 +295,7 @@ const AuditLog = ({ courses = [], categories = [], onUpdate }: AuditLogProps) =>
   // Group logs by date
   const groupedLogs: Record<string, AuditLogEntry[]> = {};
   filteredLogs.forEach((log) => {
-    const dateKey = format(new Date(log.created_at), "yyyy-MM-dd");
+    const dateKey = safeFormatDate(log.created_at, "yyyy-MM-dd") || "Unknown Date";
     if (!groupedLogs[dateKey]) groupedLogs[dateKey] = [];
     groupedLogs[dateKey].push(log);
   });
@@ -409,7 +409,7 @@ const AuditLog = ({ courses = [], categories = [], onUpdate }: AuditLogProps) =>
               {/* Date header */}
               <div className="sticky top-20 z-10 mb-3">
                 <span className="inline-block px-3 py-1 rounded-full bg-secondary text-xs font-semibold text-muted-foreground">
-                  {format(new Date(dateKey), "EEEE, dd MMMM yyyy", { locale })}
+                  {safeFormatDate(dateKey === "Unknown Date" ? new Date() : dateKey, "EEEE, dd MMMM yyyy", { locale })}
                 </span>
               </div>
 
@@ -459,8 +459,8 @@ const AuditLog = ({ courses = [], categories = [], onUpdate }: AuditLogProps) =>
                                   </span>
                                   <span className="text-[11px] text-muted-foreground flex items-center gap-1">
                                     <Clock className="w-2.5 h-2.5" />
-                                    {format(
-                                      new Date(log.created_at),
+                                    {safeFormatDate(
+                                      log.created_at,
                                       "hh:mm a",
                                       { locale }
                                     )}
