@@ -17,6 +17,7 @@ const AnnouncementManager = () => {
   const [content, setContent] = useState("");
   const [isImportant, setIsImportant] = useState(false);
   const [expiresAt, setExpiresAt] = useState("");
+  const [link, setLink] = useState("");
   const [loading, setLoading] = useState(false);
 
   const loadAnnouncements = async () => {
@@ -40,7 +41,7 @@ const AnnouncementManager = () => {
 
     try {
       const finalContent = isImportant ? `[URGENT] ${content}` : content;
-      await db.addAnnouncement({ content: finalContent, expires_at: new Date(expiresAt).toISOString() });
+      await db.addAnnouncement({ content: finalContent, expires_at: new Date(expiresAt).toISOString(), link: link || null });
       await db.addAuditLog("إضافة إعلان", `${content.substring(0, 30)}...`, {
         action_type: "add_announcement",
       });
@@ -52,6 +53,7 @@ const AnnouncementManager = () => {
           : (lang === "ar" ? "📢 إعلان جديد" : "📢 New Announcement"),
         message: content, // always use raw content (without [URGENT] prefix)
         target_audience: "all",
+        link: link || null,
         sent_by: "system",
       });
 
@@ -59,6 +61,7 @@ const AnnouncementManager = () => {
       setContent("");
       setIsImportant(false);
       setExpiresAt("");
+      setLink("");
       await loadAnnouncements();
     } catch (e) {
       toast.error(lang === "ar" ? "حدث خطأ" : "An error occurred");
@@ -107,6 +110,15 @@ const AnnouncementManager = () => {
                 className="bg-secondary/50" 
               />
             </div>
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-muted-foreground">{lang === "ar" ? "رابط إضافي (اختياري)" : "Optional Link"}</label>
+              <Input 
+                value={link} 
+                onChange={e => setLink(e.target.value)} 
+                className="bg-secondary/50" 
+                placeholder="https://..."
+              />
+            </div>
             <div className="flex items-center gap-2 mt-2">
               <input 
                 type="checkbox" 
@@ -142,6 +154,11 @@ const AnnouncementManager = () => {
                     <Clock className="w-3 h-3" />
                     <span>{lang === "ar" ? "ينتهي في:" : "Expires:"} {format(new Date(ann.expires_at), "dd MMM yyyy - hh:mm a", { locale })}</span>
                   </div>
+                  {ann.link && (
+                    <a href={ann.link} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline mt-2 inline-block">
+                      {ann.link}
+                    </a>
+                  )}
                 </div>
                 <button onClick={() => handleDelete(ann.id)} className="p-2 ml-4 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors">
                   <Trash2 className="w-4 h-4" />

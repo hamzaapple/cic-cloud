@@ -16,6 +16,7 @@ const NotificationManager = () => {
   const locale = lang === "ar" ? ar : enUS;
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [title, setTitle] = useState("");
+  const [message, setMessage] = useState("");
   const [targetAudience, setTargetAudience] = useState("all");
   const [targetYear, setTargetYear] = useState("all");
   const [link, setLink] = useState("");

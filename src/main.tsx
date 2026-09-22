@@ -23,7 +23,7 @@ if ("serviceWorker" in navigator) {
 
       // 3) Ensure subscription is valid
       const { ensurePushSubscription } = await import("./lib/push-resubscribe");
-      ensurePushSubscription();
+      ensurePushSubscription({ silent: true });
     } catch (err) {
       console.warn("[SW] Setup failed:", err);
     }
@@ -32,7 +32,7 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.addEventListener("message", async (event) => {
     if (event.data?.type === "PUSH_SUBSCRIPTION_CHANGED") {
       const { ensurePushSubscription } = await import("./lib/push-resubscribe");
-      ensurePushSubscription();
+      ensurePushSubscription({ silent: true });
     }
   });
 }

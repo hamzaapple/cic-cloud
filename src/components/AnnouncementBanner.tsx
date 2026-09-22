@@ -91,7 +91,8 @@ const AnnouncementBanner = () => {
         icon: isUrgent ? AlertCircle : Volume2,
         color: isUrgent ? "text-red-500" : "text-primary",
         bg: isUrgent ? "bg-red-500/20 border-red-500/40 text-red-600 dark:text-red-400 font-medium shadow-lg" : "bg-background/80 border-primary/20 shadow-lg text-foreground",
-        pulse: isUrgent
+        pulse: isUrgent,
+        link: a.link
       };
     })
   ];
@@ -154,7 +155,10 @@ const AnnouncementBanner = () => {
             <motion.div
               animate={{ y: [0, -6, 0], scale: [1, 1.02, 1] }}
               transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-              className={`backdrop-blur-xl border-2 rounded-full px-6 py-2.5 flex items-center gap-3 pointer-events-auto cursor-pointer max-w-xl shadow-[0_0_20px_rgba(239,68,68,0.3)] ${urgentCurrent.bg}`}
+              className={`backdrop-blur-xl border-2 rounded-full px-6 py-2.5 flex items-center gap-3 pointer-events-auto max-w-xl shadow-[0_0_20px_rgba(239,68,68,0.3)] ${urgentCurrent.bg} ${urgentCurrent.link ? 'cursor-pointer' : ''}`}
+              onClick={() => {
+                if (urgentCurrent.link) window.open(urgentCurrent.link, '_blank');
+              }}
             >
               <div className={`p-1.5 rounded-full bg-background/80 ${urgentCurrent.color} shadow-sm`}>
                 {UrgentIcon && <UrgentIcon className="w-4 h-4" />}
@@ -191,7 +195,10 @@ const AnnouncementBanner = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ type: "spring", stiffness: 200, damping: 20 }}
-            className={`backdrop-blur-xl border rounded-full px-6 py-2.5 flex items-center gap-3 pointer-events-auto cursor-pointer max-w-xl shadow-lg ${normalCurrent.bg}`}
+            className={`backdrop-blur-xl border rounded-full px-6 py-2.5 flex items-center gap-3 pointer-events-auto max-w-xl shadow-lg ${normalCurrent.bg} ${normalCurrent.link ? 'cursor-pointer hover:bg-secondary/20 transition-colors' : ''}`}
+            onClick={() => {
+              if (normalCurrent.link) window.open(normalCurrent.link, '_blank');
+            }}
           >
             <div className={`p-1.5 rounded-full bg-background/50 ${normalCurrent.color}`}>
               {NormalIcon && <NormalIcon className="w-4 h-4" />}
