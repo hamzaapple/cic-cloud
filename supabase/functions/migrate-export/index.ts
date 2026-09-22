@@ -57,7 +57,8 @@ async function buildSchemaSql(db: Client): Promise<string> {
 
   const rls = await q(`select 'ALTER TABLE public.'||quote_ident(tablename)||' ENABLE ROW LEVEL SECURITY;' from pg_tables where schemaname='public' order by tablename`);
 
-  const pol = await q(`select 'CREATE POLICY '||quote_literal(policyname)||' ON public.'||quote_ident(tablename)
+  const pol = await q(`select 'DROP POLICY IF EXISTS '||quote_ident(policyname)||' ON public.'||quote_ident(tablename)||E';\n'
+    ||'CREATE POLICY '||quote_ident(policyname)||' ON public.'||quote_ident(tablename)
     ||' AS '||permissive||' FOR '||cmd||' TO '||array_to_string(roles,', ')
     ||coalesce(' USING ('||qual||')','')||coalesce(' WITH CHECK ('||with_check||')','')||';'
     from pg_policies where schemaname='public' order by tablename, policyname`);
