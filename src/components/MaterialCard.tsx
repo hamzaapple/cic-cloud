@@ -4,7 +4,7 @@ import type { Material, MaterialCategory, Course } from "@/lib/store";
 import { db } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
 import { isPast } from "date-fns";
-import { safeFormatDate } from "@/lib/utils";
+import { safeFormatDate, slugify } from "@/lib/utils";
 import { ar, enUS } from "date-fns/locale";
 import { playClickSfx } from "@/hooks/use-sfx";
 import { useState, lazy, Suspense } from "react";
@@ -283,8 +283,23 @@ const MaterialCard = ({
                 onClick={(e) => {
                   e.stopPropagation();
                   playClickSfx();
-                  const url = new URL(window.location.origin + `/course/${material.course_id}`);
-                  if (material.category_id) url.searchParams.set("category", material.category_id);
+                  const courseObj = courses.find(c => c.id === material.course_id);
+                  let url: URL;
+                  if (courseObj) {
+                    url = new URL(window.location.origin + `/${courseObj.academic_year || "1"}/${courseObj.semester || "2"}/${slugify(courseObj.name)}`);
+                  } else {
+                    url = new URL(window.location.origin + `/course/${material.course_id}`);
+                  }
+                  
+                  if (material.category_id) {
+                    const cat = categories?.find(c => c.id === material.category_id);
+                    if (courseObj && cat) {
+                       const catSlug = slugify(cat.name_en) || slugify(cat.name_ar) || cat.id;
+                       url = new URL(window.location.origin + `/${courseObj.academic_year || "1"}/${courseObj.semester || "2"}/${slugify(courseObj.name)}/${catSlug}`);
+                    } else {
+                       url.searchParams.set("category", material.category_id);
+                    }
+                  }
                   url.searchParams.set("material", material.id);
                   
                   const shareTitle = material.title;

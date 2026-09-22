@@ -48,6 +48,8 @@ const AnimatedRoutes = () => {
           <Route path="/year/:yearId/semesters" element={<YearSemestersPage />} />
           <Route path="/year/:yearId/courses" element={<YearCoursesPage />} />
           <Route path="/course/:id" element={<CoursePage />} />
+          <Route path="/:yearId/:semesterId/:courseSlug" element={<CoursePage />} />
+          <Route path="/:yearId/:semesterId/:courseSlug/:categorySlug" element={<CoursePage />} />
           <Route path="/calendar" element={<CalendarPage />} />
           <Route path="/links" element={<LinksPage />} />
           <Route path="/schedule" element={<SchedulePage />} />

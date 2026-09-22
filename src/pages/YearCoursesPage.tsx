@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { playBackSfx, playClickSfx } from "@/hooks/use-sfx";
 import { useEffect } from "react";
 import { setPushAudience } from "@/lib/push-registration";
+import { slugify } from "@/lib/utils";
 
 const container: Variants = {
   hidden: { opacity: 0 },
@@ -114,7 +115,7 @@ const YearCoursesPage = () => {
           ) : (
             courses.map((course) =>
               <motion.div key={course.id} variants={item}>
-                <Link to={`/course/${course.id}`} onClick={() => playClickSfx()}>
+                <Link to={`/${course.academic_year || "1"}/${course.semester || "2"}/${slugify(course.name)}`} onClick={() => playClickSfx()}>
                   <motion.div
                     whileHover={{ y: -6, scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}

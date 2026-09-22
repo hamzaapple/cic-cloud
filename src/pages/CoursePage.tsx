@@ -10,45 +10,65 @@ import MaterialCard from "@/components/MaterialCard";
 import { ArrowRight, ArrowLeft, FolderDown, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { playBackSfx, playClickSfx } from "@/hooks/use-sfx";
+import { slugify } from "@/lib/utils";
 
 
 const CoursePage = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id, yearId, semesterId, courseSlug, categorySlug } = useParams<{ id?: string, yearId?: string, semesterId?: string, courseSlug?: string, categorySlug?: string }>();
   const { t, tCourse, lang } = useI18n();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [activeCategoryId, setActiveCategoryIdRaw] = useState<string | null>(
-    () => searchParams.get("category") || null
-  );
-  const [highlightedMaterialId, setHighlightedMaterialId] = useState<string | null>(null);
-
-  // Wrapper that keeps the URL in sync with the active tab
-  const setActiveCategoryId = (catId: string) => {
-    setActiveCategoryIdRaw(catId);
-    setSearchParams(prev => {
-      const next = new URLSearchParams(prev);
-      next.set("category", catId);
-      // remove material highlight param when just switching tabs
-      next.delete("material");
-      return next;
-    }, { replace: true });
-  };
-  const highlightTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { data: courses = [] } = useQuery({ queryKey: ["courses"], queryFn: db.getCourses });
-  const { data: allMaterials = [] } = useQuery({ queryKey: ["materials", id], queryFn: () => db.getMaterials(id) });
+  
+  const course = courses.find(c => {
+    if (id) return c.id === id;
+    if (yearId && semesterId && courseSlug) {
+      return (c.academic_year || "1") === yearId && 
+             (c.semester || "2") === semesterId && 
+             slugify(c.name) === courseSlug;
+    }
+    return false;
+  });
+
+  const { data: allMaterials = [] } = useQuery({ 
+    queryKey: ["materials", course?.id], 
+    queryFn: () => db.getMaterials(course?.id),
+    enabled: !!course?.id
+  });
+  
   const { data: allCategories = [] } = useQuery({
     queryKey: ["material_categories"],
     queryFn: db.getCategories,
   });
 
-  const course = courses.find(c => c.id === id);
-
   // Categories scoped to this course's department (unified + department-specific)
   const categories = categoriesForDepartment(allCategories, course?.department_id ?? null);
 
-  // Set default active category
-  const activeCategory = activeCategoryId || categories[0]?.id || "";
+  const activeCategoryBySlug = categories.find(c => slugify(c.name_en) === categorySlug || slugify(c.name_ar) === categorySlug);
+  const activeCategoryIdRaw = activeCategoryBySlug?.id || searchParams.get("category") || null;
+  const activeCategory = activeCategoryIdRaw || categories[0]?.id || "";
+
+  // Wrapper that keeps the URL in sync with the active tab
+  const setActiveCategoryId = (catId: string) => {
+    const cat = categories.find(c => c.id === catId);
+    if (yearId && semesterId && courseSlug && cat) {
+      // Use the new route structure
+      const nextSlug = slugify(cat.name_en) || slugify(cat.name_ar) || cat.id;
+      navigate(`/${yearId}/${semesterId}/${courseSlug}/${nextSlug}`, { replace: true });
+    } else {
+      setSearchParams(prev => {
+        const next = new URLSearchParams(prev);
+        next.set("category", catId);
+        // remove material highlight param when just switching tabs
+        next.delete("material");
+        return next;
+      }, { replace: true });
+    }
+  };
+  
+  const [highlightedMaterialId, setHighlightedMaterialId] = useState<string | null>(null);
+  const highlightTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Materials are already sorted by sort_order from the DB query
   const materials = allMaterials
@@ -186,11 +206,24 @@ const CoursePage = () => {
       ? `${catName} — ${courseName}`
       : `Check out the ${catName} materials for ${courseName}`;
 
-    // Build URL with the current category param
-    const url = new URL(window.location.href);
-    url.searchParams.set("category", activeCategory);
-    url.searchParams.delete("material"); // clean up stale params
-    const shareUrl = url.toString();
+    // Build URL with the current category param or slug
+    let shareUrl = window.location.href;
+    const cat = categories.find(c => c.id === activeCategory);
+    
+    if (yearId && semesterId && courseSlug && cat) {
+      const catSlug = slugify(cat.name_en) || slugify(cat.name_ar) || cat.id;
+      const url = new URL(window.location.origin + `/${yearId}/${semesterId}/${courseSlug}/${catSlug}`);
+      // Keep any other search params except material/category
+      searchParams.forEach((value, key) => {
+        if (key !== "material" && key !== "category") url.searchParams.set(key, value);
+      });
+      shareUrl = url.toString();
+    } else {
+      const url = new URL(window.location.href);
+      url.searchParams.set("category", activeCategory);
+      url.searchParams.delete("material"); // clean up stale params
+      shareUrl = url.toString();
+    }
 
     try {
       if (navigator.share) {

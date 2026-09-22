@@ -16,3 +16,10 @@ export function safeFormatDate(dateVal: any, formatStr: string, options?: any) {
     return "";
   }
 }
+
+export function slugify(text: string) {
+  if (!text) return "";
+  return text.toString().toLowerCase().trim()
+    .replace(/[^a-z0-9\u0621-\u064A]+/g, '-') // replace non-alphanumeric and non-arabic with hyphen
+    .replace(/(^-|-$)+/g, ''); // remove leading and trailing hyphens
+}
