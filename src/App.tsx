@@ -33,10 +33,24 @@ const queryClient = new QueryClient();
 
 const AnimatedRoutes = () => {
   const location = useLocation();
+  
+  // Create a stable key for page transitions to avoid full-page reloads on tab changes
+  let animationKey = location.pathname;
+  const parts = location.pathname.split('/').filter(Boolean);
+  
+  // Handle /:yearId/:semesterId/:courseSlug/:categorySlug
+  if (parts.length >= 3 && parts[0] !== 'year' && parts[0] !== 'course') {
+    animationKey = `/${parts[0]}/${parts[1]}/${parts[2]}`;
+  } 
+  // Handle /course/:id/:categorySlug (just in case)
+  else if (parts.length >= 2 && parts[0] === 'course') {
+    animationKey = `/${parts[0]}/${parts[1]}`;
+  }
+
   return (
     <AnimatePresence mode="wait" initial={false}>
       <motion.div
-        key={location.pathname}
+        key={animationKey}
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -15 }}
