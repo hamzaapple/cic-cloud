@@ -93,7 +93,7 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: cors });
   const log: string[] = [];
   try {
-    const { step = "schema", start = 0, count = 40 } = await req.json().catch(() => ({}));
+    const { step = "schema", start = 0, count = 40, limit = 5368709120 } = await req.json().catch(() => ({}));
     const srcUrl = Deno.env.get("SUPABASE_URL")!;
     const srcKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const dstUrl = (Deno.env.get("TARGET_SUPABASE_URL") || "").replace(/\/+$/, "");
@@ -127,6 +127,30 @@ Deno.serve(async (req) => {
         log.push(`${t}: ${ok}/${data.length}`);
       }
       return Response.json({ ok: true, log }, { headers: cors });
+    }
+
+    if (step === "bucket") {
+      const get = await fetch(`${dstUrl}/storage/v1/bucket/materials`, {
+        headers: { Authorization: `Bearer ${dstKey}`, apikey: dstKey },
+      });
+      const before = await get.json();
+      const put = await fetch(`${dstUrl}/storage/v1/bucket/materials`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${dstKey}`, apikey: dstKey, "Content-Type": "application/json" },
+        body: JSON.stringify({ id: "materials", name: "materials", public: true, file_size_limit: limit }),
+      });
+      const after = await put.text();
+      return Response.json({ ok: put.ok, before, after }, { headers: cors });
+    }
+
+    if (step === "verify") {
+      const out: Record<string, unknown> = {};
+      for (const t of TABLE_ORDER) {
+        const a = await src.from(t).select("*", { count: "exact", head: true });
+        const b = await dst.from(t).select("*", { count: "exact", head: true });
+        out[t] = { source: a.count ?? `err:${a.error?.message}`, target: b.count ?? `err:${b.error?.message}` };
+      }
+      return Response.json({ ok: true, tables: out }, { headers: cors });
     }
 
     if (step === "storage") {
