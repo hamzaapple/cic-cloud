@@ -93,7 +93,7 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: cors });
   const log: string[] = [];
   try {
-    const { step = "schema", start = 0, count = 40 } = await req.json().catch(() => ({}));
+    const { step = "schema", start = 0, count = 40, limit = 5368709120 } = await req.json().catch(() => ({}));
     const srcUrl = Deno.env.get("SUPABASE_URL")!;
     const srcKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const dstUrl = (Deno.env.get("TARGET_SUPABASE_URL") || "").replace(/\/+$/, "");
