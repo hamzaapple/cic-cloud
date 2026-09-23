@@ -93,7 +93,7 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: cors });
   const log: string[] = [];
   try {
-    const { step = "schema" } = await req.json().catch(() => ({}));
+    const { step = "schema", start = 0, count = 40 } = await req.json().catch(() => ({}));
     const srcUrl = Deno.env.get("SUPABASE_URL")!;
     const srcKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const dstUrl = (Deno.env.get("TARGET_SUPABASE_URL") || "").replace(/\/+$/, "");
@@ -141,14 +141,16 @@ Deno.serve(async (req) => {
         return out;
       };
       const files = (await walk("")).filter((f) => !f.startsWith("_migration/"));
+      const batch = files.slice(start, start + count);
       let copied = 0;
-      for (const f of files) {
+      for (const f of batch) {
         const { data: blob, error } = await src.storage.from("materials").download(f);
         if (error || !blob) { log.push(`skip ${f}`); continue; }
         const { error: e2 } = await dst.storage.from("materials").upload(f, blob, { upsert: true, contentType: blob.type || "application/octet-stream" });
         if (e2) log.push(`fail ${f}: ${e2.message}`); else copied++;
       }
-      return Response.json({ ok: true, total: files.length, copied, log: log.slice(0, 40) }, { headers: cors });
+      const next = start + batch.length;
+      return Response.json({ ok: true, total: files.length, start, copied, next, done: next >= files.length, log: log.slice(0, 40) }, { headers: cors });
     }
 
     return Response.json({ error: "unknown step" }, { status: 400, headers: cors });
