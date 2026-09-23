@@ -37,3 +37,7 @@ $$);
 ## 6) الموقع نفسه
 في النسخة المنشورة من GitHub (Vercel مثلًا) غيّر متغيرات البيئة:
 `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_SUPABASE_PROJECT_ID` لقيم مشروعك.
+
+## 7) الملفات الكبيرة (٧ فيديوهات)
+اتنقلت ٣٤٦ ملف من ٣٥٣. الباقي ٧ فيديوهات أكبر من الحد المسموح في مساحة التخزين عندك.
+الحل: Storage ← bucket `materials` ← Settings ← ارفع "File size limit" لـ 500MB مثلًا، وبعدها قولّي وأنا أعيد نقلهم.
