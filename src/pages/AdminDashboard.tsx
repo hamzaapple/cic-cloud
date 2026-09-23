@@ -591,7 +591,9 @@ const AdminDashboard = () => {
           <div>
             <h1 className="text-3xl font-display font-bold">{t("admin.dashboard")}</h1>
             <p className="text-muted-foreground">
-              {isOwner ? t("admin.owner") : `${t("admin.moderator")} — ${user.permissions?.length || 0} ${t("admin.permissions")}`}
+              {isOwner
+                ? t("admin.owner")
+                : `${t("admin.moderator")} (${user.academicYear === "2" ? (lang === "ar" ? "الصف الثاني" : "2nd Year") : user.academicYear === "3" ? (lang === "ar" ? "الصف الثالث" : "3rd Year") : user.academicYear === "4" ? (lang === "ar" ? "الصف الرابع" : "4th Year") : (lang === "ar" ? "الصف الأول" : "1st Year")}${departments.find(d => d.id === user.departmentId) ? ` - ${lang === "ar" ? departments.find(d => d.id === user.departmentId)?.name_ar : departments.find(d => d.id === user.departmentId)?.name_en}` : ""}) — ${user.permissions?.length || 0} ${t("admin.permissions")}`}
             </p>
           </div>
           <Button variant="ghost" size="sm" onClick={handleLogout}><LogOut className="w-4 h-4 me-1" /> {t("admin.logout")}</Button>
@@ -663,7 +665,7 @@ const AdminDashboard = () => {
                     <Select value={courseId} onValueChange={setCourseId}>
                       <SelectTrigger className="bg-secondary/50"><SelectValue placeholder={t("admin.selectCourse")} /></SelectTrigger>
                       <SelectContent>
-                        {filteredCourses.map(c => <SelectItem key={c.id} value={c.id}>{translateCourseName(c.name, lang)}</SelectItem>)}
+                        {filteredCourses.map(c => <SelectItem key={c.id} value={c.id}>{c.code ? `[${c.code}] ` : ""}{translateCourseName(c.name, lang)}</SelectItem>)}
                       </SelectContent>
                     </Select>
                     {!isPdfOnly && (
@@ -831,7 +833,7 @@ const AdminDashboard = () => {
                     <SelectContent>
                       <SelectItem value="all">{lang === "ar" ? "كل المقررات" : "All Courses"}</SelectItem>
                       {filteredCourses.map(c => (
-                        <SelectItem key={c.id} value={c.id}>{translateCourseName(c.name, lang)}</SelectItem>
+                        <SelectItem key={c.id} value={c.id}>{c.code ? `[${c.code}] ` : ""}{translateCourseName(c.name, lang)}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>

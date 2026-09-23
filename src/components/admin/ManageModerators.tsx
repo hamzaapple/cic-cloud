@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Trash2, UserPlus, Shield, ShieldCheck, Pencil, KeyRound } from "lucide-react";
+import { Trash2, UserPlus, Shield, ShieldCheck, Pencil, KeyRound, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -281,10 +281,20 @@ const ManageModerators = ({ departments }: Props) => {
                 <div className="flex items-start justify-between">
                   <div>
                     <h3 className="font-display font-semibold">{mod.display_name}</h3>
-                    <p className="text-xs text-muted-foreground">@{mod.username}</p>
-                    {mod.department_id && (
-                      <p className="text-xs text-primary mt-1">{getDeptName(mod.department_id)}</p>
-                    )}
+                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                      {mod.department_id && (
+                        <span className="text-xs text-primary font-medium">{getDeptName(mod.department_id)}</span>
+                      )}
+                      <span className="text-[11px] px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground font-semibold">
+                        {mod.academic_year === "2"
+                          ? (lang === "ar" ? "الصف الثاني" : "2nd Year")
+                          : mod.academic_year === "3"
+                          ? (lang === "ar" ? "الصف الثالث" : "3rd Year")
+                          : mod.academic_year === "4"
+                          ? (lang === "ar" ? "الصف الرابع" : "4th Year")
+                          : (lang === "ar" ? "الصف الأول" : "1st Year")}
+                      </span>
+                    </div>
                     {/* Password info */}
                     <ChangePasswordButton mod={mod} t={t} lang={lang} onChangePassword={() => { setPasswordMod(mod); setNewPassword(""); setConfirmPassword(""); setShowNewPassword(false); }} />
                     <div className="flex flex-wrap gap-1.5 mt-3">

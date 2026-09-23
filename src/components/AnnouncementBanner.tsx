@@ -80,7 +80,8 @@ const AnnouncementBanner = () => {
       icon: Clock,
       color: "text-red-500",
       bg: "bg-red-500/20 border-red-500/40 text-red-600 dark:text-red-400 font-medium",
-      pulse: true
+      pulse: true,
+      link: null as string | null | undefined
     })),
     ...announcements.map(a => {
       const isUrgent = a.content.startsWith("[URGENT]");

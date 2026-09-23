@@ -101,6 +101,7 @@ export interface Notification {
   title: string;
   message: string;
   target_audience: string;
+  target_year?: string | null;
   link?: string | null;
   sent_by: string;
   created_at: string;
@@ -405,6 +406,18 @@ export const db = {
     });
     if (error) throw error;
     if (data?.error) throw new Error(data.error);
+
+    // Guaranteed safeguard: ensure academic_year and department_id are saved in DB
+    // in case the cloud Edge Function was deployed prior to adding academic_year support
+    if (data?.moderator?.id) {
+      await supabase.from("moderators").update({
+        academic_year: mod.academic_year || '1',
+        department_id: mod.department_id || null,
+      }).eq("id", data.moderator.id);
+      data.moderator.academic_year = mod.academic_year || '1';
+      data.moderator.department_id = mod.department_id || null;
+    }
+
     return data.moderator as Moderator;
   },
   deleteModerator: async (id: string) => {
