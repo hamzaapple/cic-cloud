@@ -144,10 +144,22 @@ Deno.serve(async (req) => {
       const batch = files.slice(start, start + count);
       let copied = 0;
       for (const f of batch) {
-        const { data: blob, error } = await src.storage.from("materials").download(f);
-        if (error || !blob) { log.push(`skip ${f}`); continue; }
-        const { error: e2 } = await dst.storage.from("materials").upload(f, blob, { upsert: true, contentType: blob.type || "application/octet-stream" });
-        if (e2) log.push(`fail ${f}: ${e2.message}`); else copied++;
+        const { data: pub } = src.storage.from("materials").getPublicUrl(f);
+        const res = await fetch(pub.publicUrl);
+        if (!res.ok || !res.body) { log.push(`skip ${f}`); continue; }
+        const up = await fetch(`${dstUrl}/storage/v1/object/materials/${f.split("/").map(encodeURIComponent).join("/")}`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${dstKey}`,
+            "x-upsert": "true",
+            "Content-Type": res.headers.get("content-type") || "application/octet-stream",
+          },
+          body: res.body,
+          // @ts-ignore streaming upload
+          duplex: "half",
+        });
+        if (!up.ok) log.push(`fail ${f}: ${up.status} ${(await up.text()).slice(0, 120)}`);
+        else copied++;
       }
       const next = start + batch.length;
       return Response.json({ ok: true, total: files.length, start, copied, next, done: next >= files.length, log: log.slice(0, 40) }, { headers: cors });
