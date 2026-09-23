@@ -129,6 +129,30 @@ Deno.serve(async (req) => {
       return Response.json({ ok: true, log }, { headers: cors });
     }
 
+    if (step === "bucket") {
+      const get = await fetch(`${dstUrl}/storage/v1/bucket/materials`, {
+        headers: { Authorization: `Bearer ${dstKey}`, apikey: dstKey },
+      });
+      const before = await get.json();
+      const put = await fetch(`${dstUrl}/storage/v1/bucket/materials`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${dstKey}`, apikey: dstKey, "Content-Type": "application/json" },
+        body: JSON.stringify({ id: "materials", name: "materials", public: true, file_size_limit: 5368709120 }),
+      });
+      const after = await put.text();
+      return Response.json({ ok: put.ok, before, after }, { headers: cors });
+    }
+
+    if (step === "verify") {
+      const out: Record<string, unknown> = {};
+      for (const t of TABLE_ORDER) {
+        const a = await src.from(t).select("*", { count: "exact", head: true });
+        const b = await dst.from(t).select("*", { count: "exact", head: true });
+        out[t] = { source: a.count ?? `err:${a.error?.message}`, target: b.count ?? `err:${b.error?.message}` };
+      }
+      return Response.json({ ok: true, tables: out }, { headers: cors });
+    }
+
     if (step === "storage") {
       const walk = async (prefix: string): Promise<string[]> => {
         const out: string[] = [];
