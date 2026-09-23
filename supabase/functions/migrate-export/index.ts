@@ -137,7 +137,7 @@ Deno.serve(async (req) => {
       const put = await fetch(`${dstUrl}/storage/v1/bucket/materials`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${dstKey}`, apikey: dstKey, "Content-Type": "application/json" },
-        body: JSON.stringify({ id: "materials", name: "materials", public: true, file_size_limit: 5368709120 }),
+        body: JSON.stringify({ id: "materials", name: "materials", public: true, file_size_limit: limit }),
       });
       const after = await put.text();
       return Response.json({ ok: put.ok, before, after }, { headers: cors });
