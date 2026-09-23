@@ -76,7 +76,7 @@ function SortableAdminMaterialCard({
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const { t, lang } = useI18n();
-  const user = auth.getCurrentUser();
+  const [user] = useState(() => auth.getCurrentUser());
   const isOwner = user.role === "owner";
 
   const [courses, setCourses] = useState<Course[]>([]);
@@ -228,12 +228,12 @@ const AdminDashboard = () => {
   const [materialCategoryFilter, setMaterialCategoryFilter] = useState<string>("all");
 
   useEffect(() => {
-    if (!auth.isLoggedIn()) {
-      navigate("/login");
+    if (!user.role) {
+      navigate("/login", { replace: true });
     }
-  }, [navigate]);
+  }, [user.role, navigate]);
 
-  if (!auth.isLoggedIn()) return null;
+  if (!user.role) return <div className="min-h-screen" />;
 
   const canAddMaterials = isOwner || auth.hasPermission("add_courses") || auth.hasPermission("add_pdf_existing") || auth.hasPermission("strict_add_only");
   const canDelete = isOwner || (auth.hasPermission("edit_content") && !auth.hasPermission("strict_add_only"));
