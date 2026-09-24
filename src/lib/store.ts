@@ -186,19 +186,26 @@ export const auth = {
   login: async (username: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
       console.log('[auth] Attempting login for:', username);
-      const { data, error } = await supabase.functions.invoke('admin-login', {
-        body: { username, password },
+      
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      const response = await fetch(`${supabaseUrl}/functions/v1/admin-login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${supabaseAnonKey}`,
+        },
+        body: JSON.stringify({ username, password }),
       });
 
-      console.log('[auth] Login response:', { data: data ? { ...data, session: data.session ? '[session]' : null } : null, error });
+      const data = await response.json().catch(() => null);
 
-      if (error) {
-        console.error('[auth] Edge function error:', error);
-        // Edge function may return error in different formats
-        const errMsg = typeof error === 'object' && error !== null
-          ? (error as any).message || JSON.stringify(error)
-          : String(error);
-        return { success: false, error: errMsg || "خطأ في الاتصال بالخادم" };
+      console.log('[auth] Login response:', { status: response.status, data: data ? { ...data, session: data.session ? '[session]' : null } : null });
+
+      if (!response.ok) {
+        console.error('[auth] Edge function error:', response.status, data);
+        const errMsg = data?.error || `خطأ في الخادم (${response.status})`;
+        return { success: false, error: errMsg };
       }
 
       if (!data?.role) {

@@ -152,7 +152,7 @@ Deno.serve(async (req) => {
       if (createError) {
         console.error('Failed to create auth user:', createError.message)
         return new Response(
-          JSON.stringify({ error: 'Authentication setup failed' }),
+          JSON.stringify({ error: `Authentication setup failed: ${createError.message}` }),
           { status: 500, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
         )
       }
@@ -166,7 +166,7 @@ Deno.serve(async (req) => {
       if (newSignInError) {
         console.error('Failed to sign in after creation:', newSignInError.message)
         return new Response(
-          JSON.stringify({ error: 'Authentication failed' }),
+          JSON.stringify({ error: `Authentication failed after creation: ${newSignInError.message}` }),
           { status: 500, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
         )
       }
@@ -192,7 +192,7 @@ Deno.serve(async (req) => {
           if (refreshedSignInError) {
             console.error('Failed to refresh sign in after role update:', refreshedSignInError.message)
             return new Response(
-              JSON.stringify({ error: 'Authentication failed' }),
+              JSON.stringify({ error: `Authentication failed after refresh: ${refreshedSignInError.message}` }),
               { status: 500, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
             )
           }
