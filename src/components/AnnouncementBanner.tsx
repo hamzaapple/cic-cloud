@@ -96,7 +96,8 @@ const AnnouncementBanner = () => {
         color: isUrgent ? "text-red-500" : "text-primary",
         bg: isUrgent ? "bg-red-500/20 border-red-500/40 text-red-600 dark:text-red-400 font-medium shadow-lg" : "bg-background/80 border-primary/20 shadow-lg text-foreground",
         pulse: isUrgent,
-        link: a.link
+        link: a.link,
+        customColor: a.color
       };
     })
   ];
@@ -200,11 +201,19 @@ const AnnouncementBanner = () => {
             exit={{ opacity: 0, y: -20 }}
             transition={{ type: "spring", stiffness: 200, damping: 20 }}
             className={`backdrop-blur-xl border rounded-full px-6 py-2.5 flex items-center gap-3 pointer-events-auto max-w-xl shadow-lg ${normalCurrent.bg} ${normalCurrent.link ? 'cursor-pointer hover:bg-secondary/20 transition-colors' : ''}`}
+            style={normalCurrent.customColor ? {
+              backgroundColor: `${normalCurrent.customColor}15`,
+              borderColor: `${normalCurrent.customColor}40`,
+              color: normalCurrent.customColor
+            } : undefined}
             onClick={() => {
               if (normalCurrent.link) window.open(normalCurrent.link, '_blank');
             }}
           >
-            <div className={`p-1.5 rounded-full bg-background/50 ${normalCurrent.color}`}>
+            <div 
+              className={`p-1.5 rounded-full bg-background/50 ${normalCurrent.color}`}
+              style={normalCurrent.customColor ? { color: normalCurrent.customColor, backgroundColor: `${normalCurrent.customColor}33` } : undefined}
+            >
               {NormalIcon && <NormalIcon className="w-4 h-4" />}
             </div>
             <p className="text-xs font-medium leading-tight">{normalCurrent.content}</p>
@@ -213,7 +222,8 @@ const AnnouncementBanner = () => {
                 {normalBannerItems.map((_, i) => (
                   <div 
                     key={i} 
-                    className={`w-1.5 h-1.5 rounded-full transition-all ${i === (currentIndex % normalBannerItems.length) ? 'bg-primary scale-125' : 'bg-primary/30'}`}
+                    className={`w-1.5 h-1.5 rounded-full transition-all ${i === (currentIndex % normalBannerItems.length) ? 'scale-125' : 'opacity-30'}`}
+                    style={normalCurrent.customColor ? { backgroundColor: normalCurrent.customColor } : { backgroundColor: i === (currentIndex % normalBannerItems.length) ? 'hsl(var(--primary))' : 'hsla(var(--primary) / 0.3)' }}
                   />
                 ))}
               </div>

@@ -20,6 +20,7 @@ const AnnouncementManager = () => {
   const [expiresAt, setExpiresAt] = useState("");
   const [link, setLink] = useState("");
   const [targetYear, setTargetYear] = useState("all");
+  const [color, setColor] = useState("#3b82f6");
   const [loading, setLoading] = useState(false);
 
   const loadAnnouncements = async () => {
@@ -43,7 +44,7 @@ const AnnouncementManager = () => {
 
     try {
       const finalContent = isImportant ? `[URGENT] ${content}` : content;
-      await db.addAnnouncement({ content: finalContent, expires_at: new Date(expiresAt).toISOString(), link: link || null, target_year: targetYear === "all" ? null : targetYear });
+      await db.addAnnouncement({ content: finalContent, expires_at: new Date(expiresAt).toISOString(), link: link || null, target_year: targetYear === "all" ? null : targetYear, color: isImportant ? null : color });
       await db.addAuditLog("إضافة إعلان", `${content.substring(0, 30)}...`, {
         action_type: "add_announcement",
       });
@@ -66,6 +67,7 @@ const AnnouncementManager = () => {
       setExpiresAt("");
       setLink("");
       setTargetYear("all");
+      setColor("#3b82f6");
       await loadAnnouncements();
     } catch (e) {
       toast.error(lang === "ar" ? "حدث خطأ" : "An error occurred");
@@ -139,6 +141,20 @@ const AnnouncementManager = () => {
                 placeholder="https://..."
               />
             </div>
+            {!isImportant && (
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-muted-foreground">{lang === "ar" ? "لون الإعلان" : "Announcement Color"}</label>
+                <div className="flex items-center gap-2">
+                  <Input 
+                    type="color" 
+                    value={color} 
+                    onChange={e => setColor(e.target.value)} 
+                    className="w-12 h-10 p-1 cursor-pointer bg-secondary/50 border-0" 
+                  />
+                  <span className="text-xs text-muted-foreground" style={{ color: color }}>{lang === "ar" ? "معاينة اللون" : "Color Preview"}</span>
+                </div>
+              </div>
+            )}
             <div className="flex items-center gap-2 mt-2">
               <input 
                 type="checkbox" 
@@ -165,9 +181,9 @@ const AnnouncementManager = () => {
             <p className="text-center py-12 text-muted-foreground">{lang === "ar" ? "لا توجد إعلانات نشطة" : "No active announcements"}</p>
           ) : (
             announcements.map((ann, i) => (
-              <motion.div key={ann.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="glass-card rounded-xl p-5 flex justify-between items-start">
+              <motion.div key={ann.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="glass-card rounded-xl p-5 flex justify-between items-start" style={{ borderLeft: ann.color && !ann.content.startsWith("[URGENT]") ? `4px solid ${ann.color}` : undefined }}>
                 <div className="flex-1">
-                  <p className={`text-sm font-medium mb-3 ${ann.content.startsWith("[URGENT]") ? "text-red-500" : ""}`}>
+                  <p className={`text-sm font-medium mb-3 ${ann.content.startsWith("[URGENT]") ? "text-red-500" : ""}`} style={{ color: ann.color && !ann.content.startsWith("[URGENT]") ? ann.color : undefined }}>
                     {ann.content.replace("[URGENT] ", "")}
                   </p>
                   <div className="flex items-center gap-2 text-xs text-muted-foreground bg-secondary/30 w-fit px-2 py-1 rounded-md">
