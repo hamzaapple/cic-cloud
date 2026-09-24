@@ -13,18 +13,26 @@ const LoginPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!username.trim() || !password.trim()) {
+      setErrorMsg("يرجى إدخال اسم المستخدم وكلمة المرور");
+      return;
+    }
     setLoading(true);
-    const result = await auth.login(username, password);
+    setErrorMsg("");
+    const result = await auth.login(username.trim(), password);
     setLoading(false);
     if (result.success) {
       toast.success(t("login.welcome"));
       navigate("/admin");
     } else {
-      toast.error(result.error || t("login.error"));
+      const err = result.error || t("login.error");
+      setErrorMsg(err);
+      toast.error(err);
     }
   };
 
@@ -43,12 +51,17 @@ const LoginPage = () => {
         <form onSubmit={handleLogin} className="space-y-4">
           <div className="relative">
             <User className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input placeholder={t("login.username")} value={username} onChange={e => setUsername(e.target.value)} className="bg-secondary/50 ps-10" />
+            <Input placeholder={t("login.username")} value={username} onChange={e => { setUsername(e.target.value); setErrorMsg(""); }} className="bg-secondary/50 ps-10" autoComplete="username" />
           </div>
           <div className="relative">
             <Lock className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input type="password" placeholder={t("login.password")} value={password} onChange={e => setPassword(e.target.value)} className="bg-secondary/50 ps-10" />
+            <Input type="password" placeholder={t("login.password")} value={password} onChange={e => { setPassword(e.target.value); setErrorMsg(""); }} className="bg-secondary/50 ps-10" autoComplete="current-password" />
           </div>
+          {errorMsg && (
+            <p className="text-sm text-destructive bg-destructive/10 rounded-lg px-3 py-2 text-center">
+              {errorMsg}
+            </p>
+          )}
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? t("login.loading") : t("login.submit")}
           </Button>

@@ -68,8 +68,8 @@ const AnnouncementBanner = () => {
     };
 
     fetchData();
-    // Poll every 15 seconds to instantly reflect admin changes
-    const interval = setInterval(fetchData, 15 * 1000);
+    // Poll every 60 seconds to reflect admin changes (reduced from 15s to improve performance)
+    const interval = setInterval(fetchData, 60 * 1000);
     return () => clearInterval(interval);
   }, [lang, year]);
 

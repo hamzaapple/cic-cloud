@@ -21,10 +21,13 @@ import CoursePage from "./pages/CoursePage";
 import CalendarPage from "./pages/CalendarPage";
 import LinksPage from "./pages/LinksPage";
 import LoginPage from "./pages/LoginPage";
-import AdminDashboard from "./pages/AdminDashboard";
-import SchedulePage from "./pages/SchedulePage";
 import NotFound from "./pages/NotFound";
 import BachelorTechPage from "./pages/BachelorTechPage";
+
+// Lazy load heavy pages for faster initial load
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const SchedulePage = lazy(() => import("./pages/SchedulePage"));
+const AuditLog = lazy(() => import("./pages/AuditLog"));
 
 // Lazy load heavy visual components
 const ParticleBackground = lazy(() => import("./components/ParticleBackground"));
@@ -48,13 +51,13 @@ const AnimatedRoutes = () => {
   }
 
   return (
-    <AnimatePresence mode="wait" initial={false}>
+    <AnimatePresence initial={false}>
       <motion.div
         key={animationKey}
-        initial={{ opacity: 0, y: 15 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -15 }}
-        transition={{ duration: 0.25, ease: "easeOut" }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.15, ease: "easeOut" }}
       >
         <Routes location={location}>
           <Route path="/" element={<Index />} />
@@ -66,9 +69,9 @@ const AnimatedRoutes = () => {
           <Route path="/:yearId/:semesterId/:courseSlug/:categorySlug" element={<CoursePage />} />
           <Route path="/calendar" element={<CalendarPage />} />
           <Route path="/links" element={<LinksPage />} />
-          <Route path="/schedule" element={<SchedulePage />} />
+          <Route path="/schedule" element={<Suspense fallback={<div className="min-h-screen" />}><SchedulePage /></Suspense>} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin" element={<Suspense fallback={<div className="min-h-screen" />}><AdminDashboard /></Suspense>} />
           <Route path="/bachelor-tech" element={<BachelorTechPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

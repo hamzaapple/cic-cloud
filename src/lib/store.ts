@@ -185,11 +185,24 @@ export const auth = {
   },
   login: async (username: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
+      console.log('[auth] Attempting login for:', username);
       const { data, error } = await supabase.functions.invoke('admin-login', {
         body: { username, password },
       });
 
-      if (error || !data?.role) {
+      console.log('[auth] Login response:', { data: data ? { ...data, session: data.session ? '[session]' : null } : null, error });
+
+      if (error) {
+        console.error('[auth] Edge function error:', error);
+        // Edge function may return error in different formats
+        const errMsg = typeof error === 'object' && error !== null
+          ? (error as any).message || JSON.stringify(error)
+          : String(error);
+        return { success: false, error: errMsg || "خطأ في الاتصال بالخادم" };
+      }
+
+      if (!data?.role) {
+        console.warn('[auth] No role in response data:', data);
         return { success: false, error: data?.error || "اسم المستخدم أو كلمة المرور غير صحيحة" };
       }
 
@@ -215,9 +228,11 @@ export const auth = {
         localStorage.removeItem("lms_mod_year");
       }
 
+      console.log('[auth] Login successful, role:', data.role);
       return { success: true };
-    } catch {
-      return { success: false, error: "حدث خطأ في الاتصال" };
+    } catch (err) {
+      console.error('[auth] Login exception:', err);
+      return { success: false, error: "حدث خطأ في الاتصال — تأكد من اتصال الإنترنت" };
     }
   },
   logout: () => {

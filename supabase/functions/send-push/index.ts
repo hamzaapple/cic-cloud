@@ -2,19 +2,12 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 import webpush from "npm:web-push@3.6.7";
 
-// ─── Allowed origins (add your production domain here) ───
-const ALLOWED_ORIGINS = [
-  'https://cic-cloud.vercel.app',
-  'http://localhost:5173',
-  'http://localhost:4173',
-];
-
+// ─── CORS headers — allow any requesting origin ───
 function getCorsHeaders(req: Request) {
-  const origin = req.headers.get('origin') || '';
-  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  const origin = req.headers.get('origin') || '*';
   return {
-    'Access-Control-Allow-Origin': allowed,
-    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
     'Vary': 'Origin',
   };
 }
