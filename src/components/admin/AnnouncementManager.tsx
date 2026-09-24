@@ -4,6 +4,7 @@ import { db, type Announcement } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Megaphone, Trash2, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { safeFormatDate } from "@/lib/utils";
@@ -18,6 +19,7 @@ const AnnouncementManager = () => {
   const [isImportant, setIsImportant] = useState(false);
   const [expiresAt, setExpiresAt] = useState("");
   const [link, setLink] = useState("");
+  const [targetYear, setTargetYear] = useState("all");
   const [loading, setLoading] = useState(false);
 
   const loadAnnouncements = async () => {
@@ -41,7 +43,7 @@ const AnnouncementManager = () => {
 
     try {
       const finalContent = isImportant ? `[URGENT] ${content}` : content;
-      await db.addAnnouncement({ content: finalContent, expires_at: new Date(expiresAt).toISOString(), link: link || null });
+      await db.addAnnouncement({ content: finalContent, expires_at: new Date(expiresAt).toISOString(), link: link || null, target_year: targetYear === "all" ? null : targetYear });
       await db.addAuditLog("إضافة إعلان", `${content.substring(0, 30)}...`, {
         action_type: "add_announcement",
       });
@@ -53,6 +55,7 @@ const AnnouncementManager = () => {
           : (lang === "ar" ? "📢 إعلان جديد" : "📢 New Announcement"),
         message: content, // always use raw content (without [URGENT] prefix)
         target_audience: "all",
+        target_year: targetYear === "all" ? null : targetYear,
         link: link || null,
         sent_by: "system",
       });
@@ -62,6 +65,7 @@ const AnnouncementManager = () => {
       setIsImportant(false);
       setExpiresAt("");
       setLink("");
+      setTargetYear("all");
       await loadAnnouncements();
     } catch (e) {
       toast.error(lang === "ar" ? "حدث خطأ" : "An error occurred");
@@ -111,6 +115,22 @@ const AnnouncementManager = () => {
               />
             </div>
             <div className="space-y-1">
+              <label className="text-sm font-medium text-muted-foreground">{lang === "ar" ? "الصف المستهدف" : "Target Year"}</label>
+              <Select value={targetYear} onValueChange={setTargetYear}>
+                <SelectTrigger className="bg-secondary/50">
+                  <SelectValue placeholder={lang === "ar" ? "الصف المستهدف" : "Target Year"} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{lang === "ar" ? "كل الصفوف" : "All Years"}</SelectItem>
+                  <SelectItem value="1">{lang === "ar" ? "الصف الأول" : "1st Year"}</SelectItem>
+                  <SelectItem value="2">{lang === "ar" ? "الصف الثاني" : "2nd Year"}</SelectItem>
+                  <SelectItem value="3">{lang === "ar" ? "الصف الثالث" : "3rd Year"}</SelectItem>
+                  <SelectItem value="4">{lang === "ar" ? "الصف الرابع" : "4th Year"}</SelectItem>
+                  <SelectItem value="2b">{lang === "ar" ? "الصف الثاني - بكالوريا" : "2nd Year - Bachelor"}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1">
               <label className="text-sm font-medium text-muted-foreground">{lang === "ar" ? "رابط إضافي (اختياري)" : "Optional Link"}</label>
               <Input 
                 value={link} 
@@ -154,6 +174,11 @@ const AnnouncementManager = () => {
                     <Clock className="w-3 h-3" />
                     <span>{lang === "ar" ? "ينتهي في:" : "Expires:"} {safeFormatDate(ann.expires_at, "dd MMM yyyy - hh:mm a", { locale })}</span>
                   </div>
+                  {ann.target_year && (
+                    <div className="text-xs mt-1 text-muted-foreground">
+                      {lang === "ar" ? "مخصص لـ:" : "Target:"} {lang === "ar" ? "الصف" : "Year"} {ann.target_year}
+                    </div>
+                  )}
                   {ann.link && (
                     <a href={ann.link} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline mt-2 inline-block">
                       {ann.link}

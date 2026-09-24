@@ -22,6 +22,7 @@ export type Database = {
           expires_at: string
           id: string
           link: string | null
+          target_year: string | null
         }
         Insert: {
           content: string
@@ -30,6 +31,7 @@ export type Database = {
           expires_at: string
           id?: string
           link?: string | null
+          target_year?: string | null
         }
         Update: {
           content?: string
@@ -38,6 +40,7 @@ export type Database = {
           expires_at?: string
           id?: string
           link?: string | null
+          target_year?: string | null
         }
         Relationships: []
       }

@@ -120,6 +120,7 @@ export interface Announcement {
   content: string;
   expires_at: string;
   link?: string | null;
+  target_year?: string | null;
   created_by?: string;
   created_at?: string;
 }
@@ -532,7 +533,7 @@ export const db = {
     const { data } = await supabase.from("announcements").select("*").gt("expires_at", new Date().toISOString());
     return (data || []) as Announcement[];
   },
-  addAnnouncement: async (announcement: { content: string; expires_at: string; link?: string | null }) => {
+  addAnnouncement: async (announcement: { content: string; expires_at: string; link?: string | null; target_year?: string | null }) => {
     const { error } = await supabase.from("announcements").insert(announcement);
     if (error) throw error;
   },

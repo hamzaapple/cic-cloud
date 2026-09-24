@@ -3,12 +3,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { AlertCircle, Clock, Volume2, X } from "lucide-react";
 import { db, type Announcement, type Material, type Course } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
+import { useYear } from "@/hooks/use-year";
 import { differenceInHours } from "date-fns";
 
 const AUTO_DISMISS_MS = 10_000; // 10 seconds
 
 const AnnouncementBanner = () => {
   const { lang } = useI18n();
+  const { year } = useYear();
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [urgentAssignments, setUrgentAssignments] = useState<{ id: string; title: string; course: string; hoursLeft: number; minutesLeft: number }[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -30,7 +32,8 @@ const AnnouncementBanner = () => {
           db.getCourses()
         ]);
         
-        setAnnouncements(anns);
+        const filteredAnns = anns.filter(a => !a.target_year || a.target_year === "all" || a.target_year === year);
+        setAnnouncements(filteredAnns);
         
         // Find assignments due in less than 24 hours
         const now = new Date();
@@ -68,7 +71,7 @@ const AnnouncementBanner = () => {
     // Poll every 15 seconds to instantly reflect admin changes
     const interval = setInterval(fetchData, 15 * 1000);
     return () => clearInterval(interval);
-  }, [lang]);
+  }, [lang, year]);
 
   const allItems = [
     ...urgentAssignments.map(a => ({
