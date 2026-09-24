@@ -189,11 +189,11 @@ export const auth = {
       
       const { data: { session } } = await supabase.auth.getSession();
       
-      const response = await fetch(`${supabaseUrl}/functions/v1/admin-login`, {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabaseAnonKey}`,
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
         body: JSON.stringify({ username, password }),
       });
