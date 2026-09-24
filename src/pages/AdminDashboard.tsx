@@ -86,6 +86,7 @@ const AdminDashboard = () => {
   const [categories, setCategories] = useState<MaterialCategory[]>([]);
   const [deptFilter, setDeptFilter] = useState<string>("all");
   const [yearFilter, setYearFilter] = useState<string>("all");
+  const [semesterFilter, setSemesterFilter] = useState<string>("all");
 
   const loadData = useCallback(async () => {
     const deptId = user.role === "moderator" ? user.departmentId : undefined;
@@ -242,10 +243,11 @@ const AdminDashboard = () => {
   const isPdfOnly = !isOwner && auth.hasPermission("add_pdf_existing") && !auth.hasPermission("add_courses");
   const canAddExtLinks = isOwner || auth.hasPermission("add_external_resources");
 
-  // Filter courses by department and year
+  // Filter courses by department, year, and semester
   const filteredCourses = courses.filter(c => 
     (deptFilter === "all" || c.department_id === deptFilter) &&
-    (yearFilter === "all" || c.academic_year === yearFilter)
+    (yearFilter === "all" || c.academic_year === yearFilter) &&
+    (semesterFilter === "all" || c.semester === semesterFilter)
   );
 
   const handleUpload = async (e: React.FormEvent) => {
@@ -621,6 +623,26 @@ const AdminDashboard = () => {
                   }`}
                 >
                   {y.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+              {[
+                { id: "all", label: lang === "ar" ? "كل الفصول" : "All Semesters" },
+                { id: "1", label: lang === "ar" ? "الفصل الأول" : "First Semester" },
+                { id: "2", label: lang === "ar" ? "الفصل الثاني" : "Second Semester" },
+              ].map((s) => (
+                <button
+                  key={s.id}
+                  onClick={() => setSemesterFilter(s.id)}
+                  className={`px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
+                    semesterFilter === s.id
+                      ? "bg-primary text-primary-foreground shadow-md scale-[1.02]"
+                      : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                  }`}
+                >
+                  {s.label}
                 </button>
               ))}
             </div>
