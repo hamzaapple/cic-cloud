@@ -627,17 +627,32 @@ export const db = {
     if (!allowedTypes.includes(file.type) && !file.name.toLowerCase().endsWith('.pdf')) {
       throw new Error('نوع الملف غير مسموح به. يُسمح فقط بملفات PDF والفيديو.');
     }
-    // Use sanitized upload path
-    return db.uploadPdfSanitized(file);
+    // Route videos to Cloudflare R2, PDFs to Supabase Storage
+    const { isVideoFile, uploadVideoToR2 } = await import("@/lib/r2");
+    if (isVideoFile(file)) {
+      return uploadVideoToR2(file);
+    }
+    // Use sanitized Supabase upload path for PDFs
+    return db._uploadToSupabase(file);
   },
 
-  /** Upload a PDF with a sanitized storage path. Returns the public URL. */
+  /** Upload a file with a sanitized storage path. Returns the public URL. */
   uploadPdfSanitized: async (file: File): Promise<string> => {
     // Validate file type
     const allowedTypes: readonly string[] = db.ALLOWED_UPLOAD_TYPES;
     if (!allowedTypes.includes(file.type) && !file.name.toLowerCase().endsWith('.pdf')) {
       throw new Error('نوع الملف غير مسموح به. يُسمح فقط بملفات PDF والفيديو.');
     }
+    // Route videos to Cloudflare R2, PDFs to Supabase Storage
+    const { isVideoFile, uploadVideoToR2 } = await import("@/lib/r2");
+    if (isVideoFile(file)) {
+      return uploadVideoToR2(file);
+    }
+    return db._uploadToSupabase(file);
+  },
+
+  /** Internal: upload file to Supabase Storage (for PDFs) */
+  _uploadToSupabase: async (file: File): Promise<string> => {
     const safeName = db.sanitizeFileName(file.name);
     const { error } = await supabase.storage.from("materials").upload(safeName, file);
     if (error) throw error;
