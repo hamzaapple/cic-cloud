@@ -16,10 +16,30 @@ const item = {
 
 const LinksPage = () => {
   const { t } = useI18n();
-  const { departmentId } = useParams<{ departmentId?: string }>();
+  const deptContext = localStorage.getItem("cic_dept_context");
+  
+  const { data: allDepartments = [] } = useQuery({ queryKey: ["departments"], queryFn: db.getDepartments });
+  
   const { data: links = [] } = useQuery({
-    queryKey: ["links", departmentId || "all"],
-    queryFn: () => db.getLinks(departmentId || null),
+    queryKey: ["links"],
+    queryFn: () => db.getLinks(null), // Fetch all links
+  });
+
+  const filteredLinks = links.filter(link => {
+    // If link has no department, it's global
+    if (!link.department_id) return true;
+    
+    // Otherwise check against context
+    if (deptContext) {
+      const linkDept = allDepartments.find(d => d.id === link.department_id);
+      if (linkDept) {
+        const isCs = linkDept.name_en === "CS";
+        if (deptContext === "cs" && !isCs) return false;
+        if (deptContext === "ai_cyber" && isCs) return false;
+        return true;
+      }
+    }
+    return false; // If there's a department but no context or mismatch, hide it
   });
 
   return (
@@ -31,7 +51,7 @@ const LinksPage = () => {
         </motion.div>
 
         <motion.div variants={container} initial="hidden" animate="show" className="space-y-3">
-          {links.map(link => (
+          {filteredLinks.map(link => (
             <motion.a key={link.id} variants={item} href={link.url} target="_blank" rel="noopener noreferrer"
               whileHover={{ x: -4, scale: 1.01 }}
               className="glass-card rounded-xl p-5 flex items-center justify-between gap-4 group block">

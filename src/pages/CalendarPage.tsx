@@ -17,12 +17,25 @@ const CalendarPage = () => {
   const { data: allMaterials = [] } = useQuery({ queryKey: ["materials"], queryFn: () => db.getMaterials() });
   const { data: courses = [] } = useQuery({ queryKey: ["courses"], queryFn: db.getCourses });
 
+  const { data: allDepartments = [] } = useQuery({ queryKey: ["departments"], queryFn: db.getDepartments });
+  const deptContext = localStorage.getItem("cic_dept_context");
+
   const locale = lang === "ar" ? ar : enUS;
   const materials = allMaterials.filter(m => {
     if (!m.deadline || m.archived) return false;
     const course = courses.find(c => c.id === m.course_id);
     if (!course || course.code === "BACHELOR-PROG") return false;
     if (!showAllYears && year && course.academic_year !== year) return false;
+    
+    // Filter by department if context is set
+    if (!showAllYears && deptContext && course.department_id) {
+      const courseDept = allDepartments.find(d => d.id === course.department_id);
+      if (courseDept) {
+        const isCs = courseDept.name_en === "CS";
+        if (deptContext === "cs" && !isCs) return false;
+        if (deptContext === "ai_cyber" && isCs) return false;
+      }
+    }
     return true;
   });
   const monthStart = startOfMonth(currentMonth);
