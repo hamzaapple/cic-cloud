@@ -22,6 +22,10 @@
   <meta name="twitter:description" content="CIC - CA Interactive Cloud - منصة التعلم التفاعلية">
 </head>
   <body>
+    <!-- Redirect old domain → new domain instantly -->
+    <script>
+      if(location.hostname==="cic-cloud.lovable.app"){location.replace("https://cic-cloud.vercel.app"+location.pathname+location.search+location.hash)}
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
