@@ -57,9 +57,9 @@ const PdfViewerModal = ({
         setViewerUrl(`/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(objectUrl)}`);
       } catch (err) {
         console.error("PDF load error:", err);
-        // Fallback to direct URL if fetch fails
+        // Fallback to direct URL if fetch fails (native browser PDF viewer or direct download)
         if (!cancelled) {
-          setViewerUrl(`/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(pdfUrl)}`);
+          setViewerUrl(pdfUrl);
         }
       } finally {
         if (!cancelled) {
