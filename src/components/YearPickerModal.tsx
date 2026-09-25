@@ -28,10 +28,7 @@ const YearPickerModal = ({ open, onClose }: Props) => {
   const { data: allDepartments = [] } = useQuery({ queryKey: ["departments"], queryFn: db.getDepartments });
   const { data: allCourses = [] } = useQuery({ queryKey: ["courses"], queryFn: db.getCourses });
 
-  // Filter departments for selected year
-  const coursesForYear = selectedYear ? allCourses.filter(c => c.academic_year === selectedYear) : [];
-  const validDeptIds = new Set(coursesForYear.map(c => c.department_id).filter(Boolean));
-  const availableDepts = allDepartments.filter(d => validDeptIds.has(d.id) && d.name_en !== "Bachelor");
+  const availableDepts = allDepartments.filter(d => d.name_en !== "Bachelor");
 
   const chooseYear = (y: string) => {
     setSelectedYear(y);
