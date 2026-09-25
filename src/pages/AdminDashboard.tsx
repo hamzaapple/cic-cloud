@@ -203,6 +203,7 @@ const AdminDashboard = () => {
   const [uploading, setUploading] = useState(false);
   const [isList, setIsList] = useState(false);
   const [listContent, setListContent] = useState("");
+  const [isReference, setIsReference] = useState(false);
 
   // Bulk folder upload state
   const [isFolderMode, setIsFolderMode] = useState(false);
@@ -278,11 +279,12 @@ const AdminDashboard = () => {
         is_assignment: isAssignment,
         is_list: isList,
         list_content: isList ? listContent : null,
+        is_reference: isReference,
       });
 
       await loadData();
       setTitle(""); setExternalLink(""); setSubmissionLink(""); setDeadline(""); setIsAssignmentOpenEnded(false);
-      setPdfFile(null); setPdfExternalUrl(""); setPdfDisplayName(""); setIsList(false); setListContent("");
+      setPdfFile(null); setPdfExternalUrl(""); setPdfDisplayName(""); setIsList(false); setListContent(""); setIsReference(false);
       const fileInput = document.getElementById("pdf-upload") as HTMLInputElement;
       if (fileInput) fileInput.value = "";
       toast.success(t("admin.uploadSuccess"));
@@ -711,6 +713,19 @@ const AdminDashboard = () => {
                       />
                       <label htmlFor="isListCheckbox" className="text-sm font-medium cursor-pointer">
                         {lang === "ar" ? "هذه المادة عبارة عن قائمة منسدلة (Playlist)" : "This material is a dropdown list (Playlist)"}
+                      </label>
+                    </div>
+
+                    <div className="flex items-center gap-2 mt-2 mb-2">
+                      <input
+                        type="checkbox"
+                        id="isReferenceCheckbox"
+                        checked={isReference}
+                        onChange={(e) => setIsReference(e.target.checked)}
+                        className="accent-primary"
+                      />
+                      <label htmlFor="isReferenceCheckbox" className="text-sm font-medium cursor-pointer text-amber-500">
+                        {lang === "ar" ? "تعيين كمرجع أو كتاب للمادة (يظهر في الأعلى)" : "Set as Course Reference/Textbook (Pinned)"}
                       </label>
                     </div>
 

@@ -5,7 +5,7 @@ import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Layers, Plus, Pencil, Trash2, X, Check, Globe } from "lucide-react";
+import { Layers, Plus, Pencil, Trash2, X, Check, Globe, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -66,6 +66,34 @@ const CategoryManager = () => {
     await load();
     setEditingId(null);
     toast.success(t("cat.updated"));
+  };
+
+  const moveUp = async (index: number) => {
+    if (index === 0) return;
+    const newCats = [...visibleCategories];
+    const temp = newCats[index - 1];
+    newCats[index - 1] = newCats[index];
+    newCats[index] = temp;
+    try {
+      await db.reorderCategories(newCats.map(c => c.id));
+      await load();
+    } catch {
+      toast.error(lang === "ar" ? "فشل تغيير الترتيب" : "Failed to reorder");
+    }
+  };
+
+  const moveDown = async (index: number) => {
+    if (index === visibleCategories.length - 1) return;
+    const newCats = [...visibleCategories];
+    const temp = newCats[index + 1];
+    newCats[index + 1] = newCats[index];
+    newCats[index] = temp;
+    try {
+      await db.reorderCategories(newCats.map(c => c.id));
+      await load();
+    } catch {
+      toast.error(lang === "ar" ? "فشل تغيير الترتيب" : "Failed to reorder");
+    }
   };
 
 
@@ -156,7 +184,15 @@ const CategoryManager = () => {
                       </span>
                     </div>
 
-                    <div className="flex gap-1">
+                    <div className="flex gap-1 items-center">
+                      <div className="flex flex-col me-2 gap-1 border-e pe-2 border-border/50">
+                        <button onClick={() => moveUp(i)} disabled={i === 0} className="p-1 rounded hover:bg-secondary text-muted-foreground hover:text-foreground disabled:opacity-30">
+                          <ArrowUp className="w-3 h-3" />
+                        </button>
+                        <button onClick={() => moveDown(i)} disabled={i === visibleCategories.length - 1} className="p-1 rounded hover:bg-secondary text-muted-foreground hover:text-foreground disabled:opacity-30">
+                          <ArrowDown className="w-3 h-3" />
+                        </button>
+                      </div>
                       <button onClick={() => startEdit(cat)} className="p-1.5 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground">
                         <Pencil className="w-3.5 h-3.5" />
                       </button>

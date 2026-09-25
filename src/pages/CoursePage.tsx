@@ -70,9 +70,13 @@ const CoursePage = () => {
   const [highlightedMaterialId, setHighlightedMaterialId] = useState<string | null>(null);
   const highlightTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Materials are already sorted by sort_order from the DB query
   const materials = allMaterials
-    .filter(m => !m.archived && m.category_id === activeCategory);
+    .filter(m => !m.archived && m.category_id === activeCategory)
+    .sort((a, b) => {
+      if (a.is_reference && !b.is_reference) return -1;
+      if (!a.is_reference && b.is_reference) return 1;
+      return 0;
+    });
 
   const BackArrow = lang === "ar" ? ArrowRight : ArrowLeft;
   const [isDownloadingAll, setIsDownloadingAll] = useState(false);

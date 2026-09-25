@@ -20,6 +20,7 @@ const AnnouncementManager = () => {
   const [expiresAt, setExpiresAt] = useState("");
   const [link, setLink] = useState("");
   const [targetYear, setTargetYear] = useState("all");
+  const [targetDept, setTargetDept] = useState("all");
   const [color, setColor] = useState("#3b82f6");
   const [loading, setLoading] = useState(false);
 
@@ -44,7 +45,14 @@ const AnnouncementManager = () => {
 
     try {
       const finalContent = isImportant ? `[URGENT] ${content}` : content;
-      await db.addAnnouncement({ content: finalContent, expires_at: new Date(expiresAt).toISOString(), link: link || null, target_year: targetYear === "all" ? null : targetYear, color: isImportant ? null : color });
+      await db.addAnnouncement({ 
+        content: finalContent, 
+        expires_at: new Date(expiresAt).toISOString(), 
+        link: link || null, 
+        target_year: targetYear === "all" ? null : targetYear, 
+        target_dept: targetDept === "all" ? null : targetDept,
+        color: isImportant ? null : color 
+      });
       await db.addAuditLog("إضافة إعلان", `${content.substring(0, 30)}...`, {
         action_type: "add_announcement",
       });
@@ -129,6 +137,19 @@ const AnnouncementManager = () => {
                   <SelectItem value="3">{lang === "ar" ? "الصف الثالث" : "3rd Year"}</SelectItem>
                   <SelectItem value="4">{lang === "ar" ? "الصف الرابع" : "4th Year"}</SelectItem>
                   <SelectItem value="2b">{lang === "ar" ? "الصف الثاني - بكالوريا" : "2nd Year - Bachelor"}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-muted-foreground">{lang === "ar" ? "القسم المستهدف" : "Target Department"}</label>
+              <Select value={targetDept} onValueChange={setTargetDept}>
+                <SelectTrigger className="bg-secondary/50">
+                  <SelectValue placeholder={lang === "ar" ? "القسم المستهدف" : "Target Department"} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{lang === "ar" ? "كل الأقسام" : "All Departments"}</SelectItem>
+                  <SelectItem value="cs">{lang === "ar" ? "علوم حاسب (CS)" : "CS"}</SelectItem>
+                  <SelectItem value="ai_cyber">{lang === "ar" ? "ذكاء وسيبراني (AI/Cyber)" : "AI & Cyber"}</SelectItem>
                 </SelectContent>
               </Select>
             </div>

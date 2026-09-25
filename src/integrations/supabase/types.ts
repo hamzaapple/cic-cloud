@@ -23,6 +23,7 @@ export type Database = {
           id: string
           link: string | null
           target_year: string | null
+          target_dept: string | null
         }
         Insert: {
           content: string
@@ -32,6 +33,7 @@ export type Database = {
           id?: string
           link?: string | null
           target_year?: string | null
+          target_dept?: string | null
         }
         Update: {
           content?: string
@@ -41,6 +43,7 @@ export type Database = {
           id?: string
           link?: string | null
           target_year?: string | null
+          target_dept?: string | null
         }
         Relationships: []
       }
@@ -243,6 +246,7 @@ export type Database = {
           id: string
           name_ar: string
           name_en: string
+          display_order: number | null
         }
         Insert: {
           created_at?: string
@@ -250,6 +254,7 @@ export type Database = {
           id?: string
           name_ar: string
           name_en: string
+          display_order?: number | null
         }
         Update: {
           created_at?: string
@@ -257,6 +262,7 @@ export type Database = {
           id?: string
           name_ar?: string
           name_en?: string
+          display_order?: number | null
         }
         Relationships: [
           {
@@ -283,6 +289,7 @@ export type Database = {
           list_content: string | null
           pdf_display_name: string | null
           pdf_url: string | null
+          is_reference: boolean | null
           sort_order: number | null
           submission_link: string | null
           title: string
@@ -302,6 +309,7 @@ export type Database = {
           list_content?: string | null
           pdf_display_name?: string | null
           pdf_url?: string | null
+          is_reference?: boolean | null
           sort_order?: number | null
           submission_link?: string | null
           title: string
@@ -321,6 +329,7 @@ export type Database = {
           list_content?: string | null
           pdf_display_name?: string | null
           pdf_url?: string | null
+          is_reference?: boolean | null
           sort_order?: number | null
           submission_link?: string | null
           title?: string

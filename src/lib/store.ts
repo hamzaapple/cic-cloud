@@ -33,6 +33,7 @@ export interface MaterialCategory {
   name_en: string;
   /** null = unified category shown in every department */
   department_id?: string | null;
+  display_order?: number | null;
   created_at?: string;
 }
 
@@ -63,6 +64,7 @@ export interface Material {
   is_assignment: boolean;
   is_list?: boolean;
   list_content?: string | null;
+  is_reference?: boolean | null;
   archived: boolean;
   sort_order?: number | null;
   created_at: string;
@@ -121,6 +123,7 @@ export interface Announcement {
   expires_at: string;
   link?: string | null;
   target_year?: string | null;
+  target_dept?: string | null;
   created_by?: string;
   created_at?: string;
   color?: string | null;
@@ -264,7 +267,9 @@ export const db = {
 
   // Material Categories
   getCategories: async (): Promise<MaterialCategory[]> => {
-    const { data } = await supabase.from("material_categories").select("*").order("created_at");
+    const { data } = await supabase.from("material_categories").select("*")
+      .order("display_order", { ascending: true, nullsFirst: true })
+      .order("created_at");
     return (data || []) as MaterialCategory[];
   },
   addCategory: async (cat: { name_ar: string; name_en: string; department_id?: string | null }) => {
@@ -279,6 +284,14 @@ export const db = {
   deleteCategory: async (id: string) => {
     const { error } = await supabase.from("material_categories").delete().eq("id", id);
     if (error) throw error;
+  },
+  reorderCategories: async (orderedIds: string[]) => {
+    const updates = orderedIds.map((id, index) =>
+      supabase.from("material_categories").update({ display_order: index }).eq("id", id)
+    );
+    const results = await Promise.all(updates);
+    const failed = results.find(r => r.error);
+    if (failed?.error) throw failed.error;
   },
 
   // Courses
@@ -556,7 +569,7 @@ export const db = {
     const { data } = await supabase.from("announcements").select("*").gt("expires_at", new Date().toISOString());
     return (data || []) as Announcement[];
   },
-  addAnnouncement: async (announcement: { content: string; expires_at: string; link?: string | null; target_year?: string | null; color?: string | null }) => {
+  addAnnouncement: async (announcement: { content: string; expires_at: string; link?: string | null; target_year?: string | null; target_dept?: string | null; color?: string | null }) => {
     const { error } = await supabase.from("announcements").insert(announcement);
     if (error) throw error;
   },

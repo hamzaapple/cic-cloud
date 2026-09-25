@@ -32,7 +32,13 @@ const AnnouncementBanner = () => {
           db.getCourses()
         ]);
         
-        const filteredAnns = anns.filter(a => !a.target_year || a.target_year === "all" || a.target_year === year);
+        const deptContext = localStorage.getItem("cic_dept_context");
+        
+        const filteredAnns = anns.filter(a => {
+          const yearMatch = !a.target_year || a.target_year === "all" || a.target_year === year;
+          const deptMatch = !a.target_dept || a.target_dept === "all" || a.target_dept === deptContext;
+          return yearMatch && deptMatch;
+        });
         setAnnouncements(filteredAnns);
         
         // Find assignments due in less than 24 hours

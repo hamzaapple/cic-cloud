@@ -9,8 +9,8 @@ import { setPushAudience } from "@/lib/push-registration";
 const YEARS = [
   { id: "1", name_ar: "الفرقة الأولى", name_en: "First Year", icon: GraduationCap, color: "190 80% 45%", route: "departments", desc_ar: "المواد العامة والأساسية", desc_en: "General & Basic Courses" },
   { id: "2", name_ar: "الفرقة الثانية", name_en: "Second Year", icon: Layers, color: "260 70% 55%", route: "departments", desc_ar: "التخصصات التقنية الأساسية", desc_en: "Core Technical Depts" },
-  { id: "3", name_ar: "الفرقة الثالثة", name_en: "Third Year", icon: Monitor, color: "340 70% 55%", route: "semesters", desc_ar: "دراسات متقدمة في التخصص", desc_en: "Advanced Studies" },
-  { id: "4", name_ar: "الفرقة الرابعة", name_en: "Fourth Year", icon: Cpu, color: "30 80% 50%", route: "semesters", desc_ar: "مشاريع التخرج والتطبيقات", desc_en: "Graduation Projects" },
+  { id: "3", name_ar: "الفرقة الثالثة", name_en: "Third Year", icon: Monitor, color: "340 70% 55%", route: "departments", desc_ar: "دراسات متقدمة في التخصص", desc_en: "Advanced Studies" },
+  { id: "4", name_ar: "الفرقة الرابعة", name_en: "Fourth Year", icon: Cpu, color: "30 80% 50%", route: "departments", desc_ar: "مشاريع التخرج والتطبيقات", desc_en: "Graduation Projects" },
 ];
 
 const Index = () => {

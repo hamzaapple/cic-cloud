@@ -81,7 +81,15 @@ const YearDepartmentsPage = () => {
             const color = DEPT_COLORS[dept.name_en] || "190 80% 45%";
             return (
               <motion.div key={dept.id} variants={item}>
-                <Link to={`/year/${yearId}/semesters?dept=${dept.id}`} onClick={() => playClickSfx()}>
+                <Link 
+                  to={`/year/${yearId}/semesters?dept=${dept.id}`} 
+                  onClick={() => {
+                    playClickSfx();
+                    // Set context for Schedules and Announcements
+                    const deptContext = dept.name_en === "CS" ? "cs" : "ai_cyber";
+                    localStorage.setItem("cic_dept_context", deptContext);
+                  }}
+                >
                   <motion.div
                     whileHover={{ y: -8, scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}

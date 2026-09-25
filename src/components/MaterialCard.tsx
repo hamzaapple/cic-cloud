@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { FileText, ExternalLink, Clock, Archive, Trash2, Download, Pencil, X, Save, Link, Share2, GripVertical, ChevronDown, ChevronUp, Copy } from "lucide-react";
+import { FileText, ExternalLink, Clock, Archive, Trash2, Download, Pencil, X, Save, Link, Share2, GripVertical, ChevronDown, ChevronUp, Copy, BookOpen } from "lucide-react";
 import type { Material, MaterialCategory, Course } from "@/lib/store";
 import { db } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
@@ -159,7 +159,7 @@ const MaterialCard = ({
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: Math.min(index * 0.03, 0.3), duration: 0.25, ease: "easeOut" }}
         whileHover={{ y: -4, scale: 1.01 }}
-        className={`glass-card rounded-xl p-5 group relative overflow-hidden ${material.archived ? "opacity-60" : ""} ${isHighlighted ? "ring-2 ring-primary ring-offset-2 ring-offset-background animate-pulse" : ""}`}
+        className={`glass-card rounded-xl p-5 group relative overflow-hidden ${material.archived ? "opacity-60" : ""} ${isHighlighted ? "ring-2 ring-primary ring-offset-2 ring-offset-background animate-pulse" : ""} ${material.is_reference ? "border border-amber-500/30 bg-amber-500/5 shadow-[0_0_15px_rgba(245,158,11,0.1)]" : ""}`}
         style={{ ...style, ...(isHighlighted ? { animationDuration: "1.5s", animationIterationCount: "3" } : {}) }}
       >
         {/* Drag handle — only shown when DnD props are provided */}
@@ -174,10 +174,15 @@ const MaterialCard = ({
             <GripVertical className="w-4 h-4" />
           </button>
         )}
-        <div className={`absolute top-0 start-0 w-1 h-full bg-primary rounded-s-xl opacity-60 group-hover:opacity-100 transition-opacity ${dragHandleListeners ? "ms-6" : ""}`} />
+        <div className={`absolute top-0 start-0 w-1 h-full ${material.is_reference ? "bg-amber-500" : "bg-primary"} rounded-s-xl opacity-60 group-hover:opacity-100 transition-opacity ${dragHandleListeners ? "ms-6" : ""}`} />
 
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
+            {material.is_reference && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-500 mb-1">
+                <BookOpen className="w-3 h-3" /> {lang === "ar" ? "مرجع المادة" : "Course Reference"}
+              </span>
+            )}
             <div className="flex items-center gap-2 mb-2">
               <FileText className="w-4 h-4 text-primary shrink-0" />
               <h3 className={`font-display truncate ${material.is_list ? "font-bold text-base" : "font-semibold text-sm"}`}>{material.title}</h3>
@@ -214,53 +219,92 @@ const MaterialCard = ({
               )}
               {material.pdf_url && (
                 (() => {
-                  const isVideo = material.pdf_url.match(/\.(mp4|webm|ogg|mov|mkv|avi)$/i) || material.pdf_display_name?.match(/\.(mp4|webm|ogg|mov|mkv|avi)$/i);
+                  const isVideo = material.pdf_url.match(/\.(mp4|webm|ogg|mov|mkv|avi|mp3|wav|m4a|aac)$/i) || material.pdf_display_name?.match(/\.(mp4|webm|ogg|mov|mkv|avi|mp3|wav|m4a|aac)$/i);
                   const isSupabaseDoc = material.pdf_url.includes("supabase.co") && !isVideo;
                   
                   if (isSupabaseDoc) {
                     return (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          playClickSfx();
-                          setPdfViewerOpen(true);
-                        }}
-                        className="flex items-center gap-1 text-primary hover:underline cursor-pointer"
-                        id={`view-pdf-${material.id}`}
-                      >
-                        <FileText className="w-3 h-3" /> {material.pdf_display_name || t("pdfViewer.viewPdf")}
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            playClickSfx();
+                            setPdfViewerOpen(true);
+                          }}
+                          className="flex items-center gap-1 text-primary hover:underline cursor-pointer"
+                          id={`view-pdf-${material.id}`}
+                        >
+                          <FileText className="w-3 h-3" /> {material.pdf_display_name || t("pdfViewer.viewPdf")}
+                        </button>
+                        <a 
+                          href={`${material.pdf_url}?download=`} 
+                          download 
+                          target="_blank" 
+                          rel="noreferrer"
+                          onClick={e => e.stopPropagation()}
+                          className="text-muted-foreground hover:text-primary transition-colors p-1 bg-secondary/50 rounded"
+                          title={lang === "ar" ? "تحميل" : "Download"}
+                        >
+                          <Download className="w-3 h-3" />
+                        </a>
+                      </div>
                     );
                   }
                   
                   if (isVideo) {
                     return (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          playClickSfx();
-                          setVideoViewerOpen(true);
-                        }}
-                        className="flex items-center gap-1 text-primary hover:underline cursor-pointer"
-                      >
-                        <PlayCircle className="w-3 h-3" /> {material.pdf_display_name || (lang === "ar" ? "مشاهدة الفيديو" : "View Video")}
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            playClickSfx();
+                            setVideoViewerOpen(true);
+                          }}
+                          className="flex items-center gap-1 text-primary hover:underline cursor-pointer"
+                        >
+                          <PlayCircle className="w-3 h-3" /> {material.pdf_display_name || (lang === "ar" ? "تشغيل الميديا" : "Play Media")}
+                        </button>
+                        <a 
+                          href={material.pdf_url} 
+                          download 
+                          target="_blank" 
+                          rel="noreferrer"
+                          onClick={e => e.stopPropagation()}
+                          className="text-muted-foreground hover:text-primary transition-colors p-1 bg-secondary/50 rounded"
+                          title={lang === "ar" ? "تحميل" : "Download"}
+                        >
+                          <Download className="w-3 h-3" />
+                        </a>
+                      </div>
                     );
                   }
 
                   return (
-                    <a
-                      href={material.pdf_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        playClickSfx();
-                      }}
-                      className="flex items-center gap-1 text-primary hover:underline cursor-pointer"
-                    >
-                      <FileText className="w-3 h-3" /> {material.pdf_display_name || t("pdfViewer.viewPdf")}
-                    </a>
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={material.pdf_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          playClickSfx();
+                        }}
+                        className="flex items-center gap-1 text-primary hover:underline cursor-pointer"
+                      >
+                        <FileText className="w-3 h-3" /> {material.pdf_display_name || t("pdfViewer.viewPdf")}
+                      </a>
+                      <a 
+                        href={material.pdf_url} 
+                        download 
+                        target="_blank" 
+                        rel="noreferrer"
+                        onClick={e => e.stopPropagation()}
+                        className="text-muted-foreground hover:text-primary transition-colors p-1 bg-secondary/50 rounded"
+                        title={lang === "ar" ? "تحميل" : "Download"}
+                      >
+                        <Download className="w-3 h-3" />
+                      </a>
+                    </div>
                   );
                 })()
               )}
