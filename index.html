@@ -25,6 +25,20 @@
     <!-- Redirect old domain → new domain instantly -->
     <script>
       if(location.hostname==="cic-cloud.lovable.app"){location.replace("https://cic-cloud.vercel.app"+location.pathname+location.search+location.hash)}
+      
+      // Force cache invalidation globally (Bust cache for all users immediately)
+      var currentVersion = "1.0.1";
+      if (localStorage.getItem("app_cache_version") !== currentVersion) {
+        localStorage.setItem("app_cache_version", currentVersion);
+        // Clear caches API
+        if ('caches' in window) {
+          caches.keys().then(function(names) {
+            for (let name of names) caches.delete(name);
+          });
+        }
+        // Force hard reload (window.location.reload true is deprecated but still works in many browsers, otherwise it just reloads)
+        window.location.reload();
+      }
     </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
