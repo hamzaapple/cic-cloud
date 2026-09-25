@@ -38,43 +38,20 @@ const PdfViewerModal = ({
     }
   }, [isMobile, open]);
 
-  // Fetch the PDF as a Blob to bypass pdf.js cross-origin restrictions
+  // Set the PDF URL directly since we bypassed cross-origin restrictions in pdf.js
   useEffect(() => {
     if (!open || !pdfUrl) return;
 
-    let cancelled = false;
-    let objectUrl: string | null = null;
-
-    const loadPdfBlob = async () => {
-      setIsLoading(true);
-      try {
-        const response = await fetch(pdfUrl, { mode: "cors" });
-        if (!response.ok) throw new Error("Failed to fetch PDF");
-        const blob = await response.blob();
-        if (cancelled) return;
-        
-        objectUrl = URL.createObjectURL(blob);
-        setViewerUrl(`/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(objectUrl)}`);
-      } catch (err) {
-        console.error("PDF load error:", err);
-        // Fallback to direct URL if fetch fails (native browser PDF viewer or direct download)
-        if (!cancelled) {
-          setViewerUrl(pdfUrl);
-        }
-      } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    loadPdfBlob();
+    setViewerUrl(`/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(pdfUrl)}`);
+    
+    // Short timeout just for the initial iframe load, pdf.js has its own spinner
+    setIsLoading(true);
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
 
     return () => {
-      cancelled = true;
-      if (objectUrl) {
-        URL.revokeObjectURL(objectUrl);
-      }
+      clearTimeout(timer);
     };
   }, [open, pdfUrl]);
 
