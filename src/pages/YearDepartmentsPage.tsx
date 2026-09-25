@@ -39,11 +39,25 @@ const YearDepartmentsPage = () => {
     queryFn: db.getDepartments
   });
 
+  const { data: allCourses = [] } = useQuery({
+    queryKey: ["courses"],
+    queryFn: db.getCourses
+  });
+
   // "Bachelor" is a hidden section (used outside the university) — listed only
   // inside the hidden "2b" year, never in the public departments grid.
-  const departments = yearId === "2b"
+  const filteredDepts = yearId === "2b"
     ? allDepartments.filter(d => d.name_en === "Bachelor")
     : allDepartments.filter(d => d.name_en !== "Bachelor");
+
+  // Only show departments that have at least one course in the selected year
+  // (unless there are no courses at all, fallback to showing them)
+  const coursesForYear = allCourses.filter(c => c.academic_year === yearId);
+  const validDeptIds = new Set(coursesForYear.map(c => c.department_id).filter(Boolean));
+  
+  const departments = validDeptIds.size > 0 
+    ? filteredDepts.filter(d => validDeptIds.has(d.id))
+    : filteredDepts;
 
 
   const Arrow = lang === "ar" ? ArrowLeft : ArrowRight;
