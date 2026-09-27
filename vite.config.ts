@@ -19,12 +19,12 @@ export default defineConfig(({ mode }) => ({
       disable: mode === "development",
       registerType: "autoUpdate",
       strategies: "injectManifest",
-      srcDir: "public",
+      srcDir: "src",
       filename: "sw-push.js",
       injectRegister: null, // we register manually in main.tsx
       injectManifest: {
-        globPatterns: [],
-        injectionPoint: undefined,
+        globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
+        injectionPoint: "self.__WB_MANIFEST",
       },
       includeAssets: ["favicon.ico", "robots.txt"],
       manifest: {
