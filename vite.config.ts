@@ -23,7 +23,7 @@ export default defineConfig(({ mode }) => ({
       filename: "sw-push.js",
       injectRegister: null, // we register manually in main.tsx
       injectManifest: {
-        globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
+        globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2,woff,ttf,eot,properties,bcmap,gif,pfb,json}"],
         injectionPoint: "self.__WB_MANIFEST",
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
       },
