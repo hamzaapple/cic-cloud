@@ -71,7 +71,11 @@ const YearCard = ({ year, idx }: { year: typeof YEARS[0], idx: number }) => {
       
       {/* Quick Download Button layered on top to not trigger the Link */}
       <div className="absolute bottom-4 left-0 w-full flex justify-center z-20 pointer-events-none">
-        <div className="pointer-events-auto">
+        <div 
+          className="pointer-events-auto"
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+          onMouseDown={(e) => e.stopPropagation()}
+        >
           <BulkOfflineDownloadButton 
             urls={yearUrls} 
             label={{ ar: "حفظ الصف أوفلاين", en: "Save Year Offline" }} 
