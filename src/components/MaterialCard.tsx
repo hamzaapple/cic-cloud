@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { FileText, ExternalLink, Clock, Archive, Trash2, Download, Pencil, X, Save, Link, Share2, GripVertical, ChevronDown, ChevronUp, Copy, BookOpen } from "lucide-react";
+import { FileText, ExternalLink, Clock, Archive, Trash2, Download, Pencil, X, Save, Link, Share2, GripVertical, ChevronDown, ChevronUp, Copy, BookOpen, Sparkles } from "lucide-react";
 import type { Material, MaterialCategory, Course } from "@/lib/store";
 import { db } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
@@ -55,6 +55,7 @@ const MaterialCard = ({
   const locale = lang === "ar" ? ar : enUS;
   const deadlinePast = material.deadline && isPast(new Date(material.deadline));
   const isHighlighted = highlightedId === material.id;
+  const isRecent = Boolean(material.created_at && (Date.now() - new Date(material.created_at).getTime()) < 3 * 24 * 60 * 60 * 1000);
 
   // Edit modal state
   const [pdfViewerOpen, setPdfViewerOpen] = useState(false);
@@ -179,10 +180,19 @@ const MaterialCard = ({
 
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
-            {material.is_reference && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-500 mb-1">
-                <BookOpen className="w-3 h-3" /> {lang === "ar" ? "مرجع المادة" : "Course Reference"}
-              </span>
+            {(isRecent || material.is_reference) && (
+              <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
+                {isRecent && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 animate-pulse">
+                    <Sparkles className="w-2.5 h-2.5" /> {lang === "ar" ? "جديد مُحدّث" : "Recently Added"}
+                  </span>
+                )}
+                {material.is_reference && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-500">
+                    <BookOpen className="w-3 h-3" /> {lang === "ar" ? "مرجع المادة" : "Course Reference"}
+                  </span>
+                )}
+              </div>
             )}
             <div className="flex items-center gap-2 mb-2">
               <FileText className="w-4 h-4 text-primary shrink-0" />

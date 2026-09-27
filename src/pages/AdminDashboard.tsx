@@ -18,6 +18,7 @@ import AnnouncementManager from "@/components/admin/AnnouncementManager";
 import NotificationTemplateManager from "@/components/admin/NotificationTemplateManager";
 import AuditLog from "./AuditLog";
 import { ShieldAlert, Megaphone } from "lucide-react";
+import { yearLabel } from "@/lib/year-context";
 import {
   DndContext,
   closestCenter,
@@ -321,22 +322,35 @@ const AdminDashboard = () => {
         console.error("Failed to fetch templates", e);
       }
 
+      // Academic year of course
+      const courseYear = course?.academic_year || "all";
+      const yearName = yearLabel(courseYear, "ar");
+      const cleanTitle = pdfDisplayName || title;
+
       // Replace variables
-      const notifTitle = titleTemplate
+      let notifTitle = titleTemplate
         .replace(/{type}/g, typeLabel)
-        .replace(/{title}/g, pdfDisplayName || title)
+        .replace(/{title}/g, cleanTitle)
         .replace(/{courseName}/g, courseName);
 
-      const notifMessage = messageTemplate
+      let notifMessage = messageTemplate
         .replace(/{type}/g, typeLabel)
-        .replace(/{title}/g, pdfDisplayName || title)
+        .replace(/{title}/g, cleanTitle)
         .replace(/{courseName}/g, courseName)
         .replace(/{deadline}/g, deadline || "");
+
+      // If default template was used, make it even more helpful and personalized for this year
+      if (notifTitle.startsWith("تم رفع")) {
+        notifTitle = `📚 طلاب ${yearName}: تم إضافة ${typeLabel || "ملف جديد"} في ${courseName}`;
+        notifMessage = `تم رفع "${cleanTitle}" في مقرر ${courseName}. ادخل واطّلع على أحدث الملفات وحمّلها للمشاهدة بدون إنترنت!`;
+      }
 
       db.addNotification({
         title: notifTitle,
         message: notifMessage,
         target_audience: "all",
+        target_year: courseYear === "all" ? null : courseYear,
+        link: `/course/${courseId}`,
         sent_by: "system",
       }).catch(err => console.warn("Auto-notification failed (material was uploaded):", err));
 
@@ -443,20 +457,30 @@ const AdminDashboard = () => {
       console.error("Failed to fetch templates", e);
     }
 
-    const notifTitleBulk = bulkTitleTemplate
+    const courseYear = course?.academic_year || "all";
+    const yearName = yearLabel(courseYear, "ar");
+
+    let notifTitleBulk = bulkTitleTemplate
       .replace(/{count}/g, successCount.toString())
       .replace(/{type}/g, typeLabel)
       .replace(/{courseName}/g, courseName);
 
-    const notifMessageBulk = bulkMessageTemplate
+    let notifMessageBulk = bulkMessageTemplate
       .replace(/{count}/g, successCount.toString())
       .replace(/{type}/g, typeLabel)
       .replace(/{courseName}/g, courseName);
+
+    if (notifTitleBulk.startsWith("تم رفع")) {
+      notifTitleBulk = `📚 طلاب ${yearName}: نزل ${successCount} ملفات جديدة في ${courseName}`;
+      notifMessageBulk = `تم رفع ${successCount} ${typeLabel || "ملف"} في مقرر ${courseName}. ادخل واطّلع على أحدث الملفات وحمّلها للمشاهدة بدون إنترنت!`;
+    }
 
     db.addNotification({
       title: notifTitleBulk,
       message: notifMessageBulk,
       target_audience: "all",
+      target_year: courseYear === "all" ? null : courseYear,
+      link: `/course/${courseId}`,
       sent_by: "system",
     }).catch(err => console.warn("Auto-notification failed (bulk upload):", err));
 

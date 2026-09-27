@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { AlertCircle, Clock, Volume2, X } from "lucide-react";
+import { AlertCircle, Clock, Volume2, X, Sparkles } from "lucide-react";
 import { db, type Announcement, type Material, type Course } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
 import { useYear } from "@/hooks/use-year";
@@ -13,6 +13,7 @@ const AnnouncementBanner = () => {
   const { year } = useYear();
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [urgentAssignments, setUrgentAssignments] = useState<{ id: string; title: string; course: string; hoursLeft: number; minutesLeft: number }[]>([]);
+  const [recentUpdates, setRecentUpdates] = useState<{ id: string; title: string; course: string; courseId: string }[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   // Track which banner sections have been dismissed (urgent / normal)
@@ -68,6 +69,27 @@ const AnnouncementBanner = () => {
           .sort((a, b) => a.minutesLeft - b.minutesLeft);
           
         setUrgentAssignments(urgent);
+
+        // Find recent materials uploaded in the last 72 hours for the visitor's year
+        const threeDaysAgo = new Date(Date.now() - 72 * 60 * 60 * 1000);
+        const recent = materials
+          .filter(m => !m.archived && !m.deleted_at && m.created_at && new Date(m.created_at) > threeDaysAgo)
+          .filter(m => {
+            if (!year || year === "all") return true;
+            const course = courses.find(c => c.id === m.course_id);
+            return (course?.academic_year || "1") === year;
+          })
+          .slice(0, 3)
+          .map(m => {
+            const course = courses.find(c => c.id === m.course_id);
+            return {
+              id: m.id,
+              title: m.pdf_display_name || m.title,
+              course: course ? (lang === "ar" ? course.name : course.code) : "",
+              courseId: m.course_id
+            };
+          });
+        setRecentUpdates(recent);
       } catch (e) {
         console.error("Failed to fetch announcements:", e);
       }
@@ -91,6 +113,18 @@ const AnnouncementBanner = () => {
       bg: "bg-red-500/20 border-red-500/40 text-red-600 dark:text-red-400 font-medium",
       pulse: true,
       link: null as string | null | undefined
+    })),
+    ...recentUpdates.map(u => ({
+      type: 'update',
+      id: `upd-${u.id}`,
+      content: lang === "ar"
+        ? `🔥 ملفات ومحاضرات حديثة: تم إضافة "${u.title}" في مقرر ${u.course} — اضغط للاطلاع والتحميل!`
+        : `🔥 Recent Files: New "${u.title}" in ${u.course} — Click to view & download!`,
+      icon: Sparkles,
+      color: "text-amber-500",
+      bg: "bg-amber-500/15 border-amber-500/35 text-amber-700 dark:text-amber-300 font-semibold shadow-md",
+      pulse: false,
+      link: `/course/${u.courseId}`
     })),
     ...announcements.map(a => {
       const isUrgent = a.content.startsWith("[URGENT]");

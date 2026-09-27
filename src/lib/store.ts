@@ -550,7 +550,7 @@ export const db = {
       headers['Authorization'] = `Bearer ${session.access_token}`;
     }
     const { error: pushError } = await supabase.functions.invoke('send-push', {
-      body: { title: notif.title, message: notif.message, target_audience: notif.target_audience, target_year: notif.target_year },
+      body: { title: notif.title, message: notif.message, target_audience: notif.target_audience, target_year: notif.target_year, link: notif.link },
       headers,
     });
     

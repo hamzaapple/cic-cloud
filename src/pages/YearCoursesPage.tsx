@@ -8,6 +8,7 @@ import { BulkOfflineDownloadButton } from "@/components/BulkOfflineDownloadButto
 import { playBackSfx, playClickSfx } from "@/hooks/use-sfx";
 import { useEffect } from "react";
 import { setPushAudience } from "@/lib/push-registration";
+import { setStoredYear } from "@/lib/year-context";
 import { slugify } from "@/lib/utils";
 
 const container: Variants = {
@@ -28,6 +29,7 @@ const YearCoursesPage = () => {
 
   useEffect(() => {
     setPushAudience(yearId === "2b" ? "bachelor" : "all");
+    if (yearId) setStoredYear(yearId);
   }, [yearId]);
 
   const { data: departments = [] } = useQuery({

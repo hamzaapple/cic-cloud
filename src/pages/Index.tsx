@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { db } from "@/lib/store";
 import { BulkOfflineDownloadButton } from "@/components/BulkOfflineDownloadButton";
 import { playClickSfx } from "@/hooks/use-sfx";
+import { setStoredYear } from "@/lib/year-context";
 
 const YEARS = [
   { id: "1", name_ar: "الفرقة الأولى", name_en: "First Year", icon: GraduationCap, color: "190 80% 45%", route: "departments", desc_ar: "المواد العامة والأساسية", desc_en: "General & Basic Courses" },
@@ -45,7 +46,10 @@ const YearCard = ({ year, idx }: { year: typeof YEARS[0], idx: number }) => {
     >
       <Link 
         to={targetRoute} 
-        onClick={() => playClickSfx()} 
+        onClick={() => {
+          playClickSfx();
+          setStoredYear(year.id);
+        }} 
         className="block h-full outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-2xl"
         style={{ "--year-color": `hsl(${year.color})` } as React.CSSProperties}
       >

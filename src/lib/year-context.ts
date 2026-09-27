@@ -1,4 +1,6 @@
-// Stores which academic year (صف) the visitor belongs to, so the calendar,
+import { setPushYear } from "@/lib/push-registration";
+
+// Stores which academic year (صف/فرقة) the visitor belongs to, so the calendar,
 // schedule and notifications only show that year's content.
 const KEY = "cic_year";
 const EVENT = "cic-year-change";
@@ -8,10 +10,10 @@ export type AcademicYear = string;
 
 export const yearLabel = (year: string, lang: string) => {
   const ar: Record<string, string> = {
-    "1": "الصف الأول",
-    "2": "الصف الثاني",
-    "3": "الصف الثالث",
-    "4": "الصف الرابع",
+    "1": "الفرقة الأولى",
+    "2": "الفرقة الثانية",
+    "3": "الفرقة الثالثة",
+    "4": "الفرقة الرابعة",
     "2b": "الصف الثاني - بكالوريا",
   };
   const en: Record<string, string> = {
@@ -35,6 +37,7 @@ export const getStoredYear = (): string | null => {
 export const setStoredYear = (year: string) => {
   try {
     localStorage.setItem(KEY, year);
+    setPushYear(year).catch(() => undefined);
   } catch {
     /* ignore */
   }
