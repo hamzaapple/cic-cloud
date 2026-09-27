@@ -3,13 +3,16 @@ import { motion } from "framer-motion";
 import { Calendar, Link2, Menu, X, BookOpen, CalendarDays, Globe, Volume2, VolumeX, Home } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import NotificationBell from "./NotificationBell";
-import { useState, useMemo } from "react";
+import { useState, useMemo, lazy, Suspense } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSfx, playClickSfx } from "@/hooks/use-sfx";
 import { useYear } from "@/hooks/use-year";
 import { useOfflineStorage } from "@/hooks/use-offline-storage";
 import { HardDrive } from "lucide-react";
-import { OfflineFilesModal } from "./OfflineFilesModal";
+
+const OfflineFilesModal = lazy(() =>
+  import("./OfflineFilesModal").then((m) => ({ default: m.OfflineFilesModal }))
+);
 
 const Navbar = () => {
   const location = useLocation();
@@ -148,10 +151,14 @@ const Navbar = () => {
         </motion.div>
       }
 
-      <OfflineFilesModal
-        open={offlineModalOpen}
-        onOpenChange={setOfflineModalOpen}
-      />
+      {offlineModalOpen && (
+        <Suspense fallback={null}>
+          <OfflineFilesModal
+            open={offlineModalOpen}
+            onOpenChange={setOfflineModalOpen}
+          />
+        </Suspense>
+      )}
     </motion.nav>
   );
 };

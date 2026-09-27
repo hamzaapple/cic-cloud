@@ -22,9 +22,25 @@ registerRoute(
   new NavigationRoute(createHandlerBoundToURL('/index.html'), {
     denylist: [
       new RegExp('^/pdfjs-viewer/'),
-      new RegExp('^/api/'),
-      new RegExp('\\.[a-zA-Z0-9]+$')
+      new RegExp('^/api/')
     ]
+  })
+);
+
+// ─── 3.1) Cache-first for all same-origin static chunks (/assets/*.js, /assets/*.css)
+registerRoute(
+  ({ url }) => url.origin === self.location.origin && url.pathname.startsWith('/assets/'),
+  new CacheFirst({
+    cacheName: 'cic-assets-v1',
+    plugins: [
+      new CacheableResponsePlugin({
+        statuses: [0, 200],
+      }),
+      new ExpirationPlugin({
+        maxEntries: 150,
+        maxAgeSeconds: 30 * 24 * 60 * 60,
+      }),
+    ],
   })
 );
 

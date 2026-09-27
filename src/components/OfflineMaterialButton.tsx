@@ -52,15 +52,27 @@ export const OfflineMaterialButton = ({ url, className }: { url: string; classNa
 
   if (cached) {
     return (
-      <button
-        onClick={handleToggle}
-        className={cn("flex items-center gap-1.5 text-xs text-emerald-500 hover:text-destructive hover:bg-destructive/10 px-2 py-1 bg-emerald-500/10 rounded-full transition-all group cursor-pointer", className)}
-        title={lang === "ar" ? "متاح للمشاهدة بدون إنترنت (انقر للحذف)" : "Available offline (click to remove)"}
-      >
-        <CheckCircle2 className="w-3.5 h-3.5 group-hover:hidden" />
-        <Trash2 className="w-3.5 h-3.5 hidden group-hover:block" />
-        <span>{lang === "ar" ? "متاح أوفلاين" : "Offline Ready"}</span>
-      </button>
+      <div className={cn("flex items-center gap-[1px]", className)}>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            playClickSfx();
+            window.open(url, "_blank");
+          }}
+          className="flex items-center gap-1.5 text-xs text-emerald-500 hover:bg-emerald-500/20 px-2 py-1 bg-emerald-500/10 rounded-s-full transition-all cursor-pointer"
+          title={lang === "ar" ? "تصفح الملف أوفلاين" : "View Offline"}
+        >
+          <CheckCircle2 className="w-3.5 h-3.5" />
+          <span>{lang === "ar" ? "تصفح" : "View"}</span>
+        </button>
+        <button
+          onClick={handleToggle}
+          className="flex items-center text-xs text-emerald-500 hover:text-destructive hover:bg-destructive/10 px-2 py-1 bg-emerald-500/10 rounded-e-full transition-all cursor-pointer"
+          title={lang === "ar" ? "حذف من الذاكرة المحلية" : "Remove from offline storage"}
+        >
+          <Trash2 className="w-3.5 h-3.5" />
+        </button>
+      </div>
     );
   }
 
@@ -71,7 +83,7 @@ export const OfflineMaterialButton = ({ url, className }: { url: string; classNa
       title={lang === "ar" ? "حفظ للمشاهدة بدون إنترنت" : "Save for offline viewing"}
     >
       <HardDriveDownload className="w-3.5 h-3.5" />
-      <span className="hidden sm:inline">{lang === "ar" ? "تنزيل" : "Save"}</span>
+      <span>{lang === "ar" ? "تنزيل" : "Save"}</span>
     </button>
   );
 };

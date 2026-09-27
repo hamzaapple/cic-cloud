@@ -161,8 +161,8 @@ const MaterialCard = ({
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: Math.min(index * 0.03, 0.3), duration: 0.25, ease: "easeOut" }}
         whileHover={{ y: -4, scale: 1.01 }}
-        className={`glass-card rounded-xl p-5 group relative overflow-hidden ${material.archived ? "opacity-60" : ""} ${isHighlighted ? "ring-2 ring-primary ring-offset-2 ring-offset-background animate-pulse" : ""} ${material.is_reference ? "border border-amber-500/30 bg-amber-500/5 shadow-[0_0_15px_rgba(245,158,11,0.1)]" : ""}`}
-        style={{ ...style, ...(isHighlighted ? { animationDuration: "1.5s", animationIterationCount: "3" } : {}) }}
+        className={`glass-card rounded-xl p-5 group relative overflow-hidden ${material.archived ? "opacity-60" : ""} ${isHighlighted ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : ""} ${material.is_reference ? "border border-amber-500/30 bg-amber-500/5 shadow-[0_0_15px_rgba(245,158,11,0.1)]" : ""}`}
+        style={{ ...style }}
       >
         {/* Drag handle — only shown when DnD props are provided */}
         {dragHandleListeners && (
@@ -183,7 +183,7 @@ const MaterialCard = ({
             {(isRecent || material.is_reference) && (
               <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
                 {isRecent && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 animate-pulse">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
                     <Sparkles className="w-2.5 h-2.5" /> {lang === "ar" ? "جديد مُحدّث" : "Recently Added"}
                   </span>
                 )}

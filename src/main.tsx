@@ -30,10 +30,10 @@ if ("serviceWorker" in navigator) {
     }
   })();
 
-  // Reload when a new Service Worker takes control
+  // Reload when a new Service Worker takes control (only when online)
   let refreshing = false;
   navigator.serviceWorker.addEventListener("controllerchange", () => {
-    if (!refreshing) {
+    if (!refreshing && navigator.onLine) {
       refreshing = true;
       window.location.reload();
     }

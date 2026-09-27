@@ -25,25 +25,6 @@
     <!-- Redirect old domain → new domain instantly -->
     <script>
       if(location.hostname==="cic-cloud.lovable.app"){location.replace("https://cic-cloud.com"+location.pathname+location.search+location.hash)}
-      
-      // Force cache invalidation globally (Bust cache for all users immediately)
-      // IMPORTANT: Preserve cic-offline-materials-v1 (user-saved PDFs/videos)
-      var currentVersion = "2.2.1";
-      if (localStorage.getItem("app_cache_version") !== currentVersion) {
-        localStorage.setItem("app_cache_version", currentVersion);
-        if ('caches' in window) {
-          caches.keys().then(function(names) {
-            return Promise.all(
-              names.filter(function(n) { return n !== "cic-offline-materials-v1"; })
-                   .map(function(n) { return caches.delete(n); })
-            );
-          }).then(function() {
-            window.location.reload();
-          });
-        } else {
-          window.location.reload();
-        }
-      }
     </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
