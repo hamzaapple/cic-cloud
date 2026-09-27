@@ -67,6 +67,8 @@ export interface Material {
   is_reference?: boolean | null;
   archived: boolean;
   sort_order?: number | null;
+  video_url?: string | null;
+  deleted_at?: string | null;
   created_at: string;
 }
 
@@ -287,7 +289,7 @@ export const db = {
   },
   reorderCategories: async (orderedIds: string[]) => {
     const updates = orderedIds.map((id, index) =>
-      supabase.from("material_categories").update({ display_order: index }).eq("id", id)
+      supabase.from("material_categories").update({ display_order: index } as Record<string, number>).eq("id", id)
     );
     const results = await Promise.all(updates);
     const failed = results.find(r => r.error);
@@ -366,6 +368,7 @@ export const db = {
     is_assignment?: boolean;
     is_list?: boolean;
     list_content?: string | null;
+    is_reference?: boolean | null;
   }) => {
     const { data, error } = await supabase.from("materials").insert({
       ...material,

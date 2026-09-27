@@ -112,7 +112,8 @@ const AnnouncementBanner = () => {
       color: "text-red-500",
       bg: "bg-red-500/20 border-red-500/40 text-red-600 dark:text-red-400 font-medium",
       pulse: true,
-      link: null as string | null | undefined
+      link: null as string | null | undefined,
+      customColor: undefined as string | undefined
     })),
     ...recentUpdates.map(u => ({
       type: 'update',
@@ -124,7 +125,8 @@ const AnnouncementBanner = () => {
       color: "text-amber-500",
       bg: "bg-amber-500/15 border-amber-500/35 text-amber-700 dark:text-amber-300 font-semibold shadow-md",
       pulse: false,
-      link: `/course/${u.courseId}`
+      link: `/course/${u.courseId}`,
+      customColor: undefined as string | undefined
     })),
     ...announcements.map(a => {
       const isUrgent = a.content.startsWith("[URGENT]");
