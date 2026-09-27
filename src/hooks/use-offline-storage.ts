@@ -149,6 +149,20 @@ export function useOfflineStorage() {
     return successCount === total;
   }, [isSupported, isCached, saveToOffline]);
 
+  const clearAllOffline = useCallback(async () => {
+    if (!isSupported) return false;
+    try {
+      const cache = await caches.open(CACHE_NAME);
+      const keys = await cache.keys();
+      await Promise.all(keys.map(k => cache.delete(k)));
+      await refreshCacheInfo();
+      return true;
+    } catch (err) {
+      console.error('Failed to clear cache:', err);
+      return false;
+    }
+  }, [isSupported, refreshCacheInfo]);
+
   return {
     cachedItems,
     totalSize,
@@ -156,6 +170,8 @@ export function useOfflineStorage() {
     saveToOffline,
     saveMultipleToOffline,
     removeFromOffline,
+    clearAllOffline,
+    refreshCacheInfo,
     isCached,
     getCachedUrl,
     isSupported

@@ -5,15 +5,16 @@ import ThemeToggle from "./ThemeToggle";
 import NotificationBell from "./NotificationBell";
 import { useState, useMemo } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useI18n } from "@/lib/i18n";
-import { useSfx } from "@/hooks/use-sfx";
+import { useSfx, playClickSfx } from "@/hooks/use-sfx";
 import { useYear } from "@/hooks/use-year";
 import { useOfflineStorage } from "@/hooks/use-offline-storage";
 import { HardDrive } from "lucide-react";
+import { OfflineFilesModal } from "./OfflineFilesModal";
 
 const Navbar = () => {
   const location = useLocation();
   const [open, setOpen] = useState(false);
+  const [offlineModalOpen, setOfflineModalOpen] = useState(false);
   const isMobile = useIsMobile();
   const { t, lang, setLang } = useI18n();
   const { muted, toggleMute } = useSfx();
@@ -60,10 +61,20 @@ const Navbar = () => {
 
         <div className="flex items-center gap-1.5">
           {isSupported && totalSize > 0 && (
-            <div className="hidden sm:flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 text-xs font-medium border border-emerald-500/20" title={lang === "ar" ? "مساحة الملفات المحفوظة بدون إنترنت" : "Offline Storage Used"}>
-              <HardDrive className="w-3.5 h-3.5" />
-              <span className="font-mono">{formatSize(totalSize)}</span>
-            </div>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => {
+                playClickSfx();
+                setOfflineModalOpen(true);
+              }}
+              className="flex items-center gap-1 sm:gap-1.5 px-2 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-medium border border-emerald-500/30 transition-all cursor-pointer shadow-sm"
+              title={lang === "ar" ? "عرض وإدارة الملفات المحفوظة بدون إنترنت" : "View & manage offline files"}
+              aria-label="Offline downloaded files"
+            >
+              <HardDrive className="w-3.5 h-3.5 shrink-0" />
+              <span className="font-mono text-[11px] sm:text-xs font-bold">{formatSize(totalSize)}</span>
+            </motion.button>
           )}
           <div className="relative group">
             <motion.button
@@ -113,8 +124,34 @@ const Navbar = () => {
               </Link>
             );
           })}
+
+          {isSupported && (
+            <button
+              onClick={() => {
+                playClickSfx();
+                setOpen(false);
+                setOfflineModalOpen(true);
+              }}
+              className="w-full flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 mt-2 transition-colors cursor-pointer"
+            >
+              <div className="flex items-center gap-3">
+                <HardDrive className="w-4 h-4" />
+                <span>{lang === "ar" ? "الملفات المحفوظة بدون إنترنت" : "Offline Downloaded Files"}</span>
+              </div>
+              {totalSize > 0 && (
+                <span className="font-mono text-xs font-bold bg-emerald-500/20 px-2 py-0.5 rounded-full">
+                  {formatSize(totalSize)}
+                </span>
+              )}
+            </button>
+          )}
         </motion.div>
       }
+
+      <OfflineFilesModal
+        open={offlineModalOpen}
+        onOpenChange={setOfflineModalOpen}
+      />
     </motion.nav>
   );
 };
