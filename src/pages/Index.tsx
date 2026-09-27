@@ -2,16 +2,86 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { ArrowLeft, ArrowRight, BookOpen, Layers, Monitor, Cpu, GraduationCap, Network } from "lucide-react";
-import { playClickSfx } from "@/hooks/use-sfx";
 import { useEffect } from "react";
 import { setPushAudience } from "@/lib/push-registration";
+import { useQuery } from "@tanstack/react-query";
+import { db } from "@/lib/store";
+import { BulkOfflineDownloadButton } from "@/components/BulkOfflineDownloadButton";
 
 const YEARS = [
   { id: "1", name_ar: "الفرقة الأولى", name_en: "First Year", icon: GraduationCap, color: "190 80% 45%", route: "departments", desc_ar: "المواد العامة والأساسية", desc_en: "General & Basic Courses" },
   { id: "2", name_ar: "الفرقة الثانية", name_en: "Second Year", icon: Layers, color: "260 70% 55%", route: "departments", desc_ar: "التخصصات التقنية الأساسية", desc_en: "Core Technical Depts" },
   { id: "3", name_ar: "الفرقة الثالثة", name_en: "Third Year", icon: Monitor, color: "340 70% 55%", route: "departments", desc_ar: "دراسات متقدمة في التخصص", desc_en: "Advanced Studies" },
   { id: "4", name_ar: "الفرقة الرابعة", name_en: "Fourth Year", icon: Cpu, color: "30 80% 50%", route: "departments", desc_ar: "مشاريع التخرج والتطبيقات", desc_en: "Graduation Projects" },
+  { id: "4", name_ar: "الفرقة الرابعة", name_en: "Fourth Year", icon: Cpu, color: "30 80% 50%", route: "departments", desc_ar: "مشاريع التخرج والتطبيقات", desc_en: "Graduation Projects" },
 ];
+
+const YearCard = ({ year, idx }: { year: typeof YEARS[0], idx: number }) => {
+  const { lang } = useI18n();
+  const targetRoute = `/year/${year.id}/${year.route}`;
+  
+  // Fetch courses for this year to get their IDs
+  const { data: allCourses = [] } = useQuery({
+    queryKey: ["courses"],
+    queryFn: db.getCourses
+  });
+  
+  const yearCourses = allCourses.filter(c => (c.academic_year || "1") === year.id);
+  
+  // Fetch material URLs for this year's courses
+  const { data: yearUrls = [] } = useQuery({
+    queryKey: ["year-urls", yearCourses.map(c => c.id)],
+    queryFn: () => db.getMaterialUrlsForCourses(yearCourses.map(c => c.id)),
+    enabled: yearCourses.length > 0
+  });
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.4 + (idx * 0.1), duration: 0.4, ease: "easeOut" }}
+      className="relative group h-full"
+    >
+      <Link 
+        to={targetRoute} 
+        onClick={() => playClickSfx()} 
+        className="block h-full outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-2xl"
+        style={{ "--year-color": `hsl(${year.color})` } as React.CSSProperties}
+      >
+        <div className="glass-card rounded-2xl py-8 px-6 h-full relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-white/20 flex flex-col items-center justify-center text-center">
+          
+          <div
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full blur-2xl opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity duration-500"
+            style={{ background: `hsl(${year.color})` }}
+          />
+
+          <div className="relative z-10 flex flex-col items-center h-full">
+            <h2 
+              className="text-6xl font-display font-black mb-2 transition-transform group-hover:scale-110 duration-300"
+              style={{ color: `hsl(${year.color})` }}
+            >
+              {year.id}
+            </h2>
+            <h3 className="font-display font-bold text-xl text-foreground group-hover:text-[var(--year-color)] transition-colors duration-300 mb-6">
+              {lang === "ar" ? year.name_ar : year.name_en}
+            </h3>
+          </div>
+        </div>
+      </Link>
+      
+      {/* Quick Download Button layered on top to not trigger the Link */}
+      <div className="absolute bottom-4 left-0 w-full flex justify-center z-20 pointer-events-none">
+        <div className="pointer-events-auto">
+          <BulkOfflineDownloadButton 
+            urls={yearUrls} 
+            label={{ ar: "حفظ الصف أوفلاين", en: "Save Year Offline" }} 
+            className="rounded-full shadow-lg border-white/10 backdrop-blur-md bg-background/80 hover:bg-background"
+          />
+        </div>
+      </div>
+    </motion.div>
+  );
+};
 
 const Index = () => {
   const { t, lang } = useI18n();
@@ -58,47 +128,9 @@ const Index = () => {
           transition={{ delay: 0.3, duration: 0.5 }}
           className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 max-w-4xl mx-auto"
         >
-          {YEARS.map((year, idx) => {
-            const targetRoute = `/year/${year.id}/${year.route}`;
-            const Icon = year.icon;
-            
-            return (
-              <motion.div 
-                key={year.id} 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 + (idx * 0.1), duration: 0.4, ease: "easeOut" }}
-              >
-                <Link 
-                  to={targetRoute} 
-                  onClick={() => playClickSfx()} 
-                  className="block h-full outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-2xl group"
-                  style={{ "--year-color": `hsl(${year.color})` } as React.CSSProperties}
-                >
-                  <div className="glass-card rounded-2xl py-8 px-6 h-full relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-white/20 flex flex-col items-center justify-center text-center group">
-                    
-                    {/* Centered Number Glow */}
-                    <div
-                      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full blur-2xl opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity duration-500"
-                      style={{ background: `hsl(${year.color})` }}
-                    />
-
-                    <div className="relative z-10">
-                      <h2 
-                        className="text-6xl font-display font-black mb-2 transition-transform group-hover:scale-110 duration-300"
-                        style={{ color: `hsl(${year.color})` }}
-                      >
-                        {year.id}
-                      </h2>
-                      <h3 className="font-display font-bold text-xl text-foreground group-hover:text-[var(--year-color)] transition-colors duration-300">
-                        {lang === "ar" ? year.name_ar : year.name_en}
-                      </h3>
-                    </div>
-                  </div>
-                </Link>
-              </motion.div>
-            );
-          })}
+          {YEARS.map((year, idx) => (
+            <YearCard key={year.id} year={year} idx={idx} />
+          ))}
         </motion.div>
       </div>
     </div>
