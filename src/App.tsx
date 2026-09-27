@@ -34,7 +34,16 @@ const AuditLog = lazy(() => import("./pages/AuditLog"));
 // Lazy load heavy visual components
 const ParticleBackground = lazy(() => import("./components/ParticleBackground"));
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      networkMode: 'offlineFirst',
+    },
+    mutations: {
+      networkMode: 'offlineFirst',
+    }
+  }
+});
 
 const AnimatedRoutes = () => {
   const location = useLocation();
