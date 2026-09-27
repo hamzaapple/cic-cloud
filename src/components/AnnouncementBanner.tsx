@@ -125,7 +125,8 @@ const AnnouncementBanner = () => {
       color: "text-amber-500",
       bg: "bg-amber-500/15 border-amber-500/35 text-amber-700 dark:text-amber-300 font-semibold shadow-md",
       pulse: false,
-      link: `/course/${u.courseId}`
+      link: `/course/${u.courseId}`,
+      customColor: undefined as string | undefined
     })),
     ...announcements.map(a => {
       const isUrgent = a.content.startsWith("[URGENT]");
