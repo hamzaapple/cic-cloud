@@ -281,10 +281,11 @@ const MaterialCard = ({
                           target="_blank" 
                           rel="noreferrer"
                           onClick={e => e.stopPropagation()}
-                          className="text-muted-foreground hover:text-primary transition-colors p-1 bg-secondary/50 rounded"
-                          title={lang === "ar" ? "تحميل" : "Download"}
+                          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary hover:bg-primary/10 px-2 py-1 bg-secondary/50 rounded-full transition-all cursor-pointer"
+                          title={lang === "ar" ? "تحميل على الجهاز" : "Download to Device"}
                         >
-                          <Download className="w-3 h-3" />
+                          <Download className="w-3.5 h-3.5" />
+                          <span>{lang === "ar" ? "تنزيل (للجهاز)" : "Download (Device)"}</span>
                         </a>
                         <OfflineMaterialButton url={material.pdf_url} />
                       </div>
@@ -310,10 +311,11 @@ const MaterialCard = ({
                           target="_blank" 
                           rel="noreferrer"
                           onClick={e => e.stopPropagation()}
-                          className="text-muted-foreground hover:text-primary transition-colors p-1 bg-secondary/50 rounded"
-                          title={lang === "ar" ? "تحميل" : "Download"}
+                          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary hover:bg-primary/10 px-2 py-1 bg-secondary/50 rounded-full transition-all cursor-pointer"
+                          title={lang === "ar" ? "تحميل على الجهاز" : "Download to Device"}
                         >
-                          <Download className="w-3 h-3" />
+                          <Download className="w-3.5 h-3.5" />
+                          <span>{lang === "ar" ? "تنزيل (للجهاز)" : "Download (Device)"}</span>
                         </a>
                         <OfflineMaterialButton url={material.pdf_url} />
                       </div>
@@ -340,10 +342,11 @@ const MaterialCard = ({
                         target="_blank" 
                         rel="noreferrer"
                         onClick={e => e.stopPropagation()}
-                        className="text-muted-foreground hover:text-primary transition-colors p-1 bg-secondary/50 rounded"
-                        title={lang === "ar" ? "تحميل" : "Download"}
+                        className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary hover:bg-primary/10 px-2 py-1 bg-secondary/50 rounded-full transition-all cursor-pointer"
+                        title={lang === "ar" ? "تحميل على الجهاز" : "Download to Device"}
                       >
-                        <Download className="w-3 h-3" />
+                        <Download className="w-3.5 h-3.5" />
+                        <span>{lang === "ar" ? "تنزيل (للجهاز)" : "Download (Device)"}</span>
                       </a>
                       <OfflineMaterialButton url={material.pdf_url} />
                     </div>

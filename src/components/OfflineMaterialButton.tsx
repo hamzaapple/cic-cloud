@@ -63,7 +63,7 @@ export const OfflineMaterialButton = ({ url, className }: { url: string; classNa
           title={lang === "ar" ? "تصفح الملف أوفلاين" : "View Offline"}
         >
           <CheckCircle2 className="w-3.5 h-3.5" />
-          <span>{lang === "ar" ? "تصفح" : "View"}</span>
+          <span>{lang === "ar" ? "تصفح (بدون نت)" : "View Offline"}</span>
         </button>
         <button
           onClick={handleToggle}
@@ -83,7 +83,7 @@ export const OfflineMaterialButton = ({ url, className }: { url: string; classNa
       title={lang === "ar" ? "حفظ للمشاهدة بدون إنترنت" : "Save for offline viewing"}
     >
       <HardDriveDownload className="w-3.5 h-3.5" />
-      <span>{lang === "ar" ? "تنزيل" : "Save"}</span>
+      <span>{lang === "ar" ? "حفظ (بدون نت)" : "Save Offline"}</span>
     </button>
   );
 };
