@@ -18,16 +18,22 @@ try {
   console.warn("Navigation route registration failed:", e);
 }
 
+// Force instant activation for updates
+self.addEventListener("install", () => {
+  self.skipWaiting();
+});
+
 // CIC Cloud Service Worker — Push Notifications + Offline PWA
 // =============================================================
 // Strategy:
-//   • App Shell (HTML/CSS/JS/fonts/images): Cache-First with background update
+//   • Navigation (HTML): Network-First (with offline cache fallback to /index.html)
+//   • Hashed JS/CSS: Cache-First (immutable)
 //   • Supabase REST API: Network-First with cache fallback (stale data when offline)
 //   • Supabase Storage (PDFs/videos): Cache-First (immutable files)
 //   • Offline materials: Managed by cic-offline-materials-v1 cache (separate)
 // =============================================================
 
-const APP_SHELL_CACHE = "cic-app-shell-v3";
+const APP_SHELL_CACHE = "cic-app-shell-v4";
 const API_CACHE = "cic-api-data-v1";
 const FONT_CACHE = "cic-fonts-v1";
 const IMAGE_CACHE = "cic-images-v1";
@@ -78,8 +84,38 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // ── 5) Same-origin static assets (JS/CSS/images) → Stale-While-Revalidate ──
+  // ── 4) Same-origin static assets & Navigation ──
   if (url.origin === self.location.origin) {
+    // Navigation requests (HTML pages) → Network-First with cache fallback
+    if (event.request.mode === "navigate") {
+      // Don't intercept PDF.js viewer
+      if (url.pathname.startsWith("/pdfjs-viewer/")) {
+        return;
+      }
+      event.respondWith(
+        (async () => {
+          try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 2500);
+            const netRes = await fetch(event.request, { signal: controller.signal });
+            clearTimeout(timeoutId);
+            if (netRes.ok) {
+              const cache = await caches.open(APP_SHELL_CACHE);
+              cache.put(event.request, netRes.clone());
+              cache.put("/index.html", netRes.clone());
+              return netRes;
+            }
+          } catch (e) {
+            // Network failed or offline
+          }
+          const cache = await caches.open(APP_SHELL_CACHE);
+          const cached = (await cache.match(event.request)) || (await cache.match("/index.html"));
+          return cached || new Response("Offline", { status: 503 });
+        })()
+      );
+      return;
+    }
+
     // Hashed assets (/assets/xxx.abc123.js) → Cache-First (immutable)
     if (url.pathname.startsWith("/assets/")) {
       event.respondWith(cacheFirstWithNetwork(event.request, APP_SHELL_CACHE));

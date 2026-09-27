@@ -19,7 +19,8 @@ if ("serviceWorker" in navigator) {
       }
 
       // 2) Register our push-capable SW
-      await navigator.serviceWorker.register("/sw-push.js", { scope: "/" });
+      const reg = await navigator.serviceWorker.register("/sw-push.js", { scope: "/" });
+      reg.update().catch(() => undefined);
 
       // 3) Ensure subscription is valid
       const { ensurePushSubscription } = await import("./lib/push-resubscribe");
@@ -28,6 +29,15 @@ if ("serviceWorker" in navigator) {
       console.warn("[SW] Setup failed:", err);
     }
   })();
+
+  // Reload when a new Service Worker takes control
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (!refreshing) {
+      refreshing = true;
+      window.location.reload();
+    }
+  });
 
   navigator.serviceWorker.addEventListener("message", async (event) => {
     if (event.data?.type === "PUSH_SUBSCRIPTION_CHANGED") {
