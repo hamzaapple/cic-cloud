@@ -27,11 +27,12 @@ export const BulkOfflineDownloadButton = ({
   const [isDownloading, setIsDownloading] = useState(false);
   const [progress, setProgress] = useState({ completed: 0, total: 0 });
 
-  if (!isSupported || urls.length === 0) return null;
+  if (!isSupported) return null;
 
   // Filter out URLs that are already cached
   const uncachedUrls = urls.filter(url => !isCached(url));
-  const isAllCached = uncachedUrls.length === 0;
+  const isAllCached = urls.length > 0 && uncachedUrls.length === 0;
+  const isEmpty = urls.length === 0;
 
   const handleDownload = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -86,6 +87,21 @@ export const BulkOfflineDownloadButton = ({
       >
         <CheckCircle2 className="w-4 h-4" />
         <span>{lang === "ar" ? "متاح أوفلاين" : "Offline Ready"}</span>
+      </Button>
+    );
+  }
+
+  if (isEmpty) {
+    return (
+      <Button 
+        variant={variant} 
+        size={size}
+        disabled
+        className={cn("gap-2 w-full sm:w-auto opacity-50 cursor-not-allowed", className)}
+        title={lang === "ar" ? "لا توجد ملفات متاحة للتحميل" : "No files available to download"}
+      >
+        <HardDriveDownload className="w-4 h-4" />
+        <span>{label ? label[lang as "ar" | "en"] : (lang === "ar" ? defaultLabelAr : defaultLabelEn)}</span>
       </Button>
     );
   }

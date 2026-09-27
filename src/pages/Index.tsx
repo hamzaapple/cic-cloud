@@ -13,7 +13,6 @@ const YEARS = [
   { id: "2", name_ar: "الفرقة الثانية", name_en: "Second Year", icon: Layers, color: "260 70% 55%", route: "departments", desc_ar: "التخصصات التقنية الأساسية", desc_en: "Core Technical Depts" },
   { id: "3", name_ar: "الفرقة الثالثة", name_en: "Third Year", icon: Monitor, color: "340 70% 55%", route: "departments", desc_ar: "دراسات متقدمة في التخصص", desc_en: "Advanced Studies" },
   { id: "4", name_ar: "الفرقة الرابعة", name_en: "Fourth Year", icon: Cpu, color: "30 80% 50%", route: "departments", desc_ar: "مشاريع التخرج والتطبيقات", desc_en: "Graduation Projects" },
-  { id: "4", name_ar: "الفرقة الرابعة", name_en: "Fourth Year", icon: Cpu, color: "30 80% 50%", route: "departments", desc_ar: "مشاريع التخرج والتطبيقات", desc_en: "Graduation Projects" },
 ];
 
 const YearCard = ({ year, idx }: { year: typeof YEARS[0], idx: number }) => {
