@@ -27,16 +27,19 @@
       if(location.hostname==="cic-cloud.lovable.app"){location.replace("https://cic-cloud.com"+location.pathname+location.search+location.hash)}
       
       // Force cache invalidation globally (Bust cache for all users immediately)
-      var currentVersion = "1.0.1";
+      // IMPORTANT: Preserve cic-offline-materials-v1 (user-saved PDFs/videos)
+      var currentVersion = "2.0.0";
       if (localStorage.getItem("app_cache_version") !== currentVersion) {
         localStorage.setItem("app_cache_version", currentVersion);
-        // Clear caches API
         if ('caches' in window) {
           caches.keys().then(function(names) {
-            for (let name of names) caches.delete(name);
+            for (var i = 0; i < names.length; i++) {
+              if (names[i] !== "cic-offline-materials-v1") {
+                caches.delete(names[i]);
+              }
+            }
           });
         }
-        // Force hard reload (window.location.reload true is deprecated but still works in many browsers, otherwise it just reloads)
         window.location.reload();
       }
     </script>

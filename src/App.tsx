@@ -12,6 +12,7 @@ import InstallPrompt from "./components/InstallPrompt";
 import AnnouncementBanner from "./components/AnnouncementBanner";
 import DhikrBanner from "./components/DhikrBanner";
 import YearPickerModal from "./components/YearPickerModal";
+import OfflineBanner from "./components/OfflineBanner";
 
 import Index from "./pages/Index";
 import YearDepartmentsPage from "./pages/YearDepartmentsPage";
@@ -85,6 +86,7 @@ const AppContent = () => {
     <>
       <Suspense fallback={null}><ParticleBackground /></Suspense>
       <Navbar />
+      <OfflineBanner />
       <AnnouncementBanner />
       <DhikrBanner />
       <NotificationPrompt />
