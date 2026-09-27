@@ -6,7 +6,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Maximize, Minimize, Loader2 } from "lucide-react";
+import { Maximize, Minimize, Loader2, WifiOff } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useState, useCallback, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -99,6 +99,8 @@ const PdfViewerModal = ({
       ? `${displayName}.pdf`
       : `document.pdf`;
 
+  const isOfflineButNotCached = !navigator.onLine && !viewerUrl && !isLoading;
+
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent
@@ -147,7 +149,14 @@ const PdfViewerModal = ({
               <Loader2 className="w-8 h-8 animate-spin text-primary" />
             </div>
           )}
-          {open && viewerUrl && (
+          {isOfflineButNotCached && (
+             <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-background/95 z-10">
+                <WifiOff className="w-12 h-12 text-muted-foreground mb-4 opacity-20" />
+                <h3 className="text-lg font-semibold mb-2">غير متصل بالإنترنت</h3>
+                <p className="text-sm text-muted-foreground max-w-md">هذا الملف غير متوفر في الذاكرة المحلية (Offline Cache). يرجى الاتصال بالإنترنت لتحميله، ثم يمكنك مشاهدته لاحقاً بدون إنترنت.</p>
+             </div>
+          )}
+          {open && viewerUrl && !isOfflineButNotCached && (
             <iframe
               src={viewerUrl}
               className="w-full h-full border-0"

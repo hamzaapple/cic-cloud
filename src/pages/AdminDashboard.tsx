@@ -258,6 +258,11 @@ const AdminDashboard = () => {
 
     if (isAssignment && !isAssignmentOpenEnded && !deadline) { toast.error(t("admin.deadlineRequired")); return; }
 
+    if (!navigator.onLine) {
+      toast.error(lang === "ar" ? "لا يوجد اتصال بالإنترنت! يرجى الاتصال بالإنترنت أولاً." : "No internet connection! Please connect to the internet first.");
+      return;
+    }
+
     setUploading(true);
     try {
       let pdfUrl: string | null = null;
@@ -379,6 +384,12 @@ const AdminDashboard = () => {
 
     if (pdfFiles.length === 0) {
       toast.warning(t("admin.bulkNoPdfs"));
+      e.target.value = "";
+      return;
+    }
+
+    if (!navigator.onLine) {
+      toast.error(lang === "ar" ? "لا يوجد اتصال بالإنترنت! يرجى الاتصال بالإنترنت أولاً." : "No internet connection! Please connect to the internet first.");
       e.target.value = "";
       return;
     }
