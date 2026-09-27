@@ -289,7 +289,7 @@ export const db = {
   },
   reorderCategories: async (orderedIds: string[]) => {
     const updates = orderedIds.map((id, index) =>
-      supabase.from("material_categories").update({ display_order: index }).eq("id", id)
+      supabase.from("material_categories").update({ display_order: index } as Record<string, number>).eq("id", id)
     );
     const results = await Promise.all(updates);
     const failed = results.find(r => r.error);
