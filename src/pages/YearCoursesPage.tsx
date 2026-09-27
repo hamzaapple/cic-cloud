@@ -4,6 +4,7 @@ import { db } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { BulkOfflineDownloadButton } from "@/components/BulkOfflineDownloadButton";
 import { playBackSfx, playClickSfx } from "@/hooks/use-sfx";
 import { useEffect } from "react";
 import { setPushAudience } from "@/lib/push-registration";
@@ -82,6 +83,12 @@ const YearCoursesPage = () => {
     enabled: !!department,
   });
 
+  const { data: courseUrls = [] } = useQuery({
+    queryKey: ["course-urls", courses.map(c => c.id)],
+    queryFn: () => db.getMaterialUrlsForCourses(courses.map(c => c.id)),
+    enabled: courses.length > 0
+  });
+
   const Arrow = lang === "ar" ? ArrowLeft : ArrowRight;
   const BackArrow = lang === "ar" ? ArrowRight : ArrowLeft;
 
@@ -104,7 +111,17 @@ const YearCoursesPage = () => {
           <h1 className="text-3xl md:text-4xl font-display font-bold mb-2">
             {department ? (lang === "ar" ? department.name_ar : department.name_en) : (lang === "ar" ? "المواد الدراسية" : "Courses")}
           </h1>
-          <p className="text-muted-foreground">{t("dept.coursesIn")}</p>
+          <p className="text-muted-foreground mb-4">{t("dept.coursesIn")}</p>
+          
+          <div className="flex justify-center">
+            <BulkOfflineDownloadButton 
+              urls={courseUrls}
+              label={deptId 
+                ? { ar: "حفظ القسم أوفلاين", en: "Save Department Offline" }
+                : { ar: "حفظ جميع المواد أوفلاين", en: "Save All Courses Offline" }
+              }
+            />
+          </div>
         </motion.div>
 
         <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-1 sm:grid-cols-2 gap-4">

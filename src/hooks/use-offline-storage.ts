@@ -130,11 +130,29 @@ export function useOfflineStorage() {
     return null;
   };
 
+  const saveMultipleToOffline = useCallback(async (urls: string[], onProgress?: (completed: number, total: number) => void) => {
+    if (!isSupported) return false;
+    let successCount = 0;
+    const total = urls.length;
+    for (let i = 0; i < total; i++) {
+      const url = urls[i];
+      if (!isCached(url)) {
+        await saveToOffline(url);
+      }
+      successCount++;
+      if (onProgress) {
+        onProgress(successCount, total);
+      }
+    }
+    return successCount === total;
+  }, [isSupported, isCached, saveToOffline]);
+
   return {
     cachedItems,
     totalSize,
     formatSize,
     saveToOffline,
+    saveMultipleToOffline,
     removeFromOffline,
     isCached,
     getCachedUrl,

@@ -341,6 +341,18 @@ export const db = {
       .order("created_at", { ascending: false });
     return (data || []) as Material[];
   },
+  getMaterialUrlsForCourses: async (courseIds: string[]): Promise<string[]> => {
+    if (courseIds.length === 0) return [];
+    const { data } = await supabase.from("materials")
+      .select("pdf_url, video_url")
+      .in("course_id", courseIds)
+      .is("deleted_at", null)
+      .eq("archived", false);
+    
+    if (!data) return [];
+    
+    return data.flatMap(m => [m.pdf_url, m.video_url].filter(Boolean) as string[]);
+  },
   addMaterial: async (material: {
     title: string;
     type: string;

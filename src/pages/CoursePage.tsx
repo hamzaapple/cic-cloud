@@ -7,6 +7,7 @@ import { db, categoriesForDepartment } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
 import { useQuery } from "@tanstack/react-query";
 import MaterialCard from "@/components/MaterialCard";
+import { BulkOfflineDownloadButton } from "@/components/BulkOfflineDownloadButton";
 import { ArrowRight, ArrowLeft, FolderDown, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { playBackSfx, playClickSfx } from "@/hooks/use-sfx";
@@ -275,6 +276,14 @@ const CoursePage = () => {
           </div>
           <h1 className="text-3xl font-display font-bold">{tCourse(course.name)}</h1>
           <p className="text-muted-foreground mt-1">{course.description}</p>
+          
+          <div className="mt-4 flex flex-wrap gap-2">
+            <BulkOfflineDownloadButton 
+              urls={allMaterials.flatMap(m => [m.pdf_url, m.video_url].filter(Boolean) as string[])}
+              label={{ ar: "حفظ المقرر أوفلاين", en: "Save Course Offline" }}
+              variant="secondary"
+            />
+          </div>
         </motion.div>
 
         {/* Dynamic tabs from DB + Share button */}

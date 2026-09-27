@@ -4,6 +4,7 @@ import { db } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
 import { ArrowLeft, ArrowRight, Monitor, Brain } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { BulkOfflineDownloadButton } from "@/components/BulkOfflineDownloadButton";
 import { playBackSfx, playClickSfx } from "@/hooks/use-sfx";
 import { useEffect } from "react";
 import { setPushAudience } from "@/lib/push-registration";
@@ -44,6 +45,14 @@ const YearDepartmentsPage = () => {
     queryFn: db.getCourses
   });
 
+  const yearCourses = allCourses.filter(c => (c.academic_year || "1") === yearId);
+  
+  const { data: yearUrls = [] } = useQuery({
+    queryKey: ["year-urls", yearCourses.map(c => c.id)],
+    queryFn: () => db.getMaterialUrlsForCourses(yearCourses.map(c => c.id)),
+    enabled: yearCourses.length > 0
+  });
+
   // "Bachelor" is a hidden section (used outside the university) — listed only
   // inside the hidden "2b" year, never in the public departments grid.
   const departments = yearId === "2b"
@@ -75,9 +84,16 @@ const YearDepartmentsPage = () => {
           <h1 className="text-3xl md:text-5xl font-display font-bold mb-4">
             <span className="text-foreground">{yearName}</span>
           </h1>
-          <p className="text-lg text-muted-foreground max-w-md mx-auto">
+          <p className="text-lg text-muted-foreground max-w-md mx-auto mb-6">
             {t("dept.selectDepartment")}
           </p>
+          
+          <div className="flex justify-center">
+            <BulkOfflineDownloadButton 
+              urls={yearUrls}
+              label={{ ar: "حفظ الصف كاملاً أوفلاين", en: "Save Entire Year Offline" }}
+            />
+          </div>
         </motion.div>
 
         <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
