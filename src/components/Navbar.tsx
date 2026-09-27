@@ -8,6 +8,8 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useI18n } from "@/lib/i18n";
 import { useSfx } from "@/hooks/use-sfx";
 import { useYear } from "@/hooks/use-year";
+import { useOfflineStorage } from "@/hooks/use-offline-storage";
+import { HardDrive } from "lucide-react";
 
 const Navbar = () => {
   const location = useLocation();
@@ -16,6 +18,7 @@ const Navbar = () => {
   const { t, lang, setLang } = useI18n();
   const { muted, toggleMute } = useSfx();
   const { year } = useYear();
+  const { totalSize, formatSize, isSupported } = useOfflineStorage();
 
   const coursesRoute = useMemo(() => {
     if (!year) return "/";
@@ -56,6 +59,12 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center gap-1.5">
+          {isSupported && totalSize > 0 && (
+            <div className="hidden sm:flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 text-xs font-medium border border-emerald-500/20" title={lang === "ar" ? "مساحة الملفات المحفوظة بدون إنترنت" : "Offline Storage Used"}>
+              <HardDrive className="w-3.5 h-3.5" />
+              <span className="font-mono">{formatSize(totalSize)}</span>
+            </div>
+          )}
           <div className="relative group">
             <motion.button
               whileHover={{ scale: 1.1 }}

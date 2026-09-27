@@ -11,6 +11,7 @@ import { useState, lazy, Suspense } from "react";
 const PdfViewerModal = lazy(() => import("@/components/PdfViewerModal"));
 const VideoViewerModal = lazy(() => import("@/components/VideoViewerModal"));
 // const ExternalLinkModal = lazy(() => import("@/components/ExternalLinkModal"));
+import { OfflineMaterialButton } from "./OfflineMaterialButton";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -247,6 +248,7 @@ const MaterialCard = ({
                         >
                           <Download className="w-3 h-3" />
                         </a>
+                        <OfflineMaterialButton url={material.pdf_url} />
                       </div>
                     );
                   }
@@ -275,6 +277,7 @@ const MaterialCard = ({
                         >
                           <Download className="w-3 h-3" />
                         </a>
+                        <OfflineMaterialButton url={material.pdf_url} />
                       </div>
                     );
                   }
@@ -304,6 +307,7 @@ const MaterialCard = ({
                       >
                         <Download className="w-3 h-3" />
                       </a>
+                      <OfflineMaterialButton url={material.pdf_url} />
                     </div>
                   );
                 })()

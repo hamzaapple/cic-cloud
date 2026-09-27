@@ -10,6 +10,7 @@ import { Maximize, Minimize, Loader2 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useState, useCallback, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { useOfflineStorage } from "@/hooks/use-offline-storage";
 
 interface PdfViewerModalProps {
   open: boolean;
@@ -38,22 +39,48 @@ const PdfViewerModal = ({
     }
   }, [isMobile, open]);
 
-  // Set the PDF URL directly since we bypassed cross-origin restrictions in pdf.js
+  const { getCachedUrl } = useOfflineStorage();
+
   useEffect(() => {
     if (!open || !pdfUrl) return;
 
-    setViewerUrl(`/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(pdfUrl)}`);
-    
-    // Short timeout just for the initial iframe load, pdf.js has its own spinner
-    setIsLoading(true);
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
+    let cancelled = false;
+    let objectUrl: string | null = null;
+
+    const initViewer = async () => {
+      setIsLoading(true);
+      try {
+        const cachedUrl = await getCachedUrl(pdfUrl);
+        if (cancelled) return;
+        
+        if (cachedUrl) {
+          objectUrl = cachedUrl; // Save reference to revoke later
+          setViewerUrl(`/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(objectUrl)}`);
+        } else {
+          setViewerUrl(`/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(pdfUrl)}`);
+        }
+      } catch (err) {
+        console.error("PDF cache check error:", err);
+        if (!cancelled) setViewerUrl(`/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(pdfUrl)}`);
+      } finally {
+        if (!cancelled) {
+          // Short timeout just for the initial iframe load
+          setTimeout(() => {
+            if (!cancelled) setIsLoading(false);
+          }, 1000);
+        }
+      }
+    };
+
+    initViewer();
 
     return () => {
-      clearTimeout(timer);
+      cancelled = true;
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
     };
-  }, [open, pdfUrl]);
+  }, [open, pdfUrl, getCachedUrl]);
 
   const handleOpenChange = useCallback(
     (value: boolean) => {

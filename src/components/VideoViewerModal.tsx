@@ -11,8 +11,9 @@ import { useI18n } from "@/lib/i18n";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { playClickSfx } from "@/hooks/use-sfx";
 import { toast } from "sonner";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { useOfflineStorage } from "@/hooks/use-offline-storage";
 
 interface VideoViewerModalProps {
   open: boolean;
@@ -33,6 +34,37 @@ const VideoViewerModal = ({
   const isMobile = useIsMobile();
 
   const [isMaximized, setIsMaximized] = useState(false);
+  const [actualVideoUrl, setActualVideoUrl] = useState<string | null>(null);
+  
+  const { getCachedUrl } = useOfflineStorage();
+
+  useEffect(() => {
+    if (!open || !videoUrl) return;
+
+    let cancelled = false;
+    let objectUrl: string | null = null;
+
+    const initViewer = async () => {
+      const cachedUrl = await getCachedUrl(videoUrl);
+      if (cancelled) return;
+      
+      if (cachedUrl) {
+        objectUrl = cachedUrl;
+        setActualVideoUrl(cachedUrl);
+      } else {
+        setActualVideoUrl(videoUrl);
+      }
+    };
+
+    initViewer();
+
+    return () => {
+      cancelled = true;
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
+    };
+  }, [open, videoUrl, getCachedUrl]);
 
   const fileName = title ? `${title}.mp4` : (displayName ? `${displayName}.mp4` : `video.mp4`);
 
@@ -112,15 +144,17 @@ const VideoViewerModal = ({
 
         {/* Body */}
         <div className="flex-1 relative min-h-0 flex items-center justify-center bg-black">
-          <video
-            src={videoUrl}
-            controls
-            autoPlay
-            className="w-full h-full object-contain"
-            controlsList="nodownload"
-          >
-            {lang === "ar" ? "متصفحك لا يدعم تشغيل الفيديو." : "Your browser does not support the video tag."}
-          </video>
+          {actualVideoUrl && (
+            <video
+              src={actualVideoUrl}
+              controls
+              autoPlay
+              className="w-full h-full object-contain"
+              controlsList="nodownload"
+            >
+              {lang === "ar" ? "متصفحك لا يدعم تشغيل الفيديو." : "Your browser does not support the video tag."}
+            </video>
+          )}
         </div>
       </DialogContent>
     </Dialog>
