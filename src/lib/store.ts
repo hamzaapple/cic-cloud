@@ -647,17 +647,23 @@ export const db = {
   },
 
   /** Allowed file MIME types for upload */
-  ALLOWED_UPLOAD_TYPES: ['application/pdf', 'video/mp4', 'video/webm', 'video/ogg', 'video/quicktime'] as const,
+  ALLOWED_UPLOAD_TYPES: [
+    'application/pdf',
+    'video/mp4', 'video/webm', 'video/ogg', 'video/quicktime',
+    'audio/mpeg', 'audio/wav', 'audio/aac', 'audio/x-m4a', 'audio/m4a', 'audio/ogg'
+  ] as const,
 
   uploadPdf: async (file: File): Promise<string> => {
     // Validate file type
     const allowedTypes: readonly string[] = db.ALLOWED_UPLOAD_TYPES;
-    if (!allowedTypes.includes(file.type) && !file.name.toLowerCase().endsWith('.pdf')) {
-      throw new Error('نوع الملف غير مسموح به. يُسمح فقط بملفات PDF والفيديو.');
+    const allowedExtensions = ['.pdf', '.mp3', '.wav', '.m4a', '.aac', '.ogg'];
+    const hasAllowedExtension = allowedExtensions.some(ext => file.name.toLowerCase().endsWith(ext));
+    if (!allowedTypes.includes(file.type) && !hasAllowedExtension) {
+      throw new Error('نوع الملف غير مسموح به. يُسمح بملفات PDF، الفيديو، والصوتيات.');
     }
-    // Route videos to Cloudflare R2, PDFs to Supabase Storage
+    // Route videos/audios to Cloudflare R2, PDFs to Supabase Storage
     const { isVideoFile, uploadVideoToR2 } = await import("@/lib/r2");
-    if (isVideoFile(file)) {
+    if (isVideoFile(file) || file.type.startsWith('audio/') || hasAllowedExtension && !file.name.toLowerCase().endsWith('.pdf')) {
       return uploadVideoToR2(file);
     }
     // Use sanitized Supabase upload path for PDFs
@@ -668,12 +674,14 @@ export const db = {
   uploadPdfSanitized: async (file: File): Promise<string> => {
     // Validate file type
     const allowedTypes: readonly string[] = db.ALLOWED_UPLOAD_TYPES;
-    if (!allowedTypes.includes(file.type) && !file.name.toLowerCase().endsWith('.pdf')) {
-      throw new Error('نوع الملف غير مسموح به. يُسمح فقط بملفات PDF والفيديو.');
+    const allowedExtensions = ['.pdf', '.mp3', '.wav', '.m4a', '.aac', '.ogg'];
+    const hasAllowedExtension = allowedExtensions.some(ext => file.name.toLowerCase().endsWith(ext));
+    if (!allowedTypes.includes(file.type) && !hasAllowedExtension) {
+      throw new Error('نوع الملف غير مسموح به. يُسمح بملفات PDF، الفيديو، والصوتيات.');
     }
-    // Route videos to Cloudflare R2, PDFs to Supabase Storage
+    // Route videos/audios to Cloudflare R2, PDFs to Supabase Storage
     const { isVideoFile, uploadVideoToR2 } = await import("@/lib/r2");
-    if (isVideoFile(file)) {
+    if (isVideoFile(file) || file.type.startsWith('audio/') || hasAllowedExtension && !file.name.toLowerCase().endsWith('.pdf')) {
       return uploadVideoToR2(file);
     }
     return db._uploadToSupabase(file);

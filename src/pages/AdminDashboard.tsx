@@ -377,9 +377,10 @@ const AdminDashboard = () => {
       return;
     }
 
-    // Filter to PDF files only
+    // Filter to PDF, video, and audio files
+    const mediaExtensions = [".pdf", ".mp4", ".webm", ".mkv", ".avi", ".mov", ".mp3", ".wav", ".m4a", ".aac", ".ogg"];
     const pdfFiles = Array.from(fileList).filter(
-      (f) => f.type === "application/pdf" || f.name.toLowerCase().endsWith(".pdf")
+      (f) => f.type === "application/pdf" || f.type.startsWith("video/") || f.type.startsWith("audio/") || mediaExtensions.some(ext => f.name.toLowerCase().endsWith(ext))
     );
 
     if (pdfFiles.length === 0) {
@@ -407,7 +408,7 @@ const AdminDashboard = () => {
 
       // Derive a user-friendly title from the original file name (without extension)
       const originalName = file.name;
-      const friendlyTitle = originalName.replace(/\.pdf$/i, "");
+      const friendlyTitle = originalName.replace(/\.(pdf|mp4|webm|mkv|avi|mov|mp3|wav|m4a|aac|ogg)$/i, "");
 
       try {
         // Upload with sanitized storage path
@@ -813,8 +814,8 @@ const AdminDashboard = () => {
                           </div>
                           <p className="text-[11px] text-muted-foreground leading-relaxed">
                             {lang === "ar"
-                              ? "سيتم رفع ملفات PDF فقط من المجلد. الملفات الأخرى سيتم تجاهلها."
-                              : "Only PDF files from the folder will be uploaded. Other files will be ignored."}
+                              ? "سيتم رفع الملفات المدعومة فقط (PDF، فيديو، وصوتيات) من المجلد. الملفات الأخرى سيتم تجاهلها."
+                              : "Only supported files (PDF, Video, Audio) from the folder will be uploaded. Other files will be ignored."}
                           </p>
                           {uploading && bulkTotal > 0 && (
                             <div className="space-y-1.5">
@@ -835,7 +836,7 @@ const AdminDashboard = () => {
                         </div>
                       ) : pdfMode === "upload" ? (
                         <div className="space-y-1">
-                          <Input id="pdf-upload" type="file" accept=".pdf" onChange={e => setPdfFile(e.target.files?.[0] || null)} className="bg-secondary/50" />
+                          <Input id="pdf-upload" type="file" accept=".pdf,video/*,audio/*" onChange={e => setPdfFile(e.target.files?.[0] || null)} className="bg-secondary/50" />
                           {pdfFile && <p className="text-xs text-primary">{pdfFile.name}</p>}
                         </div>
                       ) : (

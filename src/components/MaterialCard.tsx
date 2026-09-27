@@ -233,6 +233,34 @@ const MaterialCard = ({
                   const isVideo = material.pdf_url.match(/\.(mp4|webm|ogg|mov|mkv|avi|mp3|wav|m4a|aac)$/i) || material.pdf_display_name?.match(/\.(mp4|webm|ogg|mov|mkv|avi|mp3|wav|m4a|aac)$/i);
                   const isSupabaseDoc = material.pdf_url.includes("supabase.co") && !isVideo;
                   
+                  const getDownloadUrl = (url: string) => {
+                    try {
+                      const urlObj = new URL(url);
+                      if (urlObj.hostname.includes("supabase.co")) {
+                        const pathParts = urlObj.pathname.split('/');
+                        const filename = pathParts[pathParts.length - 1];
+                        const extMatch = filename.match(/\.[0-9a-z]+$/i);
+                        let ext = extMatch ? extMatch[0] : '';
+                        
+                        if (!ext) {
+                          if (isVideo) ext = '.mp4';
+                          else if (isSupabaseDoc) ext = '.pdf';
+                        }
+                        
+                        let name = material.pdf_display_name || material.title || "download";
+                        if (ext && !name.toLowerCase().endsWith(ext.toLowerCase())) {
+                          name = `${name}${ext}`;
+                        }
+                        urlObj.searchParams.set('download', name);
+                        return urlObj.toString();
+                      }
+                      return url;
+                    } catch (e) {
+                      return `${url}?download=`;
+                    }
+                  };
+                  const downloadUrl = getDownloadUrl(material.pdf_url);
+                  
                   if (isSupabaseDoc) {
                     return (
                       <div className="flex items-center gap-2">
@@ -248,7 +276,7 @@ const MaterialCard = ({
                           <FileText className="w-3 h-3" /> {material.pdf_display_name || t("pdfViewer.viewPdf")}
                         </button>
                         <a 
-                          href={`${material.pdf_url}?download=`} 
+                          href={downloadUrl} 
                           download 
                           target="_blank" 
                           rel="noreferrer"
@@ -277,7 +305,7 @@ const MaterialCard = ({
                           <PlayCircle className="w-3 h-3" /> {material.pdf_display_name || (lang === "ar" ? "تشغيل الميديا" : "Play Media")}
                         </button>
                         <a 
-                          href={material.pdf_url} 
+                          href={downloadUrl} 
                           download 
                           target="_blank" 
                           rel="noreferrer"
@@ -307,7 +335,7 @@ const MaterialCard = ({
                         <FileText className="w-3 h-3" /> {material.pdf_display_name || t("pdfViewer.viewPdf")}
                       </a>
                       <a 
-                        href={material.pdf_url} 
+                        href={downloadUrl} 
                         download 
                         target="_blank" 
                         rel="noreferrer"
