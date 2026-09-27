@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Bell, Send, Clock } from "lucide-react";
+import { Bell, Send, Clock, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { safeFormatDate } from "@/lib/utils";
 import { ar, enUS } from "date-fns/locale";
@@ -94,6 +94,39 @@ const NotificationManager = () => {
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? t("notif.sending") : t("notif.send")}
             </Button>
+
+            <div className="pt-3 border-t border-border/50">
+              <Button 
+                type="button" 
+                variant="outline" 
+                className="w-full text-xs text-amber-500 border-amber-500/30 hover:bg-amber-500/10 flex items-center justify-center gap-1.5"
+                disabled={loading}
+                onClick={async () => {
+                  const confirmed = window.confirm(lang === "ar" ? "هل تريد إرسال أمر تحديث ومسح الكاش فوراً لجميع أجهزة المستخدمين؟" : "Send update & cache clear command to all users?");
+                  if (!confirmed) return;
+                  setLoading(true);
+                  try {
+                    await db.addNotification({
+                      title: "تحديث جديد لمنصة CIC 🚀",
+                      message: "تم تحديث المنصة وتحسين الأداء. تم مسح الذاكرة المؤقتة تلقائياً لضمان ظهور أحدث نسخة.",
+                      target_audience: "all",
+                      target_year: null,
+                      link: "/",
+                      sent_by: "owner",
+                    });
+                    toast.success(lang === "ar" ? "تم إرسال أمر التحديث ومسح الكاش بنجاح!" : "Update & cache clear sent successfully!");
+                    await loadNotifications();
+                  } catch (err: any) {
+                    toast.error(err?.message || "فشل إرسال التحديث");
+                  } finally {
+                    setLoading(false);
+                  }
+                }}
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                {lang === "ar" ? "إرسال أمر مسح الكاش والتحديث للكل" : "Send Clear Cache & Update to All"}
+              </Button>
+            </div>
           </form>
         </div>
       </motion.div>

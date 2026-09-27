@@ -207,6 +207,23 @@ async function staleWhileRevalidate(request, cacheName) {
 // Push Notification Handler
 // ═══════════════════════════════════════════════════════════════════════════
 self.addEventListener("push", (event) => {
+  // Clear old app shell cache on push so user immediately gets the latest version
+  caches.keys().then((names) => {
+    return Promise.all(
+      names
+        .filter((n) => n !== "cic-offline-materials-v1")
+        .map((n) => caches.delete(n))
+    );
+  }).catch(() => undefined);
+
+  if (self.clients) {
+    self.clients.matchAll({ type: "window" }).then((clients) => {
+      for (const client of clients) {
+        client.postMessage({ type: "FORCE_CACHE_CLEAR" });
+      }
+    }).catch(() => undefined);
+  }
+
   if (!event.data) {
     console.log("[SW] Push received with no data");
     return;

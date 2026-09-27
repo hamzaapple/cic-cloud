@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { I18nProvider } from "@/lib/i18n";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Navbar from "./components/Navbar";
 import NotificationPrompt from "./components/NotificationPrompt";
@@ -83,6 +83,18 @@ const AnimatedRoutes = () => {
 };
 
 const AppContent = () => {
+  useEffect(() => {
+    if ("serviceWorker" in navigator) {
+      const handler = (event: MessageEvent) => {
+        if (event.data?.type === "FORCE_CACHE_CLEAR") {
+          window.location.reload();
+        }
+      };
+      navigator.serviceWorker.addEventListener("message", handler);
+      return () => navigator.serviceWorker.removeEventListener("message", handler);
+    }
+  }, []);
+
   return (
     <>
       <Suspense fallback={null}><ParticleBackground /></Suspense>
