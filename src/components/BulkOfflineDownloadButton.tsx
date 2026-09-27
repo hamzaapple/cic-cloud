@@ -25,7 +25,7 @@ export const BulkOfflineDownloadButton = ({
   const { isSupported, saveMultipleToOffline, isCached } = useOfflineStorage();
   const { lang } = useI18n();
   const [isDownloading, setIsDownloading] = useState(false);
-  const [progress, setProgress] = useState({ completed: 0, total: 0 });
+  const [progress, setProgress] = useState({ completed: 0, total: 0, pct: 0 });
 
   if (!isSupported) return null;
 
@@ -45,11 +45,11 @@ export const BulkOfflineDownloadButton = ({
     }
 
     setIsDownloading(true);
-    setProgress({ completed: 0, total: uncachedUrls.length });
+    setProgress({ completed: 0, total: uncachedUrls.length, pct: 0 });
     
     try {
-      const success = await saveMultipleToOffline(uncachedUrls, (completed, total) => {
-        setProgress({ completed, total });
+      const success = await saveMultipleToOffline(uncachedUrls, (completed, total, pct) => {
+        setProgress({ completed, total, pct });
       });
       
       if (success) {
@@ -69,9 +69,17 @@ export const BulkOfflineDownloadButton = ({
 
   if (isDownloading) {
     return (
-      <Button variant={variant} size={size} disabled className={cn("gap-2 w-full sm:w-auto", className)}>
-        <Loader2 className="w-4 h-4 animate-spin" />
-        <span>{lang === "ar" ? `جاري التحميل... ${progress.completed}/${progress.total}` : `Downloading... ${progress.completed}/${progress.total}`}</span>
+      <Button variant={variant} size={size} disabled className={cn("gap-2 w-full sm:w-auto relative overflow-hidden", className)}>
+        <div 
+          className="absolute inset-0 bg-primary/20 transition-all duration-300"
+          style={{ width: `${progress.pct}%` }}
+        />
+        <Loader2 className="w-4 h-4 animate-spin relative z-10" />
+        <span className="relative z-10 font-bold">
+          {lang === "ar" 
+            ? `جاري التحميل... ${progress.completed}/${progress.total} (${progress.pct}%)` 
+            : `Downloading... ${progress.completed}/${progress.total} (${progress.pct}%)`}
+        </span>
       </Button>
     );
   }
