@@ -18,14 +18,26 @@ self.addEventListener("activate", (event) => {
 });
 
 // ─── 3) SPA Navigation Route — serves precached index.html on ANY route offline
-registerRoute(
-  new NavigationRoute(createHandlerBoundToURL('/index.html'), {
-    denylist: [
-      new RegExp('^/pdfjs-viewer/'),
-      new RegExp('^/api/')
-    ]
-  })
-);
+try {
+  registerRoute(
+    new NavigationRoute(createHandlerBoundToURL('index.html'), {
+      denylist: [
+        new RegExp('^/pdfjs-viewer/'),
+        new RegExp('^/api/')
+      ]
+    })
+  );
+} catch (e) {
+  console.warn('[SW] Failed to bind to index.html, trying /index.html', e);
+  registerRoute(
+    new NavigationRoute(createHandlerBoundToURL('/index.html'), {
+      denylist: [
+        new RegExp('^/pdfjs-viewer/'),
+        new RegExp('^/api/')
+      ]
+    })
+  );
+}
 
 // ─── 3.1) Cache-first for all same-origin static chunks (/assets/*.js, /assets/*.css)
 registerRoute(

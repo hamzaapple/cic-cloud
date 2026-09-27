@@ -163,7 +163,7 @@ const AdminDashboard = () => {
   }, [user.role, user.departmentId, user.academicYear]);
 
   const sections: { key: string; label: string; icon: any }[] = [];
-  if (isOwner || auth.hasPermission("add_courses") || auth.hasPermission("add_pdf_existing") || auth.hasPermission("strict_add_only")) {
+  if (isOwner || auth.hasPermission("add_courses") || auth.hasPermission("add_pdf_existing") || auth.hasPermission("strict_add_only") || auth.hasPermission("edit_materials")) {
     sections.push({ key: "materials", label: t("admin.materials"), icon: Upload });
   }
   if (isOwner || auth.hasPermission("add_courses") || auth.hasPermission("edit_content")) {
@@ -240,7 +240,7 @@ const AdminDashboard = () => {
 
   const canAddMaterials = isOwner || auth.hasPermission("add_courses") || auth.hasPermission("add_pdf_existing") || auth.hasPermission("strict_add_only");
   const canDelete = isOwner || (auth.hasPermission("edit_content") && !auth.hasPermission("strict_add_only"));
-  const canEdit = isOwner || auth.hasPermission("edit_content");
+  const canEdit = isOwner || auth.hasPermission("edit_content") || auth.hasPermission("edit_materials");
   const isStrictAddOnly = !isOwner && auth.hasPermission("strict_add_only");
   const isPdfOnly = !isOwner && auth.hasPermission("add_pdf_existing") && !auth.hasPermission("add_courses");
   const canAddExtLinks = isOwner || auth.hasPermission("add_external_resources");

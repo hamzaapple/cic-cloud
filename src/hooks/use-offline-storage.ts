@@ -115,7 +115,7 @@ export function useOfflineStorage() {
     return cachedItems.some(item => item.url === url);
   }, [cachedItems]);
 
-  const getCachedUrl = async (url: string) => {
+  const getCachedUrl = useCallback(async (url: string) => {
     if (!isSupported) return null;
     try {
       const cache = await caches.open(CACHE_NAME);
@@ -128,7 +128,7 @@ export function useOfflineStorage() {
       console.error('Failed to get cached url:', err);
     }
     return null;
-  };
+  }, [isSupported]);
 
   const saveMultipleToOffline = useCallback(async (urls: string[], onProgress?: (completed: number, total: number, currentFilePct: number) => void) => {
     if (!isSupported) return false;

@@ -8,7 +8,8 @@ export type Permission =
   | "add_pdf_existing"
   | "announcements"
   | "add_external_resources"
-  | "manage_categories";
+  | "manage_categories"
+  | "edit_materials";
 
 export const PERMISSION_LABELS: Record<Permission, string> = {
   edit_content: "التعديل",
@@ -18,6 +19,7 @@ export const PERMISSION_LABELS: Record<Permission, string> = {
   announcements: "إعلان وإشعار",
   add_external_resources: "إضافة مصادر خارجية",
   manage_categories: "إدارة الأقسام الداخلية",
+  edit_materials: "تعديل بيانات الملفات المرفوعة (الاسم، الرابط، إلخ)",
 };
 
 export interface Department {
