@@ -118,10 +118,10 @@ const YearCoursesPage = () => {
           <div className="flex justify-center">
             <BulkOfflineDownloadButton 
               urls={courseUrls}
-              label={deptId 
-                ? { ar: "حفظ القسم أوفلاين", en: "Save Department Offline" }
-                : { ar: "حفظ جميع المواد أوفلاين", en: "Save All Courses Offline" }
-              }
+              label={{
+                ar: `تحميل الفصل الدراسي ${semesterId === "1" ? "الأول" : "الثاني"} أوفلاين (${courses.length} مقرر)`,
+                en: `Download Semester ${semesterId} Offline (${courses.length} courses)`,
+              }}
             />
           </div>
         </motion.div>
