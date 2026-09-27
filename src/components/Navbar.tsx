@@ -7,6 +7,7 @@ import { useState, useMemo, lazy, Suspense } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSfx, playClickSfx } from "@/hooks/use-sfx";
 import { useYear } from "@/hooks/use-year";
+import { useI18n } from "@/lib/i18n";
 import { useOfflineStorage } from "@/hooks/use-offline-storage";
 import { HardDrive } from "lucide-react";
 

@@ -112,7 +112,8 @@ const AnnouncementBanner = () => {
       color: "text-red-500",
       bg: "bg-red-500/20 border-red-500/40 text-red-600 dark:text-red-400 font-medium",
       pulse: true,
-      link: null as string | null | undefined
+      link: null as string | null | undefined,
+      customColor: undefined as string | undefined
     })),
     ...recentUpdates.map(u => ({
       type: 'update',

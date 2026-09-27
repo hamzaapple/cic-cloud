@@ -67,6 +67,8 @@ export interface Material {
   is_reference?: boolean | null;
   archived: boolean;
   sort_order?: number | null;
+  video_url?: string | null;
+  deleted_at?: string | null;
   created_at: string;
 }
 
@@ -366,6 +368,7 @@ export const db = {
     is_assignment?: boolean;
     is_list?: boolean;
     list_content?: string | null;
+    is_reference?: boolean | null;
   }) => {
     const { data, error } = await supabase.from("materials").insert({
       ...material,
