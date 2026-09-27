@@ -4,8 +4,9 @@ import { useI18n } from "@/lib/i18n";
 import { YEARS, yearLabel } from "@/lib/year-context";
 import { useYear } from "@/hooks/use-year";
 import { setPushYear } from "@/lib/push-registration";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "react-router-dom";
 import { db } from "@/lib/store";
 
 interface Props {
@@ -21,7 +22,10 @@ interface Props {
 const YearPickerModal = ({ open, onClose }: Props) => {
   const { lang } = useI18n();
   const { year, setYear } = useYear();
-  const visible = open ?? (!year || !localStorage.getItem("cic_dept_context"));
+  const location = useLocation();
+  // Never show the picker on admin/auth pages
+  const isAdminRoute = location.pathname.startsWith("/admin") || location.pathname.startsWith("/login");
+  const visible = !isAdminRoute && (open ?? (!year || !localStorage.getItem("cic_dept_context")));
   const [step, setStep] = useState<1 | 2>(!year ? 1 : 2);
   const [selectedYear, setSelectedYear] = useState<string | null>(year);
 
@@ -44,10 +48,13 @@ const YearPickerModal = ({ open, onClose }: Props) => {
     onClose?.();
   };
 
-  // If there are no departments for this year yet, just finish
-  if (step === 2 && availableDepts.length === 0 && selectedYear && allDepartments.length > 0 && allCourses.length > 0) {
-    chooseDept("all");
-  }
+  // If there are no departments for this year yet, just finish (side effect, not during render)
+  useEffect(() => {
+    if (step === 2 && availableDepts.length === 0 && selectedYear && allDepartments.length > 0 && allCourses.length > 0) {
+      chooseDept("all");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step, availableDepts.length, selectedYear, allDepartments.length, allCourses.length]);
 
   return (
     <AnimatePresence>
