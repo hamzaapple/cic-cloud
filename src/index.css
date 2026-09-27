@@ -93,7 +93,10 @@
 
 @layer utilities {
   .glass-card {
-    @apply bg-card/80 backdrop-blur-md border border-white/[0.08] shadow-sm transition-all duration-300;
+    @apply bg-card/90 md:bg-card/80 backdrop-blur-sm md:backdrop-blur-md border border-white/[0.08] shadow-sm transition-all duration-300;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transform: translateZ(0);
   }
 
   .glow-border {
@@ -109,7 +112,7 @@
                 radial-gradient(circle at 85% 30%, hsl(var(--primary)/0.12), transparent 25%);
     background-size: cover;
     background-position: center;
-    background-attachment: fixed;
+    /* mobile smooth */
   }
 
 }

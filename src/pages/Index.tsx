@@ -37,10 +37,11 @@ const YearCard = ({ year, idx }: { year: typeof YEARS[0], idx: number }) => {
 
   return (
     <motion.div 
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.4 + (idx * 0.1), duration: 0.4, ease: "easeOut" }}
+      transition={{ delay: 0.15 + (idx * 0.05), duration: 0.3, ease: "easeOut" }}
       className="relative group h-full"
+      style={{ willChange: "transform, opacity", transform: "translateZ(0)" }}
     >
       <Link 
         to={targetRoute} 
@@ -48,21 +49,24 @@ const YearCard = ({ year, idx }: { year: typeof YEARS[0], idx: number }) => {
         className="block h-full outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-2xl"
         style={{ "--year-color": `hsl(${year.color})` } as React.CSSProperties}
       >
-        <div className="glass-card rounded-2xl py-8 px-6 h-full relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-white/20 flex flex-col items-center justify-center text-center">
+        <div className="glass-card rounded-2xl pt-8 pb-16 px-6 h-full relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-white/20 flex flex-col items-center justify-center text-center min-h-[200px]">
           
+          {/* Smooth GPU radial gradient — Never clips into a rectangle/square on mobile iOS/Android */}
           <div
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full blur-2xl opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity duration-500"
-            style={{ background: `hsl(${year.color})` }}
+            className="absolute inset-0 pointer-events-none transition-opacity duration-500 opacity-25 group-hover:opacity-50"
+            style={{
+              background: `radial-gradient(circle at 50% 38%, hsl(${year.color} / 0.35) 0%, transparent 65%)`,
+            }}
           />
 
-          <div className="relative z-10 flex flex-col items-center h-full">
+          <div className="relative z-10 flex flex-col items-center justify-center">
             <h2 
-              className="text-6xl font-display font-black mb-2 transition-transform group-hover:scale-110 duration-300"
+              className="text-6xl md:text-7xl font-display font-black mb-1 transition-transform group-hover:scale-105 duration-300 select-none"
               style={{ color: `hsl(${year.color})` }}
             >
               {year.id}
             </h2>
-            <h3 className="font-display font-bold text-xl text-foreground group-hover:text-[var(--year-color)] transition-colors duration-300 mb-6">
+            <h3 className="font-display font-bold text-xl text-foreground group-hover:text-[var(--year-color)] transition-colors duration-300">
               {lang === "ar" ? year.name_ar : year.name_en}
             </h3>
           </div>
@@ -70,7 +74,7 @@ const YearCard = ({ year, idx }: { year: typeof YEARS[0], idx: number }) => {
       </Link>
       
       {/* Quick Download Button layered on top to not trigger the Link */}
-      <div className="absolute bottom-4 left-0 w-full flex justify-center z-20 pointer-events-none">
+      <div className="absolute bottom-3.5 left-0 w-full flex justify-center z-20 pointer-events-none px-4">
         <div 
           className="pointer-events-auto"
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
@@ -79,7 +83,7 @@ const YearCard = ({ year, idx }: { year: typeof YEARS[0], idx: number }) => {
           <BulkOfflineDownloadButton 
             urls={yearUrls} 
             label={{ ar: "حفظ الصف أوفلاين", en: "Save Year Offline" }} 
-            className="rounded-full shadow-lg border-white/10 backdrop-blur-md bg-background/80 hover:bg-background"
+            className="rounded-full shadow-md border-border/50 bg-background/90 hover:bg-background text-xs font-semibold px-4 py-1.5"
           />
         </div>
       </div>
@@ -96,22 +100,20 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-4 relative z-10">
+    <div className="min-h-screen pt-20 md:pt-24 pb-32 px-4 relative z-10">
       <div className="container mx-auto max-w-5xl">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="text-center mb-16"
+          transition={{ duration: 0.4, ease: "easeOut" }}
+          className="text-center mb-10 md:mb-16"
         >
-          <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-6xl font-display font-bold mb-4 tracking-tight">
-              <span className="text-gradient">CIC</span>
-            </h1>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto font-medium">
-              CA Interactive Cloud
-            </p>
-          </div>
+          <h1 className="text-4xl md:text-6xl font-display font-bold mb-3 tracking-tight">
+            <span className="text-gradient">CIC</span>
+          </h1>
+          <p className="text-base md:text-xl text-muted-foreground max-w-xl mx-auto font-medium">
+            CA Interactive Cloud
+          </p>
         </motion.div>
 
         <motion.div

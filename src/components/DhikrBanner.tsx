@@ -73,17 +73,28 @@ const DhikrBanner = () => {
             style={{ touchAction: "none" }} // Allows drag on mobile without scrolling page
           >
             <motion.div
-              animate={{ y: [0, -4, 0] }}
+              animate={{ y: [0, -3, 0] }}
               transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              className="backdrop-blur-xl border-2 border-emerald-500/40 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 shadow-[0_0_20px_rgba(16,185,129,0.3)]
-              flex items-center justify-center
-              rounded-full px-6 py-3 max-w-[90vw]
-              md:w-40 md:h-40 md:p-6 md:flex-col md:text-center"
+              className="backdrop-blur-md border border-emerald-500/40 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 shadow-[0_4px_16px_rgba(16,185,129,0.2)]
+              flex items-center justify-between gap-3
+              rounded-full px-4 py-2 max-w-[90vw]
+              md:w-40 md:h-40 md:p-6 md:flex-col md:text-center md:justify-center"
               dir="rtl"
             >
-              <p className="text-sm md:text-base font-bold leading-relaxed text-center select-none">
+              <p className="text-xs md:text-base font-bold leading-relaxed text-center select-none flex-1">
                 {DHIKR[index]}
               </p>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsVisible(false);
+                }}
+                className="w-4 h-4 rounded-full flex items-center justify-center text-emerald-600 dark:text-emerald-400 opacity-60 hover:opacity-100 transition-opacity text-xs"
+                title="إخفاء"
+              >
+                ✕
+              </button>
             </motion.div>
           </motion.div>
         )}
