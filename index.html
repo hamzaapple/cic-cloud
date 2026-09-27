@@ -28,19 +28,21 @@
       
       // Force cache invalidation globally (Bust cache for all users immediately)
       // IMPORTANT: Preserve cic-offline-materials-v1 (user-saved PDFs/videos)
-      var currentVersion = "2.0.0";
+      var currentVersion = "2.1.0";
       if (localStorage.getItem("app_cache_version") !== currentVersion) {
         localStorage.setItem("app_cache_version", currentVersion);
         if ('caches' in window) {
           caches.keys().then(function(names) {
-            for (var i = 0; i < names.length; i++) {
-              if (names[i] !== "cic-offline-materials-v1") {
-                caches.delete(names[i]);
-              }
-            }
+            return Promise.all(
+              names.filter(function(n) { return n !== "cic-offline-materials-v1"; })
+                   .map(function(n) { return caches.delete(n); })
+            );
+          }).then(function() {
+            window.location.reload();
           });
+        } else {
+          window.location.reload();
         }
-        window.location.reload();
       }
     </script>
     <div id="root"></div>
