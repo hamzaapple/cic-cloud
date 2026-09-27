@@ -7,6 +7,7 @@ import { setPushAudience } from "@/lib/push-registration";
 import { useQuery } from "@tanstack/react-query";
 import { db } from "@/lib/store";
 import { BulkOfflineDownloadButton } from "@/components/BulkOfflineDownloadButton";
+import { playClickSfx } from "@/hooks/use-sfx";
 
 const YEARS = [
   { id: "1", name_ar: "الفرقة الأولى", name_en: "First Year", icon: GraduationCap, color: "190 80% 45%", route: "departments", desc_ar: "المواد العامة والأساسية", desc_en: "General & Basic Courses" },
