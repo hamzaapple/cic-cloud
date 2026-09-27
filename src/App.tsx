@@ -53,7 +53,7 @@ const AnimatedRoutes = () => {
   }
 
   return (
-    <AnimatePresence initial={false}>
+    <AnimatePresence initial={false} mode="wait">
       <motion.div
         key={animationKey}
         initial={{ opacity: 0, y: 10 }}

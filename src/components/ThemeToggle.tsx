@@ -13,7 +13,7 @@ const ThemeToggle = () => {
       className="relative p-2 rounded-lg bg-secondary text-secondary-foreground overflow-hidden w-9 h-9 flex items-center justify-center"
       aria-label="Toggle theme"
     >
-      <AnimatePresence initial={false}>
+      <AnimatePresence initial={false} mode="wait">
         {theme === "dark" ? (
           <motion.div
             key="sun"
