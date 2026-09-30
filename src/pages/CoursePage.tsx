@@ -11,7 +11,7 @@ import { BulkOfflineDownloadButton } from "@/components/BulkOfflineDownloadButto
 import { ArrowRight, ArrowLeft, FolderDown, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { playBackSfx, playClickSfx } from "@/hooks/use-sfx";
-import { slugify } from "@/lib/utils";
+import { slugify, findCourseBySlug } from "@/lib/utils";
 
 
 const CoursePage = () => {

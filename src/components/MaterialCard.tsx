@@ -4,7 +4,7 @@ import type { Material, MaterialCategory, Course } from "@/lib/store";
 import { db } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
 import { isPast } from "date-fns";
-import { safeFormatDate, slugify } from "@/lib/utils";
+import { safeFormatDate, slugify, coursePath } from "@/lib/utils";
 import { ar, enUS } from "date-fns/locale";
 import { playClickSfx } from "@/hooks/use-sfx";
 import { useState, lazy, Suspense } from "react";
