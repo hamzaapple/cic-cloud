@@ -16,8 +16,9 @@ import NotificationManager from "@/components/admin/NotificationManager";
 import CategoryManager from "@/components/admin/CategoryManager";
 import AnnouncementManager from "@/components/admin/AnnouncementManager";
 import NotificationTemplateManager from "@/components/admin/NotificationTemplateManager";
+import { ScheduleManager } from "@/components/admin/ScheduleManager";
 import AuditLog from "./AuditLog";
-import { ShieldAlert, Megaphone } from "lucide-react";
+import { ShieldAlert, Megaphone, Calendar } from "lucide-react";
 import { yearLabel } from "@/lib/year-context";
 import {
   DndContext,
@@ -178,6 +179,9 @@ const AdminDashboard = () => {
   if (isOwner || auth.hasPermission("manage_categories")) {
     sections.push({ key: "categories", label: t("admin.categories"), icon: Layers });
   }
+  if (isOwner) {
+    sections.push({ key: "schedules", label: lang === "ar" ? "الجداول الدراسية" : "Schedules", icon: Calendar });
+  }
   if (isOwner || auth.hasPermission("announcements")) {
     sections.push({ key: "announcements", label: lang === "ar" ? "الإعلانات العامة" : "Announcements", icon: Megaphone });
   }
@@ -239,7 +243,7 @@ const AdminDashboard = () => {
   if (!user.role) return <div className="min-h-screen" />;
 
   const canAddMaterials = isOwner || auth.hasPermission("add_courses") || auth.hasPermission("add_pdf_existing") || auth.hasPermission("strict_add_only");
-  const canDelete = isOwner || (auth.hasPermission("edit_content") && !auth.hasPermission("strict_add_only"));
+  const canDelete = isOwner || auth.hasPermission("delete_materials");
   const canEdit = isOwner || auth.hasPermission("edit_content") || auth.hasPermission("edit_materials");
   const isStrictAddOnly = !isOwner && auth.hasPermission("strict_add_only");
   const canEditMaterials = isOwner || auth.hasPermission("edit_materials");
@@ -247,11 +251,16 @@ const AdminDashboard = () => {
   const canAddExtLinks = isOwner || auth.hasPermission("add_external_resources");
 
   // Filter courses by department, year, and semester
-  const filteredCourses = courses.filter(c => 
-    (deptFilter === "all" || c.department_id === deptFilter) &&
-    (yearFilter === "all" || c.academic_year === yearFilter) &&
-    (semesterFilter === "all" || c.semester === semesterFilter)
-  );
+  const filteredCourses = courses.filter(c => {
+    // If it's a moderator and the course is from a different department/year, it's a shared course
+    // which they should always have access to regardless of the current filters.
+    const isSharedCourseForMod = user.role === "moderator" && (c.department_id !== user.departmentId || c.academic_year !== user.academicYear);
+    if (isSharedCourseForMod) return true;
+    
+    return (deptFilter === "all" || c.department_id === deptFilter) &&
+           (yearFilter === "all" || c.academic_year === yearFilter) &&
+           (semesterFilter === "all" || c.semester === semesterFilter);
+  });
 
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1016,6 +1025,7 @@ const AdminDashboard = () => {
         {activeSection === "notification_templates" && isOwner && <NotificationTemplateManager />}
         {activeSection === "announcements" && (isOwner || auth.hasPermission("announcements")) && <AnnouncementManager />}
         {activeSection === "categories" && (isOwner || auth.hasPermission("manage_categories")) && <CategoryManager />}
+        {activeSection === "schedules" && isOwner && <ScheduleManager />}
         {activeSection === "moderators" && isOwner && <ManageModerators departments={departments} />}
         {activeSection === "audit_logs" && isOwner && <AuditLog courses={courses} categories={categories} onUpdate={loadData} />}
       </div>

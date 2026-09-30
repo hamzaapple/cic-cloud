@@ -9,7 +9,8 @@ export type Permission =
   | "announcements"
   | "add_external_resources"
   | "manage_categories"
-  | "edit_materials";
+  | "edit_materials"
+  | "delete_materials";
 
 export const PERMISSION_LABELS: Record<Permission, string> = {
   edit_content: "التعديل",
@@ -20,6 +21,7 @@ export const PERMISSION_LABELS: Record<Permission, string> = {
   add_external_resources: "إضافة مصادر خارجية",
   manage_categories: "إدارة الأقسام الداخلية",
   edit_materials: "تعديل بيانات الملفات المرفوعة (الاسم، الرابط، إلخ)",
+  delete_materials: "حذف المواد والمقررات",
 };
 
 export interface Department {

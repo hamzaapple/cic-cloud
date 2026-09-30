@@ -83,6 +83,11 @@ export function openLink(raw: string | null | undefined, navigate?: (to: string)
       return;
     }
   } catch { /* ignore */ }
-  const w = window.open(url, "_blank", "noopener,noreferrer");
-  if (!w) window.location.assign(url); // popup blocked (common in installed app mode)
+  const a = document.createElement("a");
+  a.href = url;
+  a.target = "_blank";
+  a.rel = "noopener noreferrer";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }

@@ -59,6 +59,7 @@ const ManageModerators = ({ departments }: Props) => {
   const [selectedPerms, setSelectedPerms] = useState<Permission[]>([]);
   const [selectedDeptId, setSelectedDeptId] = useState<string>("");
   const [selectedYear, setSelectedYear] = useState<string>("1");
+  const [selectedSharedCourses, setSelectedSharedCourses] = useState<string[]>([]);
   const [filterYear, setFilterYear] = useState<string>("all");
 
   // Edit modal state
@@ -100,15 +101,24 @@ const ManageModerators = ({ departments }: Props) => {
     if (selectedPerms.length === 0) { toast.error(t("mod.selectOnePerm")); return; }
     if (!selectedDeptId) { toast.error(t("mod.selectDeptRequired")); return; }
     if (moderators.some(m => m.username === username)) { toast.error(t("mod.usernameExists")); return; }
-    await db.addModerator({
-      username, password, display_name: displayName,
-      permissions: selectedPerms,
-      department_id: selectedDeptId || null,
-      academic_year: selectedYear,
-    });
-    await loadMods();
-    setUsername(""); setPassword(""); setDisplayName(""); setSelectedPerms([]); setSelectedDeptId(""); setSelectedYear("1");
-    toast.success(t("mod.addedSuccess"));
+    try {
+      const newMod = await db.addModerator({
+        username, password, display_name: displayName,
+        permissions: selectedPerms,
+        department_id: selectedDeptId || null,
+        academic_year: selectedYear,
+      });
+
+      if (selectedSharedCourses.length > 0 && newMod?.id) {
+        await Promise.all(selectedSharedCourses.map(id => db.addModeratorCourseAccess(newMod.id, id)));
+      }
+
+      await loadMods();
+      setUsername(""); setPassword(""); setDisplayName(""); setSelectedPerms([]); setSelectedDeptId(""); setSelectedYear("1"); setSelectedSharedCourses([]);
+      toast.success(t("mod.addedSuccess"));
+    } catch (err: any) {
+      toast.error(err.message || "حدث خطأ");
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -187,8 +197,11 @@ const ManageModerators = ({ departments }: Props) => {
     return dept ? (lang === "ar" ? dept.name_ar : dept.name_en) : "";
   };
 
-  // Courses NOT in the moderator's department (for shared courses)
+  // Courses NOT in the moderator's department (for shared courses in EDIT modal)
   const externalCourses = editDeptId ? allCourses.filter(c => c.department_id !== editDeptId) : allCourses;
+
+  // Courses NOT in the moderator's department (for shared courses in ADD modal)
+  const addExternalCourses = selectedDeptId ? allCourses.filter(c => c.department_id !== selectedDeptId) : allCourses;
 
   const editAllSelected = ALL_PERMISSIONS.every(p => editPerms.includes(p));
 
@@ -251,6 +264,29 @@ const ManageModerators = ({ departments }: Props) => {
                 </label>
               ))}
             </div>
+
+            <div className="space-y-2 pt-2 border-t border-border/50">
+              <p className="text-sm font-medium text-muted-foreground">{t("mod.externalCourseAccess")}</p>
+              {addExternalCourses.length === 0 ? (
+                <p className="text-xs text-muted-foreground">{lang === "ar" ? "لا توجد مقررات خارجية" : "No external courses"}</p>
+              ) : (
+                <div className="max-h-40 overflow-y-auto space-y-1.5 border border-border/30 rounded-lg p-2 bg-background/50">
+                  {addExternalCourses.map(c => (
+                    <label key={c.id} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-secondary/20 p-1 rounded">
+                      <Checkbox
+                        checked={selectedSharedCourses.includes(c.id)}
+                        onCheckedChange={() => setSelectedSharedCourses(prev =>
+                          prev.includes(c.id) ? prev.filter(id => id !== c.id) : [...prev, c.id]
+                        )}
+                      />
+                      <span>{c.name}</span>
+                      <span className="text-[10px] text-muted-foreground">({getDeptName(c.department_id)})</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+
             <Button type="submit" className="w-full">{t("mod.addBtn")}</Button>
           </form>
         </div>

@@ -2,7 +2,7 @@ import { useState, useRef, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useI18n } from "@/lib/i18n";
 import { useYear } from "@/hooks/use-year";
-import { csScheduleData, cyberScheduleData, aiScheduleData, DAYS_ORDER, PERIODS_ORDER, ScheduleEntry, AllSchedules } from "@/lib/schedule-data";
+import { csScheduleData, cyberScheduleData, aiScheduleData, DAYS_ORDER, PERIODS_ORDER, ScheduleEntry, DeptSchedule } from "@/lib/schedule-data";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Download, CalendarDays, Merge, Sparkles, Pencil, X, Check, Trash2, Monitor, Brain, Shield } from "lucide-react";
@@ -22,7 +22,7 @@ interface EditingCell {
 
 type ScheduleDept = "cs" | "cyber" | "ai";
 
-const DEPT_SCHEDULES: Record<ScheduleDept, AllSchedules> = {
+const DEPT_SCHEDULES: Record<ScheduleDept, DeptSchedule> = {
   cs: csScheduleData,
   cyber: cyberScheduleData,
   ai: aiScheduleData,
@@ -42,6 +42,7 @@ const SchedulePage = () => {
   };
 
   const [selectedDept, setSelectedDept] = useState<ScheduleDept>(getDefaultDept);
+  const [selectedSemester, setSelectedSemester] = useState<string>("1");
   const [selected, setSelected] = useState<string[]>([]);
   const [showCommon, setShowCommon] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -55,7 +56,8 @@ const SchedulePage = () => {
   const commonScheduleRef = useRef<HTMLDivElement>(null);
   const optimizedScheduleRef = useRef<HTMLDivElement>(null);
   
-  const currentScheduleData = DEPT_SCHEDULES[selectedDept];
+  const yearKey = year || "1";
+  const currentScheduleData = DEPT_SCHEDULES[selectedDept]?.[yearKey]?.[selectedSemester] || {};
   const allSections = Object.keys(currentScheduleData);
   const hasData = allSections.length > 0;
 
@@ -271,8 +273,15 @@ const SchedulePage = () => {
     const allResults: Array<Array<{ day: string; period: string; entry: ScheduleEntry; section: string }>> = [];
     const currentAssignment: Array<{ day: string; period: string; entry: ScheduleEntry; section: string }> = [];
     const usedSlots = new Set<string>();
+    
+    let iterations = 0;
+    const MAX_RESULTS = 50;
+    const MAX_ITERATIONS = 50000;
 
     const backtrackAll = (reqIndex: number): void => {
+      if (allResults.length >= MAX_RESULTS || iterations >= MAX_ITERATIONS) return;
+      iterations++;
+
       if (reqIndex === requirements.length) {
         // Found a valid assignment - save a copy
         allResults.push([...currentAssignment]);
@@ -281,6 +290,8 @@ const SchedulePage = () => {
 
       const req = requirements[reqIndex];
       for (const opt of req.options) {
+        if (allResults.length >= MAX_RESULTS || iterations >= MAX_ITERATIONS) break;
+        
         const slotKey = `${opt.day}-${opt.period}`;
         if (!usedSlots.has(slotKey)) {
           // Try this option
@@ -565,15 +576,7 @@ const SchedulePage = () => {
           <p className="text-muted-foreground mb-8">{t("schedule.subtitle")}</p>
         </motion.div>
 
-        {year && year !== "1" ? (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card rounded-2xl p-12 text-center mt-8">
-            <CalendarDays className="w-16 h-16 mx-auto mb-4 text-primary/30" />
-            <p className="text-lg font-display font-semibold text-muted-foreground">
-              {lang === "ar" ? "الجدول لسه مش متاح لصفك الدراسي" : "Schedule is not available yet for your year"}
-            </p>
-          </motion.div>
-        ) : (
-          <>
+        <>
             {/* Department Toggle - Hidden for CS-only context */}
             {!isCSOnly && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
@@ -591,6 +594,18 @@ const SchedulePage = () => {
               <Button variant={selectedDept === "ai" ? "default" : "outline"} size="sm" onClick={() => handleDeptChange("ai")} className="gap-2">
                 <Brain className="w-4 h-4" /> {t("schedule.aiDept")}
               </Button>
+            </div>
+            
+            <div className="mt-4 pt-4 border-t border-border">
+              <p className="text-sm font-medium text-muted-foreground mb-3">{lang === "ar" ? "اختر الفصل الدراسي:" : "Select Semester:"}</p>
+              <div className="flex gap-2">
+                <Button variant={selectedSemester === "1" ? "default" : "outline"} size="sm" onClick={() => { setSelectedSemester("1"); setSelected([]); }}>
+                  {lang === "ar" ? "الترم الأول" : "First Semester"}
+                </Button>
+                <Button variant={selectedSemester === "2" ? "default" : "outline"} size="sm" onClick={() => { setSelectedSemester("2"); setSelected([]); }}>
+                  {lang === "ar" ? "الترم الثاني" : "Second Semester"}
+                </Button>
+              </div>
             </div>
           </motion.div>
         )}
@@ -1045,9 +1060,8 @@ const SchedulePage = () => {
             )}
           </TabsContent>
         </Tabs>
-          )}
-          </>
-        )}
+      )}
+      </>
       </div>
     </div>
   );
