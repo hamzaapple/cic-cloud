@@ -375,7 +375,7 @@ const MaterialCard = ({
                   const courseObj = courses.find(c => c.id === material.course_id);
                   let url: URL;
                   if (courseObj) {
-                    url = new URL(window.location.origin + `/${courseObj.academic_year || "1"}/${courseObj.semester || "2"}/${slugify(courseObj.name)}`);
+                    url = new URL(window.location.origin + coursePath(courseObj, courses));
                   } else {
                     url = new URL(window.location.origin + `/course/${material.course_id}`);
                   }
@@ -384,7 +384,7 @@ const MaterialCard = ({
                     const cat = categories?.find(c => c.id === material.category_id);
                     if (courseObj && cat) {
                        const catSlug = slugify(cat.name_en) || slugify(cat.name_ar) || cat.id;
-                       url = new URL(window.location.origin + `/${courseObj.academic_year || "1"}/${courseObj.semester || "2"}/${slugify(courseObj.name)}/${catSlug}`);
+                       url = new URL(window.location.origin + `${coursePath(courseObj, courses)}/${catSlug}`);
                     } else {
                        url.searchParams.set("category", material.category_id);
                     }

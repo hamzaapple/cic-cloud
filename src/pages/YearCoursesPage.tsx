@@ -9,7 +9,7 @@ import { playBackSfx, playClickSfx } from "@/hooks/use-sfx";
 import { useEffect } from "react";
 import { setPushAudience } from "@/lib/push-registration";
 import { setStoredYear } from "@/lib/year-context";
-import { slugify } from "@/lib/utils";
+import { coursePath } from "@/lib/utils";
 
 const container: Variants = {
   hidden: { opacity: 0 },
@@ -51,10 +51,10 @@ const YearCoursesPage = () => {
   });
 
   // Get the actual shared courses (or all courses if no deptId)
+  // Always loaded: also needed to build unique links for same-named courses in different departments
   const { data: allCourses = [] } = useQuery({
     queryKey: ["courses", "all"],
     queryFn: db.getCourses,
-    enabled: sharedCourseIds.length > 0 || !deptId,
   });
 
   const sharedCourses = allCourses.filter(c => sharedCourseIds.includes(c.id));
@@ -134,7 +134,7 @@ const YearCoursesPage = () => {
           ) : (
             courses.map((course) =>
               <motion.div key={course.id} variants={item}>
-                <Link to={`/${course.academic_year || "1"}/${course.semester || "2"}/${slugify(course.name)}`} onClick={() => playClickSfx()}>
+                <Link to={coursePath(course, allCourses)} onClick={() => playClickSfx()}>
                   <motion.div
                     whileHover={{ y: -6, scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}

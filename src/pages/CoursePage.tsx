@@ -22,15 +22,9 @@ const CoursePage = () => {
 
   const { data: courses = [] } = useQuery({ queryKey: ["courses"], queryFn: db.getCourses });
   
-  const course = courses.find(c => {
-    if (id) return c.id === id;
-    if (yearId && semesterId && courseSlug) {
-      return (c.academic_year || "1") === yearId && 
-             (c.semester || "2") === semesterId && 
-             slugify(c.name) === courseSlug;
-    }
-    return false;
-  });
+  const course = id
+    ? courses.find(c => c.id === id)
+    : (yearId && semesterId && courseSlug ? findCourseBySlug(courses, yearId, semesterId, courseSlug) : undefined);
 
   const { data: allMaterials = [] } = useQuery({ 
     queryKey: ["materials", course?.id], 
