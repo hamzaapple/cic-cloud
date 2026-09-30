@@ -60,7 +60,7 @@ function SortableAdminMaterialCard({
       <MaterialCard
         material={material} index={index} isAdmin
         showDelete={canDelete && !isStrictAddOnly}
-        showEdit={canEdit && !isStrictAddOnly}
+        showEdit={canEdit && (!isStrictAddOnly || canEditMaterials)}
         onArchive={canDelete ? handleArchive : undefined}
         onDelete={canDelete ? handleDelete : undefined}
         onUpdate={loadData}
@@ -242,6 +242,7 @@ const AdminDashboard = () => {
   const canDelete = isOwner || (auth.hasPermission("edit_content") && !auth.hasPermission("strict_add_only"));
   const canEdit = isOwner || auth.hasPermission("edit_content") || auth.hasPermission("edit_materials");
   const isStrictAddOnly = !isOwner && auth.hasPermission("strict_add_only");
+  const canEditMaterials = isOwner || auth.hasPermission("edit_materials");
   const isPdfOnly = !isOwner && auth.hasPermission("add_pdf_existing") && !auth.hasPermission("add_courses");
   const canAddExtLinks = isOwner || auth.hasPermission("add_external_resources");
 
@@ -949,7 +950,7 @@ const AdminDashboard = () => {
                   displayMaterials.map((m, i) => (
                     <MaterialCard key={m.id} material={m} index={i} isAdmin
                       showDelete={canDelete && !isStrictAddOnly}
-                      showEdit={canEdit && !isStrictAddOnly}
+                      showEdit={canEdit && (!isStrictAddOnly || canEditMaterials)}
                       onArchive={canDelete ? handleArchive : undefined}
                       onDelete={canDelete ? handleDelete : undefined}
                       onUpdate={loadData}
