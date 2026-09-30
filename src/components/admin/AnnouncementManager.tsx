@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Megaphone, Trash2, Clock } from "lucide-react";
 import { toast } from "sonner";
-import { safeFormatDate } from "@/lib/utils";
+import { safeFormatDate, normalizeLink } from "@/lib/utils";
 import { ar, enUS } from "date-fns/locale";
 
 const AnnouncementManager = () => {

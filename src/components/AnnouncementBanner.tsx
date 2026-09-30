@@ -12,6 +12,7 @@ const AUTO_DISMISS_MS = 10_000; // 10 seconds
 
 const AnnouncementBanner = () => {
   const { lang } = useI18n();
+  const navigate = useNavigate();
   const { year } = useYear();
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [urgentAssignments, setUrgentAssignments] = useState<{ id: string; title: string; course: string; hoursLeft: number; minutesLeft: number }[]>([]);
