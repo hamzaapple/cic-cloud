@@ -217,7 +217,7 @@ const AnnouncementManager = () => {
                     </div>
                   )}
                   {ann.link && (
-                    <a href={ann.link} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline mt-2 inline-block">
+                    <a href={normalizeLink(ann.link) || "#"} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline mt-2 inline-block">
                       {ann.link}
                     </a>
                   )}

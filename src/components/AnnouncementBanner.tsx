@@ -5,6 +5,8 @@ import { db, type Announcement, type Material, type Course } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
 import { useYear } from "@/hooks/use-year";
 import { differenceInHours } from "date-fns";
+import { useNavigate } from "react-router-dom";
+import { openLink, extractFirstUrl } from "@/lib/utils";
 
 const AUTO_DISMISS_MS = 10_000; // 10 seconds
 
@@ -138,7 +140,7 @@ const AnnouncementBanner = () => {
         color: isUrgent ? "text-red-500" : "text-primary",
         bg: isUrgent ? "bg-red-500/20 border-red-500/40 text-red-600 dark:text-red-400 font-medium shadow-lg" : "bg-background/80 border-primary/20 shadow-lg text-foreground",
         pulse: isUrgent,
-        link: a.link,
+        link: a.link || extractFirstUrl(a.content),
         customColor: a.color
       };
     })
@@ -204,7 +206,7 @@ const AnnouncementBanner = () => {
               transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
               className={`backdrop-blur-xl border-2 rounded-full px-6 py-2.5 flex items-center gap-3 pointer-events-auto max-w-xl shadow-[0_0_20px_rgba(239,68,68,0.3)] ${urgentCurrent.bg} ${urgentCurrent.link ? 'cursor-pointer' : ''}`}
               onClick={() => {
-                if (urgentCurrent.link) window.open(urgentCurrent.link, '_blank');
+                if (urgentCurrent.link) openLink(urgentCurrent.link, navigate);
               }}
             >
               <div className={`p-1.5 rounded-full bg-background/80 ${urgentCurrent.color} shadow-sm`}>
@@ -249,7 +251,7 @@ const AnnouncementBanner = () => {
               color: normalCurrent.customColor
             } : undefined}
             onClick={() => {
-              if (normalCurrent.link) window.open(normalCurrent.link, '_blank');
+              if (normalCurrent.link) openLink(normalCurrent.link, navigate);
             }}
           >
             <div 

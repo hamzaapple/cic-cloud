@@ -49,3 +49,40 @@ export function findCourseBySlug<T extends SlugCourse>(courses: T[], yearId: str
   const inTerm = courses.filter((c) => (c.academic_year || "1") === yearId && (c.semester || "2") === semesterId);
   return inTerm.find((c) => courseSlug(c, courses) === slug) || inTerm.find((c) => slugify(c.name) === slug);
 }
+
+/** Turn whatever an admin typed ("t.me/x", "www.site.com", "/schedule", "https://…") into a usable link. */
+export function normalizeLink(raw?: string | null): string | null {
+  if (!raw) return null;
+  const v = raw.trim();
+  if (!v) return null;
+  if (v.startsWith("/")) return v;
+  if (/^(https?:|mailto:|tel:)/i.test(v)) return v;
+  return `https://${v.replace(/^\/+/, "")}`;
+}
+
+/** First URL written inside a piece of text, if any. */
+export function extractFirstUrl(text?: string | null): string | null {
+  if (!text) return null;
+  const m = text.match(/(https?:\/\/[^\s]+|www\.[^\s]+|t\.me\/[^\s]+)/i);
+  return m ? m[1].replace(/[)\].,،]+$/, "") : null;
+}
+
+/** Open a link: in-site paths stay in the app, external ones open in a new tab. */
+export function openLink(raw: string | null | undefined, navigate?: (to: string) => void) {
+  const url = normalizeLink(raw);
+  if (!url) return;
+  if (url.startsWith("/")) {
+    if (navigate) navigate(url); else window.location.assign(url);
+    return;
+  }
+  try {
+    const u = new URL(url);
+    if (u.origin === window.location.origin) {
+      const path = u.pathname + u.search + u.hash;
+      if (navigate) navigate(path); else window.location.assign(path);
+      return;
+    }
+  } catch { /* ignore */ }
+  const w = window.open(url, "_blank", "noopener,noreferrer");
+  if (!w) window.location.assign(url); // popup blocked (common in installed app mode)
+}
