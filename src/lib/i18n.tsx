@@ -244,6 +244,8 @@ const translations: Record<string, Record<Lang, string>> = {
   "perm.announcements": { ar: "إعلان وإشعار", en: "Announcements & Notifications" },
   "perm.add_external_resources": { ar: "إضافة مصادر خارجية", en: "Add External Resources" },
   "perm.manage_categories": { ar: "إدارة الأقسام الداخلية", en: "Manage Categories" },
+  "perm.edit_materials": { ar: "تعديل بيانات المقررات", en: "Edit Materials" },
+  "perm.delete_materials": { ar: "حذف المواد والمقررات", en: "Delete Materials" },
 
   // Schedule department
   "schedule.selectDept": { ar: "اختر القسم", en: "Select Department" },

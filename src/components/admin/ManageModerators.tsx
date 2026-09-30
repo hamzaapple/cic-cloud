@@ -18,7 +18,7 @@ import {
 
 const ALL_PERMISSIONS: Permission[] = [
   "edit_content", "add_courses", "strict_add_only",
-  "add_pdf_existing", "announcements", "add_external_resources", "manage_categories", "edit_materials",
+  "add_pdf_existing", "announcements", "add_external_resources", "manage_categories", "edit_materials", "delete_materials"
 ];
 
 interface Props {
