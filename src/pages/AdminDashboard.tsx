@@ -60,7 +60,7 @@ function SortableAdminMaterialCard({
       <MaterialCard
         material={material} index={index} isAdmin
         showDelete={canDelete && !isStrictAddOnly}
-        showEdit={canEdit && (!isStrictAddOnly || canEditMaterials)}
+        showEdit={canEdit}
         onArchive={canDelete ? handleArchive : undefined}
         onDelete={canDelete ? handleDelete : undefined}
         onUpdate={loadData}
@@ -938,7 +938,7 @@ const AdminDashboard = () => {
                         {displayMaterials.map((m, i) => (
                           <SortableAdminMaterialCard
                             key={m.id} material={m} index={i}
-                            canDelete={canDelete} canEdit={canEdit} isStrictAddOnly={isStrictAddOnly}
+                            canDelete={canDelete} canEdit={canEdit && (!isStrictAddOnly || canEditMaterials)} isStrictAddOnly={isStrictAddOnly}
                             handleArchive={handleArchive} handleDelete={handleDelete}
                             loadData={loadData} categories={categories} courses={courses}
                           />
