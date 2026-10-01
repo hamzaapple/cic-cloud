@@ -25,6 +25,7 @@
               "location": "معمل 203"
             }
           ],
+          "الثلاثاء": [],
           "الأربعاء": [
             {
               "period": "الفترة الأولى",
@@ -35,13 +36,13 @@
           ],
           "الخميس": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة الفكر الابداعي",
               "instructor": "Dr.Samah",
               "location": "online"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة لغة انجليزية",
               "instructor": "Dr.sameh",
               "location": "online"
@@ -63,6 +64,7 @@
               "location": "مدرج 5"
             }
           ],
+          "الإثنين": [],
           "الثلاثاء": [
             {
               "period": "الفترة الأولى",
@@ -81,13 +83,13 @@
           ],
           "الخميس": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة الفكر الابداعي",
               "instructor": "Dr.Samah",
               "location": "online"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة لغة انجليزية",
               "instructor": "Dr.sameh",
               "location": "online"
@@ -95,6 +97,7 @@
           ]
         },
         "3": {
+          "الأحد": [],
           "الإثنين": [
             {
               "period": "الفترة الأولى",
@@ -103,6 +106,7 @@
               "location": "lab-203 Al"
             }
           ],
+          "الثلاثاء": [],
           "الأربعاء": [
             {
               "period": "الفترة الأولى",
@@ -125,13 +129,13 @@
           ],
           "الخميس": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة الفكر الابداعي",
               "instructor": "Dr.Samah",
               "location": "online"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة لغة انجليزية",
               "instructor": "Dr.sameh",
               "location": "online"
@@ -141,7 +145,7 @@
         "4": {
           "الأحد": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة الكترونيات",
               "instructor": "Dr.Hayam",
               "location": "مدرج 5 اعلام"
@@ -157,13 +161,13 @@
           ],
           "الثلاثاء": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة مقدمة في علوم الحاسب",
               "instructor": "Dr. mohamed Elzwidy",
               "location": "مدرج 7"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة التفاضل والتكامل",
               "instructor": "Dr.Hamdy",
               "location": "مدرج 5 اعلام"
@@ -171,7 +175,7 @@
           ],
           "الأربعاء": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة فيزياء",
               "instructor": "Dr.Mahmoud abd elmohsen",
               "location": "مدرج 5 اعلام"
@@ -191,13 +195,13 @@
           ],
           "الخميس": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة الفكر الابداعي",
               "instructor": "Dr.Samah",
               "location": "online"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة لغة انجليزية",
               "instructor": "Dr.sameh",
               "location": "online"
@@ -207,7 +211,7 @@
         "5": {
           "الأحد": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة الكترونيات",
               "instructor": "Dr.Hayam",
               "location": "مدرج 5 اعلام"
@@ -235,7 +239,7 @@
           ],
           "الثلاثاء": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة مقدمة في علوم الحاسب",
               "instructor": "Dr. mohamed Elzwidy",
               "location": "مدرج 7"
@@ -253,7 +257,7 @@
               "location": "معمل 416"
             },
             {
-              "period": "محاضرة الفترة الرابعة",
+              "period": "الفترة الرابعة",
               "subject": "محاضرة التفاضل والتكامل",
               "instructor": "Dr.Hamdy",
               "location": "مدرج 5 اعلام"
@@ -261,7 +265,7 @@
           ],
           "الأربعاء": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة فيزياء",
               "instructor": "Dr.Mahmoud abd elmohsen",
               "location": "مدرج 5 اعلام"
@@ -269,13 +273,13 @@
           ],
           "الخميس": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة الفكر الابداعي",
               "instructor": "Dr.Samah",
               "location": "online"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة لغة انجليزية",
               "instructor": "Dr.sameh",
               "location": "online"
@@ -285,7 +289,7 @@
         "6": {
           "الأحد": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة الكترونيات",
               "instructor": "Dr.Hayam",
               "location": "مدرج 5 اعلام"
@@ -313,13 +317,13 @@
           ],
           "الثلاثاء": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة مقدمة في علوم الحاسب",
               "instructor": "Dr. mohamed Elzwidy",
               "location": "مدرج 7"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة التفاضل والتكامل",
               "instructor": "Dr.Hamdy",
               "location": "مدرج 5 اعلام"
@@ -327,7 +331,7 @@
           ],
           "الأربعاء": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة فيزياء",
               "instructor": "Dr.Mahmoud abd elmohsen",
               "location": "مدرج 5 اعلام"
@@ -341,13 +345,13 @@
           ],
           "الخميس": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة الفكر الابداعي",
               "instructor": "Dr.Samah",
               "location": "online"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة لغة انجليزية",
               "instructor": "Dr.sameh",
               "location": "online"
@@ -357,7 +361,7 @@
         "7": {
           "الأحد": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة الكترونيات",
               "instructor": "Dr.Hayam",
               "location": "مدرج 5 اعلام"
@@ -391,13 +395,13 @@
           ],
           "الثلاثاء": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة مقدمة في علوم الحاسب",
               "instructor": "Dr. mohamed Elzwidy",
               "location": "مدرج 7"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة التفاضل والتكامل",
               "instructor": "Dr.Hamdy",
               "location": "مدرج 5 اعلام"
@@ -405,7 +409,7 @@
           ],
           "الأربعاء": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة فيزياء",
               "instructor": "Dr.Mahmoud abd elmohsen",
               "location": "مدرج 5 اعلام"
@@ -413,13 +417,13 @@
           ],
           "الخميس": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة الفكر الابداعي",
               "instructor": "Dr.Samah",
               "location": "online"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة لغة انجليزية",
               "instructor": "Dr.sameh",
               "location": "online"
@@ -429,7 +433,7 @@
         "8": {
           "الأحد": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة الكترونيات",
               "instructor": "Dr.Hayam",
               "location": "مدرج 5 اعلام"
@@ -457,7 +461,7 @@
           ],
           "الثلاثاء": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة مقدمة في علوم الحاسب",
               "instructor": "Dr. mohamed Elzwidy",
               "location": "مدرج 7"
@@ -469,7 +473,7 @@
               "location": "مدرج 6"
             },
             {
-              "period": "محاضرة الفترة الثالثة",
+              "period": "الفترة الثالثة",
               "subject": "محاضرة التفاضل والتكامل",
               "instructor": "Dr.Hamdy",
               "location": "مدرج 5 اعلام"
@@ -477,7 +481,7 @@
           ],
           "الأربعاء": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة فيزياء",
               "instructor": "Dr.Mahmoud abd elmohsen",
               "location": "مدرج 5 اعلام"
@@ -485,13 +489,13 @@
           ],
           "الخميس": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة الفكر الابداعي",
               "instructor": "Dr.Samah",
               "location": "online"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة لغة انجليزية",
               "instructor": "Dr.sameh",
               "location": "online"
@@ -501,7 +505,7 @@
         "9": {
           "الأحد": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة الكترونيات",
               "instructor": "Dr.Hayam",
               "location": "مدرج 5 اعلام"
@@ -513,9 +517,10 @@
               "location": "معمل 004"
             }
           ],
+          "الإثنين": [],
           "الثلاثاء": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة مقدمة في علوم الحاسب",
               "instructor": "Dr. mohamed Elzwidy",
               "location": "مدرج 7"
@@ -527,7 +532,7 @@
               "location": "معمل 416"
             },
             {
-              "period": "محاضرة الفترة الثالثة",
+              "period": "الفترة الثالثة",
               "subject": "محاضرة التفاضل والتكامل",
               "instructor": "Dr.Hamdy",
               "location": "مدرج 5 اعلام"
@@ -535,7 +540,7 @@
           ],
           "الأربعاء": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة فيزياء",
               "instructor": "Dr.Mahmoud abd elmohsen",
               "location": "مدرج 5 اعلام"
@@ -555,13 +560,13 @@
           ],
           "الخميس": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة الفكر الابداعي",
               "instructor": "Dr.Samah",
               "location": "online"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة لغة انجليزية",
               "instructor": "Dr.sameh",
               "location": "online"
@@ -577,13 +582,13 @@
               "location": "معمل 416"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة الكترونيات",
               "instructor": "Dr.Hayam",
               "location": "مدرج 5 اعلام"
             },
             {
-              "period": "محاضرة الفترة الثالثة",
+              "period": "الفترة الثالثة",
               "subject": "محاضرة مقدمة في علوم الحاسب",
               "instructor": "Dr.Mohamed Elzwidy",
               "location": "مدرج 7"
@@ -591,7 +596,7 @@
           ],
           "الإثنين": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة فيزياء",
               "instructor": "Dr.Mahmoud abd elmohsen",
               "location": "مدرج 5 اعلام"
@@ -613,7 +618,7 @@
           ],
           "الأربعاء": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة التفاضل والتكامل",
               "instructor": "Dr.Hamdy",
               "location": "مدرج 5 اعلام"
@@ -627,13 +632,13 @@
           ],
           "الخميس": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة Creative thinking",
               "instructor": "Dr.Samah",
               "location": "Online"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة English",
               "instructor": "DR.sameh",
               "location": "Online"
@@ -643,13 +648,13 @@
         "11": {
           "الأحد": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة الكترونيات",
               "instructor": "Dr.Hayam",
               "location": "مدرج 5 اعلام"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة مقدمة في علوم الحاسب",
               "instructor": "Dr.Mohamed Elzwidy",
               "location": "مدرج 7"
@@ -657,7 +662,7 @@
           ],
           "الإثنين": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة فيزياء",
               "instructor": "Dr.Mahmoud abd elmohsen",
               "location": "مدرج 5 اعلام"
@@ -679,7 +684,7 @@
           ],
           "الأربعاء": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة التفاضل والتكامل",
               "instructor": "Dr.Hamdy",
               "location": "مدرج 5 اعلام"
@@ -699,13 +704,13 @@
           ],
           "الخميس": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة Creative thinking",
               "instructor": "Dr.Samah",
               "location": "Online"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة English",
               "instructor": "DR.sameh",
               "location": "Online"
@@ -715,13 +720,13 @@
         "12": {
           "الأحد": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة الكترونيات",
               "instructor": "Dr.Hayam",
               "location": "مدرج 5 اعلام"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة مقدمة في علوم الحاسب",
               "instructor": "Dr.Mohamed Elzwidy",
               "location": "مدرج 7"
@@ -735,7 +740,7 @@
           ],
           "الإثنين": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة فيزياء",
               "instructor": "Dr.Mahmoud abd elmohsen",
               "location": "مدرج 5 اعلام"
@@ -747,9 +752,10 @@
               "location": "مدرج 5"
             }
           ],
+          "الثلاثاء": [],
           "الأربعاء": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة التفاضل والتكامل",
               "instructor": "Dr.Hamdy",
               "location": "مدرج 5 اعلام"
@@ -769,13 +775,13 @@
           ],
           "الخميس": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة Creative thinking",
               "instructor": "Dr.Samah",
               "location": "Online"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة English",
               "instructor": "DR.sameh",
               "location": "Online"
@@ -791,13 +797,13 @@
               "location": "مدرج 6"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة الكترونيات",
               "instructor": "Dr.Hayam",
               "location": "مدرج 5 اعلام"
             },
             {
-              "period": "محاضرة الفترة الثالثة",
+              "period": "الفترة الثالثة",
               "subject": "محاضرة مقدمة في علوم الحاسب",
               "instructor": "Dr.Mohamed Elzwidy",
               "location": "مدرج 7"
@@ -805,7 +811,7 @@
           ],
           "الإثنين": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة فيزياء",
               "instructor": "Dr.Mahmoud abd elmohsen",
               "location": "مدرج 5 اعلام"
@@ -823,9 +829,10 @@
               "location": "معمل 418"
             }
           ],
+          "الثلاثاء": [],
           "الأربعاء": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة التفاضل والتكامل",
               "instructor": "Dr.Hamdy",
               "location": "مدرج 5 اعلام"
@@ -839,13 +846,13 @@
           ],
           "الخميس": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة Creative thinking",
               "instructor": "Dr.Samah",
               "location": "Online"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة English",
               "instructor": "DR.sameh",
               "location": "Online"
@@ -861,13 +868,13 @@
               "location": "مدرج 6"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة الكترونيات",
               "instructor": "Dr.Hayam",
               "location": "مدرج 5 اعلام"
             },
             {
-              "period": "محاضرة الفترة الثالثة",
+              "period": "الفترة الثالثة",
               "subject": "محاضرة مقدمة في علوم الحاسب",
               "instructor": "Dr.Mohamed Elzwidy",
               "location": "مدرج 7"
@@ -875,7 +882,7 @@
           ],
           "الإثنين": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة فيزياء",
               "instructor": "Dr.Mahmoud abd elmohsen",
               "location": "مدرج 5 اعلام"
@@ -897,7 +904,7 @@
           ],
           "الأربعاء": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة التفاضل والتكامل",
               "instructor": "Dr.Hamdy",
               "location": "مدرج 5 اعلام"
@@ -911,13 +918,13 @@
           ],
           "الخميس": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة Creative thinking",
               "instructor": "Dr.Samah",
               "location": "Online"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة English",
               "instructor": "DR.sameh",
               "location": "Online"
@@ -933,13 +940,13 @@
               "location": "معمل 103"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة الكترونيات",
               "instructor": "Dr.Hayam",
               "location": "مدرج 5 اعلام"
             },
             {
-              "period": "محاضرة الفترة الثالثة",
+              "period": "الفترة الثالثة",
               "subject": "محاضرة مقدمة في علوم الحاسب",
               "instructor": "Dr.Mohamed Elzwidy",
               "location": "مدرج 7"
@@ -947,7 +954,7 @@
           ],
           "الإثنين": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة فيزياء",
               "instructor": "Dr.Mahmoud abd elmohsen",
               "location": "مدرج 5 اعلام"
@@ -959,9 +966,10 @@
               "location": "مدرج 1"
             }
           ],
+          "الثلاثاء": [],
           "الأربعاء": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة التفاضل والتكامل",
               "instructor": "Dr.Hamdy",
               "location": "مدرج 5 اعلام"
@@ -981,13 +989,13 @@
           ],
           "الخميس": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة Creative thinking",
               "instructor": "Dr.Samah",
               "location": "Online"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة English",
               "instructor": "DR.sameh",
               "location": "Online"
@@ -1003,13 +1011,13 @@
               "location": "معمل 205"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة الكترونيات",
               "instructor": "Dr.Hayam",
               "location": "مدرج 5 اعلام"
             },
             {
-              "period": "محاضرة الفترة الثالثة",
+              "period": "الفترة الثالثة",
               "subject": "محاضرة مقدمة في علوم الحاسب",
               "instructor": "Dr.Mohamed Elzwidy",
               "location": "مدرج 7"
@@ -1017,7 +1025,7 @@
           ],
           "الإثنين": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة فيزياء",
               "instructor": "Dr.Mahmoud abd elmohsen",
               "location": "مدرج 5 اعلام"
@@ -1029,9 +1037,10 @@
               "location": "مدرج 3"
             }
           ],
+          "الثلاثاء": [],
           "الأربعاء": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة التفاضل والتكامل",
               "instructor": "Dr.Hamdy",
               "location": "مدرج 5 اعلام"
@@ -1051,13 +1060,13 @@
           ],
           "الخميس": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة Creative thinking",
               "instructor": "Dr.Samah",
               "location": "Online"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة English",
               "instructor": "DR.sameh",
               "location": "Online"
@@ -1073,13 +1082,13 @@
               "location": "معمل 104"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة الكترونيات",
               "instructor": "Dr.Hayam",
               "location": "مدرج 5 اعلام"
             },
             {
-              "period": "محاضرة الفترة الثالثة",
+              "period": "الفترة الثالثة",
               "subject": "محاضرة مقدمة في علوم الحاسب",
               "instructor": "Dr.Mohamed Elzwidy",
               "location": "مدرج 7"
@@ -1087,7 +1096,7 @@
           ],
           "الإثنين": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة فيزياء",
               "instructor": "Dr.Mahmoud abd elmohsen",
               "location": "مدرج 5 اعلام"
@@ -1109,7 +1118,7 @@
           ],
           "الأربعاء": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة التفاضل والتكامل",
               "instructor": "Dr.Hamdy",
               "location": "مدرج 5 اعلام"
@@ -1123,13 +1132,13 @@
           ],
           "الخميس": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة Creative thinking",
               "instructor": "Dr.Samah",
               "location": "Online"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة English",
               "instructor": "DR.sameh",
               "location": "Online"
@@ -1139,13 +1148,13 @@
         "18": {
           "الأحد": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة الكترونيات",
               "instructor": "Dr.Hayam",
               "location": "مدرج 5 اعلام"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة مقدمة في علوم الحاسب",
               "instructor": "Dr.Mohamed Elzwidy",
               "location": "مدرج 7"
@@ -1153,7 +1162,7 @@
           ],
           "الإثنين": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة فيزياء",
               "instructor": "Dr.Mahmoud abd elmohsen",
               "location": "مدرج 5 اعلام"
@@ -1175,7 +1184,7 @@
           ],
           "الأربعاء": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة التفاضل والتكامل",
               "instructor": "Dr.Hamdy",
               "location": "مدرج 5 اعلام"
@@ -1195,13 +1204,13 @@
           ],
           "الخميس": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة Creative thinking",
               "instructor": "Dr.Samah",
               "location": "Online"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة English",
               "instructor": "DR.sameh",
               "location": "Online"
@@ -1211,13 +1220,13 @@
         "19": {
           "الأحد": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة الكترونيات",
               "instructor": "Dr.Hayam",
               "location": "مدرج 5 اعلام"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة مقدمة في علوم الحاسب",
               "instructor": "Dr.Mohamed Elzwidy",
               "location": "مدرج 7"
@@ -1239,7 +1248,7 @@
           ],
           "الثلاثاء": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة التفاضل والتكامل",
               "instructor": "Dr.Hamdy",
               "location": "مدرج 5 اعلام"
@@ -1247,7 +1256,7 @@
           ],
           "الأربعاء": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة فيزياء",
               "instructor": "Dr.Mahmoud abd elmohsen",
               "location": "مدرج 5 اعلام"
@@ -1267,13 +1276,13 @@
           ],
           "الخميس": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة Creative thinking",
               "instructor": "Dr.Samah",
               "location": "Online"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة English",
               "instructor": "DR.Sameh",
               "location": "Online"
@@ -1283,13 +1292,13 @@
         "20": {
           "الأحد": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة الكترونيات",
               "instructor": "Dr.Hayam",
               "location": "مدرج 5 اعلام"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة مقدمة في علوم الحاسب",
               "instructor": "Dr.Mohamed Elzwidy",
               "location": "مدرج 7"
@@ -1303,7 +1312,7 @@
               "location": "مدرج 3"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة مقدمة في علوم الحاسب",
               "instructor": "Dr.Mohamed Elzwidy",
               "location": "مدرج 7"
@@ -1317,7 +1326,7 @@
               "location": "Lab 219 Al"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة التفاضل والتكامل",
               "instructor": "Dr.Hamdy",
               "location": "مدرج 5 اعلام"
@@ -1325,7 +1334,7 @@
           ],
           "الأربعاء": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة فيزياء",
               "instructor": "Dr.Mahmoud abd elmohsen",
               "location": "مدرج 5 اعلام"
@@ -1345,13 +1354,13 @@
           ],
           "الخميس": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة Creative thinking",
               "instructor": "Dr.Samah",
               "location": "Online"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة English",
               "instructor": "DR.Sameh",
               "location": "Online"
@@ -1361,13 +1370,13 @@
         "21": {
           "الأحد": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة الكترونيات",
               "instructor": "Dr.Hayam",
               "location": "مدرج 5 اعلام"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة مقدمة في علوم الحاسب",
               "instructor": "Dr.Mohamed Elzwidy",
               "location": "مدرج 7"
@@ -1381,7 +1390,7 @@
               "location": "مدرج 2"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة مقدمة في علوم الحاسب",
               "instructor": "Dr.Mohamed Elzwidy",
               "location": "مدرج 7"
@@ -1389,7 +1398,7 @@
           ],
           "الثلاثاء": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة التفاضل والتكامل",
               "instructor": "Dr.Hamdy",
               "location": "مدرج 5 اعلام"
@@ -1397,7 +1406,7 @@
           ],
           "الأربعاء": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة فيزياء",
               "instructor": "Dr.Mahmoud abd elmohsen",
               "location": "مدرج 5 اعلام"
@@ -1423,13 +1432,13 @@
           ],
           "الخميس": [
             {
-              "period": "محاضرة الفترة الأولى",
+              "period": "الفترة الأولى",
               "subject": "محاضرة Creative thinking",
               "instructor": "Dr.Samah",
               "location": "Online"
             },
             {
-              "period": "محاضرة الفترة الثانية",
+              "period": "الفترة الثانية",
               "subject": "محاضرة English",
               "instructor": "DR.Sameh",
               "location": "Online"
