@@ -29,7 +29,7 @@ const PdfViewerModal = ({
 }: PdfViewerModalProps) => {
   const isMobile = useIsMobile();
   const [isMaximized, setIsMaximized] = useState(false);
-  const [viewerUrl, setViewerUrl] = useState<string | null>(null);
+  const [objectUrl, setObjectUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [useNativeViewer, setUseNativeViewer] = useState(false);
 
@@ -46,33 +46,24 @@ const PdfViewerModal = ({
     if (!open || !pdfUrl) return;
 
     let cancelled = false;
-    let objectUrl: string | null = null;
+    let currentObjectUrl: string | null = null;
+    setIsLoading(true);
 
-    setViewerUrl(null);
-
-    const initViewer = async () => {
-      setIsLoading(true);
-      
-      const isImg = pdfUrl.match(/\.(jpg|jpeg|png|gif|webp|svg|bmp)(\?.*)?$/i) || displayName?.match(/\.(jpg|jpeg|png|gif|webp|svg|bmp)$/i);
-
+    const fetchPdf = async () => {
       try {
         const cachedUrl = await getCachedUrl(pdfUrl);
         if (cancelled) return;
         
         if (cachedUrl) {
-          objectUrl = cachedUrl;
-          setViewerUrl(useNativeViewer && !isImg ? objectUrl : (isImg ? objectUrl : `/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(objectUrl)}`));
+          currentObjectUrl = cachedUrl;
+          setObjectUrl(cachedUrl);
         } else {
-          setViewerUrl(useNativeViewer && !isImg ? pdfUrl : (isImg ? pdfUrl : `/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(pdfUrl)}`));
+          setObjectUrl(null);
         }
       } catch (err) {
         console.error("PDF cache check error:", err);
-        if (!cancelled) {
-          setViewerUrl(useNativeViewer && !isImg ? pdfUrl : (isImg ? pdfUrl : `/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(pdfUrl)}`));
-        }
       } finally {
         if (!cancelled) {
-          // Short timeout just for the initial iframe load
           setTimeout(() => {
             if (!cancelled) setIsLoading(false);
           }, 1000);
@@ -80,20 +71,20 @@ const PdfViewerModal = ({
       }
     };
 
-    initViewer();
+    fetchPdf();
 
     return () => {
       cancelled = true;
-      if (objectUrl) {
-        URL.revokeObjectURL(objectUrl);
+      if (currentObjectUrl) {
+        URL.revokeObjectURL(currentObjectUrl);
       }
+      setObjectUrl(null);
     };
-  }, [open, pdfUrl, getCachedUrl, useNativeViewer]);
+  }, [open, pdfUrl, getCachedUrl]);
 
   const handleOpenChange = useCallback(
     (value: boolean) => {
       if (!value) {
-        setViewerUrl(null);
         if (!isMobile) setIsMaximized(false);
         setUseNativeViewer(false);
       }
@@ -108,7 +99,15 @@ const PdfViewerModal = ({
       ? `${displayName}.pdf`
       : `document.pdf`;
 
-  const isOfflineButNotCached = !navigator.onLine && !viewerUrl && !isLoading;
+  const isImg = pdfUrl?.match(/\.(jpg|jpeg|png|gif|webp|svg|bmp)(\?.*)?$/i) || displayName?.match(/\.(jpg|jpeg|png|gif|webp|svg|bmp)$/i);
+  const finalPdfUrl = objectUrl || pdfUrl;
+  const viewerUrl = useNativeViewer && !isImg 
+    ? finalPdfUrl 
+    : (isImg 
+        ? finalPdfUrl 
+        : `/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(finalPdfUrl)}`);
+
+  const isOfflineButNotCached = !navigator.onLine && !objectUrl && !isLoading;
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
