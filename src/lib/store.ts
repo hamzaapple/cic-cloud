@@ -523,6 +523,10 @@ export const db = {
     const { data } = await supabase.from("shared_department_courses").select("course_id").eq("target_department_id", targetDeptId);
     return (data || []).map((r: any) => r.course_id);
   },
+  getTargetDepartmentsForCourse: async (courseId: string): Promise<string[]> => {
+    const { data } = await supabase.from("shared_department_courses").select("target_department_id").eq("course_id", courseId);
+    return (data || []).map((r: any) => r.target_department_id);
+  },
   getAllSharedDeptCourses: async (): Promise<{ id: string; course_id: string; target_department_id: string }[]> => {
     const { data } = await supabase.from("shared_department_courses").select("*");
     return (data || []) as any[];
@@ -533,6 +537,14 @@ export const db = {
     // Insert new
     if (courseIds.length > 0) {
       const rows = courseIds.map(cid => ({ course_id: cid, target_department_id: targetDeptId }));
+      const { error } = await supabase.from("shared_department_courses").insert(rows);
+      if (error) throw error;
+    }
+  },
+  setTargetDepartmentsForCourse: async (courseId: string, targetDeptIds: string[]) => {
+    await supabase.from("shared_department_courses").delete().eq("course_id", courseId);
+    if (targetDeptIds.length > 0) {
+      const rows = targetDeptIds.map(tid => ({ course_id: courseId, target_department_id: tid }));
       const { error } = await supabase.from("shared_department_courses").insert(rows);
       if (error) throw error;
     }

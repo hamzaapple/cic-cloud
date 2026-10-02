@@ -41,10 +41,10 @@ export function useOfflineStorage() {
     refreshCacheInfo();
   }, [refreshCacheInfo]);
 
-  const saveToOffline = useCallback(async (url: string, onProgress?: (pct: number) => void) => {
+  const saveToOffline = useCallback(async (url: string, onProgress?: (pct: number) => void, signal?: AbortSignal) => {
     if (!isSupported) return false;
     try {
-      const response = await fetch(url, { mode: 'cors' });
+      const response = await fetch(url, { mode: 'cors', signal });
       if (!response.ok) throw new Error('Fetch failed');
       
       const contentLength = response.headers.get('content-length');
@@ -60,6 +60,10 @@ export function useOfflineStorage() {
               return;
             }
             while (true) {
+              if (signal?.aborted) {
+                controller.error(new Error('Aborted'));
+                break;
+              }
               const { done, value } = await reader.read();
               if (done) break;
               loaded += value.length;
@@ -82,7 +86,11 @@ export function useOfflineStorage() {
       await cache.put(url, res);
       await refreshCacheInfo();
       return true;
-    } catch (err) {
+    } catch (err: any) {
+      if (err.name === 'AbortError') {
+        console.log('Download aborted');
+        return false;
+      }
       console.error('Failed to cache:', err);
       return false;
     }
@@ -130,17 +138,19 @@ export function useOfflineStorage() {
     return null;
   }, [isSupported]);
 
-  const saveMultipleToOffline = useCallback(async (urls: string[], onProgress?: (completed: number, total: number, currentFilePct: number) => void) => {
+  const saveMultipleToOffline = useCallback(async (urls: string[], onProgress?: (completed: number, total: number, currentFilePct: number) => void, signal?: AbortSignal) => {
     if (!isSupported) return false;
     let successCount = 0;
     const total = urls.length;
     for (let i = 0; i < total; i++) {
+      if (signal?.aborted) return false;
       const url = urls[i];
       if (!isCached(url)) {
         await saveToOffline(url, (pct) => {
           if (onProgress) onProgress(successCount, total, pct);
-        });
+        }, signal);
       }
+      if (signal?.aborted) return false;
       successCount++;
       if (onProgress) {
         onProgress(successCount, total, 100);

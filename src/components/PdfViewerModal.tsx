@@ -54,14 +54,16 @@ const PdfViewerModal = ({
         if (cancelled) return;
         
         if (cachedUrl) {
-          objectUrl = cachedUrl; // Save reference to revoke later
-          setViewerUrl(`/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(objectUrl)}`);
+          objectUrl = cachedUrl;
+          setViewerUrl(objectUrl);
         } else {
-          setViewerUrl(`/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(pdfUrl)}`);
+          setViewerUrl(pdfUrl);
         }
       } catch (err) {
         console.error("PDF cache check error:", err);
-        if (!cancelled) setViewerUrl(`/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(pdfUrl)}`);
+        if (!cancelled) {
+          setViewerUrl(pdfUrl);
+        }
       } finally {
         if (!cancelled) {
           // Short timeout just for the initial iframe load

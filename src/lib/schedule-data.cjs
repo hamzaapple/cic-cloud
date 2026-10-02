@@ -1,0 +1,981 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.scheduleData = exports.aiScheduleData = exports.cyberScheduleData = exports.csScheduleData = exports.PERIODS_ORDER = exports.DAYS_ORDER = void 0;
+exports.DAYS_ORDER = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"];
+exports.PERIODS_ORDER = ["الفترة الأولى", "الفترة الثانية", "الفترة الثالثة", "الفترة الرابعة"];
+exports.csScheduleData = {
+    "1": {
+        "1": {
+            "1": { "╪د┘╪ث╪ص╪»": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘╪س╪ر", "subject": "Intro to IS", "instructor": "T.A Rowyda", "location": "Lab 205" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪▒╪د╪ذ╪╣╪ر", "subject": "Discrete Math", "instructor": "T.A Doaa", "location": "┘à╪»╪▒╪ش 3" }], "╪د┘╪ح╪س┘┘è┘": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪ث┘ê┘┘ë", "subject": "┘à╪ص╪د╪╢╪▒╪ر Logic Design", "instructor": "Dr/Salah", "location": "┘à╪»╪▒╪ش 7" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘┘è╪ر", "subject": "Computer Programming", "instructor": "T.A Roaa", "location": "Lab 203 Al" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪▒╪د╪ذ╪╣╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Intro to IS", "instructor": "Dr/Sameh Sherif", "location": "┘à╪»╪▒╪ش 7" }], "╪د┘╪س┘╪د╪س╪د╪ة": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘┘è╪ر", "subject": "Linear Algebra", "instructor": "T.A Alaa Mohamed", "location": "┘à╪»╪▒╪ش 2" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘╪س╪ر", "subject": "Logic Design", "instructor": "T.A Elzahraa", "location": "Lab 305" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪▒╪د╪ذ╪╣╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Linear Algebra", "instructor": "Dr/Hamdy", "location": "┘à╪»╪▒╪ش 5 ╪د╪╣┘╪د┘à" }], "╪د┘╪«┘à┘è╪│": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪ث┘ê┘┘ë", "subject": "┘à╪ص╪د╪╢╪▒╪ر Discrete Math", "instructor": "Dr/Maher", "location": "┘à╪»╪▒╪ش 5 ╪د╪╣┘╪د┘à" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘╪س╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Computer Programming", "instructor": "Dr/Negm Shawky", "location": "┘à╪»╪▒╪ش 5 ╪د╪╣┘╪د┘à" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪▒╪د╪ذ╪╣╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Report Writing", "instructor": "Dr/Hayam Reda", "location": "┘à╪»╪▒╪ش 7" }] },
+            "2": { "╪د┘╪ح╪س┘┘è┘": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪ث┘ê┘┘ë", "subject": "┘à╪ص╪د╪╢╪▒╪ر Logic Design", "instructor": "Dr/Salah", "location": "┘à╪»╪▒╪ش 7" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘┘è╪ر", "subject": "Discrete Math", "instructor": "T.A Doaa", "location": "┘à╪»╪▒╪ش 2" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪▒╪د╪ذ╪╣╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Intro to IS", "instructor": "Dr/Sameh Sherif", "location": "┘à╪»╪▒╪ش 7" }], "╪د┘╪س┘╪د╪س╪د╪ة": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪ث┘ê┘┘ë", "subject": "Logic Design", "instructor": "T.A Elzahraa", "location": "Lab 304" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪▒╪د╪ذ╪╣╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Linear Algebra", "instructor": "Dr/Hamdy", "location": "┘à╪»╪▒╪ش 5 ╪د╪╣┘╪د┘à" }], "╪د┘╪ث╪▒╪ذ╪╣╪د╪ة": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘┘è╪ر", "subject": "Linear Algebra", "instructor": "T.A Alaa Mohamed", "location": "┘à╪»╪▒╪ش 6" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪▒╪د╪ذ╪╣╪ر", "subject": "Intro to IS", "instructor": "T.A Salma", "location": "Lab 002" }], "╪د┘╪«┘à┘è╪│": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪ث┘ê┘┘ë", "subject": "┘à╪ص╪د╪╢╪▒╪ر Discrete Math", "instructor": "Dr/Maher", "location": "┘à╪»╪▒╪ش 5 ╪د╪╣┘╪د┘à" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘┘è╪ر", "subject": "Computer Programming", "instructor": "T.A Roaa", "location": "Lab 002" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘╪س╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Computer Programming", "instructor": "Dr/Negm Shawky", "location": "┘à╪»╪▒╪ش 5 ╪د╪╣┘╪د┘à" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪▒╪د╪ذ╪╣╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Report Writing", "instructor": "Dr/Hayam Reda", "location": "┘à╪»╪▒╪ش 7" }] },
+            "3": { "╪د┘╪ث╪ص╪»": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪ث┘ê┘┘ë", "subject": "Discrete Math", "instructor": "T.A Doaa", "location": "┘à╪»╪▒╪ش 1" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪▒╪د╪ذ╪╣╪ر", "subject": "Linear Algebra", "instructor": "T.A Alaa Mohamed", "location": "┘à╪»╪▒╪ش 6" }], "╪د┘╪ح╪س┘┘è┘": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪ث┘ê┘┘ë", "subject": "┘à╪ص╪د╪╢╪▒╪ر Logic Design", "instructor": "Dr/Salah", "location": "┘à╪»╪▒╪ش 7" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘╪س╪ر", "subject": "Computer Programming", "instructor": "T.A Rehab", "location": "Lab 205" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪▒╪د╪ذ╪╣╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Intro to IS", "instructor": "Dr/Sameh Sherif", "location": "┘à╪»╪▒╪ش 7" }], "╪د┘╪س┘╪د╪س╪د╪ة": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘┘è╪ر", "subject": "Logic Design", "instructor": "T.A Elzahraa", "location": "Lab 305" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪▒╪د╪ذ╪╣╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Linear Algebra", "instructor": "Dr/Hamdy", "location": "┘à╪»╪▒╪ش 5 ╪د╪╣┘╪د┘à" }], "╪د┘╪«┘à┘è╪│": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪ث┘ê┘┘ë", "subject": "┘à╪ص╪د╪╢╪▒╪ر Discrete Math", "instructor": "Dr/Maher", "location": "┘à╪»╪▒╪ش 5 ╪د╪╣┘╪د┘à" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘┘è╪ر", "subject": "Intro to IS", "instructor": "T.A Salma Tarek", "location": "Lab 205" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘╪س╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Computer Programming", "instructor": "Dr/Negm Shawky", "location": "┘à╪»╪▒╪ش 5 ╪د╪╣┘╪د┘à" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪▒╪د╪ذ╪╣╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Report Writing", "instructor": "Dr/Hayam Reda", "location": "┘à╪»╪▒╪ش 7" }] },
+            "4": { "╪د┘╪ح╪س┘┘è┘": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪ث┘ê┘┘ë", "subject": "┘à╪ص╪د╪╢╪▒╪ر Logic Design", "instructor": "Dr/Salah", "location": "┘à╪»╪▒╪ش 7" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘┘è╪ر", "subject": "Computer Programming", "instructor": "T.A Rehab", "location": "Lab 103" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘╪س╪ر", "subject": "Intro to IS", "instructor": "T.A Aisha", "location": "Lab 102" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪▒╪د╪ذ╪╣╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Intro to IS", "instructor": "Dr/Sameh Sherif", "location": "┘à╪»╪▒╪ش 7" }], "╪د┘╪س┘╪د╪س╪د╪ة": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘╪س╪ر", "subject": "Discrete Math", "instructor": "T.A Alaa Mohamed", "location": "┘à╪»╪▒╪ش 6" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪▒╪د╪ذ╪╣╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Linear Algebra", "instructor": "Dr/Hamdy", "location": "┘à╪»╪▒╪ش 5 ╪د╪╣┘╪د┘à" }], "╪د┘╪ث╪▒╪ذ╪╣╪د╪ة": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪ث┘ê┘┘ë", "subject": "Logic Design", "instructor": "T.A Ahmed", "location": "Lab 304" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘┘è╪ر", "subject": "Linear Algebra", "instructor": "T.A Alaa Mohamed", "location": "┘à╪»╪▒╪ش 6" }], "╪د┘╪«┘à┘è╪│": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪ث┘ê┘┘ë", "subject": "┘à╪ص╪د╪╢╪▒╪ر Discrete Math", "instructor": "Dr/Maher", "location": "┘à╪»╪▒╪ش 5 ╪د╪╣┘╪د┘à" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘╪س╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Computer Programming", "instructor": "Dr/Negm Shawky", "location": "┘à╪»╪▒╪ش 5 ╪د╪╣┘╪د┘à" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪▒╪د╪ذ╪╣╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Report Writing", "instructor": "Dr/Hayam Reda", "location": "┘à╪»╪▒╪ش 7" }] },
+            "5": { "╪د┘╪ح╪س┘┘è┘": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪ث┘ê┘┘ë", "subject": "┘à╪ص╪د╪╢╪▒╪ر Logic Design", "instructor": "Dr/Salah", "location": "┘à╪»╪▒╪ش 7" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘┘è╪ر", "subject": "Intro to IS", "instructor": "T.A Aisha", "location": "Lab 004" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪▒╪د╪ذ╪╣╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Intro to IS", "instructor": "Dr/Sameh Sherif", "location": "┘à╪»╪▒╪ش 7" }], "╪د┘╪س┘╪د╪س╪د╪ة": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘┘è╪ر", "subject": "Logic Design", "instructor": "T.A Ahmed Gamal", "location": "Lab 304" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪▒╪د╪ذ╪╣╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Linear Algebra", "instructor": "Dr/Hamdy", "location": "┘à╪»╪▒╪ش 5 ╪د╪╣┘╪د┘à" }], "╪د┘╪ث╪▒╪ذ╪╣╪د╪ة": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘╪س╪ر", "subject": "Computer Programming", "instructor": "T.A Rehab", "location": "Lab 004" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪▒╪د╪ذ╪╣╪ر", "subject": "Linear Algebra", "instructor": "T.A Alaa Mohamed", "location": "┘à╪»╪▒╪ش 2" }], "╪د┘╪«┘à┘è╪│": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪ث┘ê┘┘ë", "subject": "┘à╪ص╪د╪╢╪▒╪ر Discrete Math", "instructor": "Dr/Maher", "location": "┘à╪»╪▒╪ش 5 ╪د╪╣┘╪د┘à" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘┘è╪ر", "subject": "Linear Algebra", "instructor": "T.A Alaa Mohamed", "location": "┘à╪»╪▒╪ش 2" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘╪س╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Computer Programming", "instructor": "Dr/Negm Shawky", "location": "┘à╪»╪▒╪ش 5 ╪د╪╣┘╪د┘à" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪▒╪د╪ذ╪╣╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Report Writing", "instructor": "Dr/Hayam Reda", "location": "┘à╪»╪▒╪ش 7" }] },
+            "6": { "╪د┘╪ث╪ص╪»": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪ث┘ê┘┘ë", "subject": "Linear Algebra", "instructor": "T.A Alaa Mohamed", "location": "┘à╪»╪▒╪ش 6" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘┘è╪ر", "subject": "Discrete Math", "instructor": "T.A Alaa Mohamed", "location": "┘à╪»╪▒╪ش 5" }], "╪د┘╪ح╪س┘┘è┘": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪ث┘ê┘┘ë", "subject": "┘à╪ص╪د╪╢╪▒╪ر Logic Design", "instructor": "Dr/Salah", "location": "┘à╪»╪▒╪ش 7" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘┘è╪ر", "subject": "Logic Design", "instructor": "T.A Ahmed Gamal", "location": "Lab 305" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘╪س╪ر", "subject": "Intro to IS", "instructor": "T.A Salma Tarek", "location": "Lab 303" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪▒╪د╪ذ╪╣╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Intro to IS", "instructor": "Dr/Sameh Sherif", "location": "┘à╪»╪▒╪ش 7" }], "╪د┘╪س┘╪د╪س╪د╪ة": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪ث┘ê┘┘ë", "subject": "Computer Programming", "instructor": "T.A Rehab", "location": "Lab 303" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪▒╪د╪ذ╪╣╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Linear Algebra", "instructor": "Dr/Hamdy", "location": "┘à╪»╪▒╪ش 5 ╪د╪╣┘╪د┘à" }], "╪د┘╪«┘à┘è╪│": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪ث┘ê┘┘ë", "subject": "┘à╪ص╪د╪╢╪▒╪ر Discrete Math", "instructor": "Dr/Maher", "location": "┘à╪»╪▒╪ش 5 ╪د╪╣┘╪د┘à" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘╪س╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Computer Programming", "instructor": "Dr/Negm Shawky", "location": "┘à╪»╪▒╪ش 5 ╪د╪╣┘╪د┘à" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪▒╪د╪ذ╪╣╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Report Writing", "instructor": "Dr/Hayam Reda", "location": "┘à╪»╪▒╪ش 7" }] },
+            "7": { "╪د┘╪ث╪ص╪»": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪ث┘ê┘┘ë", "subject": "Linear Algebra", "instructor": "T.A Alaa Mohamed", "location": "┘à╪»╪▒╪ش 6" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘┘è╪ر", "subject": "Logic Design", "instructor": "T.A Ahmed", "location": "Lab 305" }], "╪د┘╪ح╪س┘┘è┘": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪ث┘ê┘┘ë", "subject": "┘à╪ص╪د╪╢╪▒╪ر Logic Design", "instructor": "Dr/Salah", "location": "┘à╪»╪▒╪ش 7" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘┘è╪ر", "subject": "Intro to IS", "instructor": "T.A Salma Tarek", "location": "Lab 104" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪▒╪د╪ذ╪╣╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Intro to IS", "instructor": "Dr/Sameh Sherif", "location": "┘à╪»╪▒╪ش 7" }], "╪د┘╪س┘╪د╪س╪د╪ة": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪ث┘ê┘┘ë", "subject": "Discrete Math", "instructor": "T.A Alaa Mohamed", "location": "┘à╪»╪▒╪ش 1" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘┘è╪ر", "subject": "Computer Programming", "instructor": "T.A Rehab", "location": "Lab 104" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪▒╪د╪ذ╪╣╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Linear Algebra", "instructor": "Dr/Hamdy", "location": "┘à╪»╪▒╪ش 5 ╪د╪╣┘╪د┘à" }], "╪د┘╪«┘à┘è╪│": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪ث┘ê┘┘ë", "subject": "┘à╪ص╪د╪╢╪▒╪ر Discrete Math", "instructor": "Dr/Maher", "location": "┘à╪»╪▒╪ش 5 ╪د╪╣┘╪د┘à" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘╪س╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Computer Programming", "instructor": "Dr/Negm Shawky", "location": "┘à╪»╪▒╪ش 5 ╪د╪╣┘╪د┘à" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪▒╪د╪ذ╪╣╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Report Writing", "instructor": "Dr/Hayam Reda", "location": "┘à╪»╪▒╪ش 7" }] },
+            "8": { "╪د┘╪ث╪ص╪»": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪ث┘ê┘┘ë", "subject": "Logic Design", "instructor": "T.A Ahmed Hasanein", "location": "Lab 305" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘╪س╪ر", "subject": "Linear Algebra", "instructor": "T.A Eman", "location": "┘à╪»╪▒╪ش 6" }], "╪د┘╪س┘╪د╪س╪د╪ة": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪ث┘ê┘┘ë", "subject": "┘à╪ص╪د╪╢╪▒╪ر Computer Programming", "instructor": "Dr/Negm Shawky", "location": "┘à╪»╪▒╪ش 5 ╪د╪╣┘╪د┘à" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘┘è╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Intro to IS", "instructor": "Dr/Sameh Sherif", "location": "┘à╪»╪▒╪ش 5 ╪د╪╣┘╪د┘à" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘╪س╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Linear Algebra", "instructor": "Dr/Hamdy", "location": "┘à╪»╪▒╪ش 5 ╪د╪╣┘╪د┘à" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪▒╪د╪ذ╪╣╪ر", "subject": "Intro to IS", "instructor": "T.A Salma Tarek", "location": "Lab 002" }], "╪د┘╪ث╪▒╪ذ╪╣╪د╪ة": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘╪س╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Report Writing", "instructor": "Dr/Hayam Reda", "location": "┘à╪»╪▒╪ش 5 ╪د╪╣┘╪د┘à" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪▒╪د╪ذ╪╣╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Logic Design", "instructor": "Dr/Salah", "location": "┘à╪»╪▒╪ش 7" }], "╪د┘╪«┘à┘è╪│": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪ث┘ê┘┘ë", "subject": "┘à╪ص╪د╪╢╪▒╪ر Discrete Math", "instructor": "Dr/Maher", "location": "┘à╪»╪▒╪ش 5 ╪د╪╣┘╪د┘à" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘┘è╪ر", "subject": "Computer Programming", "instructor": "T.A Roaa", "location": "Lab 103" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘╪س╪ر", "subject": "Discrete Math", "instructor": "T.A Alaa Mohamed", "location": "┘à╪»╪▒╪ش 5" }] },
+            "9": { "╪د┘╪ح╪س┘┘è┘": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘┘è╪ر", "subject": "Computer Programming", "instructor": "T.A Hend", "location": "Lab 203" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘╪س╪ر", "subject": "Intro to IS", "instructor": "T.A Ahmed Hasanein", "location": "Lab 105" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪▒╪د╪ذ╪╣╪ر", "subject": "Discrete Math", "instructor": "T.A Doaa", "location": "┘à╪»╪▒╪ش 4" }], "╪د┘╪س┘╪د╪س╪د╪ة": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪ث┘ê┘┘ë", "subject": "┘à╪ص╪د╪╢╪▒╪ر Computer Programming", "instructor": "Dr/Negm Shawky", "location": "┘à╪»╪▒╪ش 5 ╪د╪╣┘╪د┘à" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘┘è╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Intro to IS", "instructor": "Dr/Sameh Sherif", "location": "┘à╪»╪▒╪ش 5 ╪د╪╣┘╪د┘à" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘╪س╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Linear Algebra", "instructor": "Dr/Hamdy", "location": "┘à╪»╪▒╪ش 5 ╪د╪╣┘╪د┘à" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪▒╪د╪ذ╪╣╪ر", "subject": "Logic Design", "instructor": "T.A Hossam", "location": "Lab 304" }], "╪د┘╪ث╪▒╪ذ╪╣╪د╪ة": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪س╪د┘╪س╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Report Writing", "instructor": "Dr/Hayam Reda", "location": "┘à╪»╪▒╪ش 5 ╪د╪╣┘╪د┘à" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪▒╪د╪ذ╪╣╪ر", "subject": "┘à╪ص╪د╪╢╪▒╪ر Logic Design", "instructor": "Dr/Salah", "location": "┘à╪»╪▒╪ش 7" }], "╪د┘╪«┘à┘è╪│": [{ "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪ث┘ê┘┘ë", "subject": "┘à╪ص╪د╪╢╪▒╪ر Discrete Math", "instructor": "Dr/Maher", "location": "┘à╪»╪▒╪ش 5 ╪د╪╣┘╪د┘à" }, { "period": "╪د┘┘╪ز╪▒╪ر ╪د┘╪▒╪د╪ذ╪╣╪ر", "subject": "Linear Algebra", "instructor": "T.A Adel", "location": "┘à╪»╪▒╪ش 1" }] },
+            "10": {
+                "الأحد": [
+                    { "period": "الفترة الأولى", "subject": "فيزياء", "instructor": "T.A-", "location": "معمل 416" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة الكترونيات", "instructor": "Dr.Hayam", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة مقدمة في علوم الحاسب", "instructor": "Dr.Mohamed Elzwidy", "location": "مدرج 7" }
+                ],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة فيزياء", "instructor": "Dr.Mahmoud abd elmohsen", "location": "مدرج 5 اعلام" }
+                ],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "الكترونيات", "instructor": "T.A-Hossam", "location": "مدرج 5" },
+                    { "period": "الفترة الثانية", "subject": "مقدمة في علوم الحاسب", "instructor": "T.A-Abrar", "location": "lab 203_Al" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة التفاضل والتكامل", "instructor": "Dr.Hamdy", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "التفاضل والتكامل", "instructor": "T.A-Adel", "location": "مدرج 3" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة Creative thinking", "instructor": "Dr.Samah", "location": "Online" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة English", "instructor": "DR.sameh", "location": "Online" }
+                ]
+            },
+            "11": {
+                "الأحد": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة الكترونيات", "instructor": "Dr.Hayam", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة مقدمة في علوم الحاسب", "instructor": "Dr.Mohamed Elzwidy", "location": "مدرج 7" }
+                ],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة فيزياء", "instructor": "Dr.Mahmoud abd elmohsen", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "مقدمة في علوم الحاسب", "instructor": "T.A-Abrar", "location": "معمل 103" }
+                ],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "فيزياء", "instructor": "T.A-", "location": "معمل 416" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة التفاضل والتكامل", "instructor": "Dr.Hamdy", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "الكترونيات", "instructor": "T.A-Hossam", "location": "مدرج 4" },
+                    { "period": "الفترة الثالثة", "subject": "التفاضل والتكامل", "instructor": "T.A-Adel", "location": "مدرج 1" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة Creative thinking", "instructor": "Dr.Samah", "location": "Online" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة English", "instructor": "DR.sameh", "location": "Online" }
+                ]
+            },
+            "12": {
+                "الأحد": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة الكترونيات", "instructor": "Dr.Hayam", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة مقدمة في علوم الحاسب", "instructor": "Dr.Mohamed Elzwidy", "location": "مدرج 7" },
+                    { "period": "الفترة الثالثة", "subject": "فيزياء", "instructor": "T.A-", "location": "معمل 416" }
+                ],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة فيزياء", "instructor": "Dr.Mahmoud abd elmohsen", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "الكترونيات", "instructor": "T.A-Hossam", "location": "مدرج 5" }
+                ],
+                "الثلاثاء": [],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة التفاضل والتكامل", "instructor": "Dr.Hamdy", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "مقدمة في علوم الحاسب", "instructor": "T.A-Abrar", "location": "lab 222_Al" },
+                    { "period": "الفترة الثالثة", "subject": "التفاضل والتكامل", "instructor": "T.A-Adel", "location": "مدرج 1" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة Creative thinking", "instructor": "Dr.Samah", "location": "Online" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة English", "instructor": "DR.sameh", "location": "Online" }
+                ]
+            },
+            "13": {
+                "الأحد": [
+                    { "period": "الفترة الأولى", "subject": "التفاضل والتكامل", "instructor": "T.A-Adel", "location": "مدرج 6" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة الكترونيات", "instructor": "Dr.Hayam", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة مقدمة في علوم الحاسب", "instructor": "Dr.Mohamed Elzwidy", "location": "مدرج 7" }
+                ],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة فيزياء", "instructor": "Dr.Mahmoud abd elmohsen", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "الكترونيات", "instructor": "T.A-Asmaa", "location": "مدرج 2" },
+                    { "period": "الفترة الثالثة", "subject": "فيزياء", "instructor": "T.A-", "location": "معمل 418" }
+                ],
+                "الثلاثاء": [],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة التفاضل والتكامل", "instructor": "Dr.Hamdy", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "مقدمة في علوم", "instructor": "T.A-Fatma", "location": "lab 201_Al" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة Creative thinking", "instructor": "Dr.Samah", "location": "Online" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة English", "instructor": "DR.sameh", "location": "Online" }
+                ]
+            },
+            "14": {
+                "الأحد": [
+                    { "period": "الفترة الأولى", "subject": "التفاضل والتكامل", "instructor": "T.A-Adel", "location": "مدرج 6" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة الكترونيات", "instructor": "Dr.Hayam", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة مقدمة في علوم الحاسب", "instructor": "Dr.Mohamed Elzwidy", "location": "مدرج 7" }
+                ],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة فيزياء", "instructor": "Dr.Mahmoud abd elmohsen", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "الكترونيات", "instructor": "T.A-Asmaa", "location": "مدرج 3" }
+                ],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "فيزياء", "instructor": "T.A-", "location": "معمل 416" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة التفاضل والتكامل", "instructor": "Dr.Hamdy", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "مقدمة في علوم الحاسب", "instructor": "T.A-Fatma", "location": "معمل 105" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة Creative thinking", "instructor": "Dr.Samah", "location": "Online" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة English", "instructor": "DR.sameh", "location": "Online" }
+                ]
+            },
+            "15": {
+                "الأحد": [
+                    { "period": "الفترة الأولى", "subject": "مقدمة في علوم الحاسب", "instructor": "T.A-Fatma", "location": "معمل 103" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة الكترونيات", "instructor": "Dr.Hayam", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة مقدمة في علوم الحاسب", "instructor": "Dr.Mohamed Elzwidy", "location": "مدرج 7" }
+                ],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة فيزياء", "instructor": "Dr.Mahmoud abd elmohsen", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "الكترونيات", "instructor": "T.A-Asmaa", "location": "مدرج 1" }
+                ],
+                "الثلاثاء": [],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة التفاضل والتكامل", "instructor": "Dr.Hamdy", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "التفاضل والتكامل", "instructor": "T.A-Adel", "location": "مدرج 3" },
+                    { "period": "الفترة الثالثة", "subject": "فيزياء", "instructor": "T.A-", "location": "معمل 416" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة Creative thinking", "instructor": "Dr.Samah", "location": "Online" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة English", "instructor": "DR.sameh", "location": "Online" }
+                ]
+            },
+            "16": {
+                "الأحد": [
+                    { "period": "الفترة الأولى", "subject": "مقدمة في علوم الحاسب", "instructor": "T.A-Fatma", "location": "معمل 205" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة الكترونيات", "instructor": "Dr.Hayam", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة مقدمة في علوم الحاسب", "instructor": "Dr.Mohamed Elzwidy", "location": "مدرج 7" }
+                ],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة فيزياء", "instructor": "Dr.Mahmoud abd elmohsen", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "الكترونيات", "instructor": "T.A-Asmaa", "location": "مدرج 3" }
+                ],
+                "الثلاثاء": [],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة التفاضل والتكامل", "instructor": "Dr.Hamdy", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "التفاضل والتكامل", "instructor": "T.A-Adel", "location": "مدرج 3" },
+                    { "period": "الفترة الثالثة", "subject": "فيزياء", "instructor": "T.A-", "location": "معمل 417" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة Creative thinking", "instructor": "Dr.Samah", "location": "Online" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة English", "instructor": "DR.sameh", "location": "Online" }
+                ]
+            },
+            "17": {
+                "الأحد": [
+                    { "period": "الفترة الأولى", "subject": "مقدمة في علوم الحاسب", "instructor": "T.A-Salma Anwar", "location": "معمل 104" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة الكترونيات", "instructor": "Dr.Hayam", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة مقدمة في علوم الحاسب", "instructor": "Dr.Mohamed Elzwidy", "location": "مدرج 7" }
+                ],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة فيزياء", "instructor": "Dr.Mahmoud abd elmohsen", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "التفاضل والتكامل", "instructor": "T.A-Adel", "location": "مدرج 4" }
+                ],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "الكترونيات", "instructor": "T.A-Asmaa", "location": "مدرج 3" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة التفاضل والتكامل", "instructor": "Dr.Hamdy", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "فيزياء", "instructor": "T.A-", "location": "معمل 417" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة Creative thinking", "instructor": "Dr.Samah", "location": "Online" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة English", "instructor": "DR.sameh", "location": "Online" }
+                ]
+            },
+            "18": {
+                "الأحد": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة الكترونيات", "instructor": "Dr.Hayam", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة مقدمة في علوم الحاسب", "instructor": "Dr.Mohamed Elzwidy", "location": "مدرج 7" }
+                ],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة فيزياء", "instructor": "Dr.Mahmoud abd elmohsen", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "التفاضل والتكامل", "instructor": "T.A-Adel", "location": "مدرج 4" }
+                ],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "الكترونيات", "instructor": "T.A-Asmaa", "location": "مدرج 5" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة التفاضل والتكامل", "instructor": "Dr.Hamdy", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "فيزياء", "instructor": "T.A-", "location": "معمل 322" },
+                    { "period": "الفترة الثالثة", "subject": "مقدمة في علوم الحاسب", "instructor": "T.A-Salma Anwar", "location": "معمل 004" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة Creative thinking", "instructor": "Dr.Samah", "location": "Online" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة English", "instructor": "DR.sameh", "location": "Online" }
+                ]
+            }
+        },
+        "2": {}
+    },
+    "2": {
+        "1": {
+            "1": {
+                "الأحد": [],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة تنظيم الحاسب ولغة التجميع", "instructor": "Dr.Tarek Salah", "location": "مدرج 7" }
+                ],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة إحصاء واحتمالات", "instructor": "Dr.Helmy", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "إحصاء واحتمالات", "instructor": "TA.Eman", "location": "مدرج 5" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة أخلاقيات العمل", "instructor": "Dr.Sameh sherif", "location": "مدرج 1 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "البرمجة الشيئية", "instructor": "TA.Radwa", "location": "معمل 101" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة البرمجة الشيئية", "instructor": "Dr.Mohamed Hussein", "location": "مدرج 7" },
+                    { "period": "الفترة الرابعة", "subject": "تنظيم الحاسب", "instructor": "TA.Wafaa", "location": "معمل 203" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة معالجة الملفات", "instructor": "Dr.Osama Shafik", "location": "مدرج 1 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "بحوث عمليات", "instructor": "TA.Alaa Mohamed", "location": "مدرج 5" },
+                    { "period": "الفترة الثالثة", "subject": "معالجة الملفات", "instructor": "TA.Omnia", "location": "معمل 101" }
+                ]
+            },
+            "2": {
+                "الأحد": [],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة تنظيم الحاسب ولغة التجميع", "instructor": "Dr.Tarek Salah", "location": "مدرج 7" }
+                ],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة إحصاء واحتمالات", "instructor": "Dr.Helmy", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "إحصاء واحتمالات", "instructor": "TA.Eman", "location": "مدرج 5" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة أخلاقيات العمل", "instructor": "Dr.Sameh sherif", "location": "مدرج 1 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "تنظيم الحاسب", "instructor": "TA.Wafaa", "location": "معمل 203 Al" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة البرمجة الشيئية", "instructor": "Dr.Mohamed Hussein", "location": "مدرج 7" },
+                    { "period": "الفترة الرابعة", "subject": "البرمجة الشيئية", "instructor": "TA.Radwa", "location": "معمل 218 Al" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة معالجة الملفات", "instructor": "Dr.Osama Shafik", "location": "مدرج 1 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "بحوث عمليات", "instructor": "TA.Alaa Mohamed", "location": "مدرج 5" },
+                    { "period": "الفترة الثالثة", "subject": "معالجة الملفات", "instructor": "TA.Omnia", "location": "معمل 102" }
+                ]
+            },
+            "3": {
+                "الأحد": [],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "إحصاء واحتمالات", "instructor": "TA.Eman", "location": "مدرج 2" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة تنظيم الحاسب ولغة التجميع", "instructor": "Dr.Tarek Salah", "location": "مدرج 7" }
+                ],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "تنظيم الحاسب", "instructor": "TA.Wafaa", "location": "معمل 002" },
+                    { "period": "الفترة الثانية", "subject": "البرمجة الشيئية", "instructor": "TA.Radwa", "location": "معمل 105" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة إحصاء واحتمالات", "instructor": "Dr.Helmy", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الرابعة", "subject": "محاضرة بحوث عمليات", "instructor": "Dr.Mohamed Mostafa", "location": "مدرج 7" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة أخلاقيات العمل", "instructor": "Dr.Sameh sherif", "location": "مدرج 1 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "معالجة الملفات", "instructor": "TA.Omnia", "location": "معمل 002" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة البرمجة الشيئية", "instructor": "Dr.Mohamed Hussein", "location": "مدرج 7" },
+                    { "period": "الفترة الرابعة", "subject": "بحوث عمليات", "instructor": "TA.Alaa Mohamed", "location": "مدرج 5" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة معالجة الملفات", "instructor": "Dr.Osama Shafik", "location": "مدرج 1 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "معالجة الملفات", "instructor": "TA.Omnia", "location": "معمل 218 Al" }
+                ]
+            },
+            "4": {
+                "الأحد": [],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "إحصاء واحتمالات", "instructor": "TA.Eman", "location": "مدرج 2" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة تنظيم الحاسب ولغة التجميع", "instructor": "Dr.Tarek Salah", "location": "مدرج 7" }
+                ],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "البرمجة الشيئية", "instructor": "TA.Layla", "location": "معمل 101" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة إحصاء واحتمالات", "instructor": "Dr.Helmy", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة بحوث عمليات", "instructor": "Dr.Mohamed Mostafa", "location": "مدرج 7" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة أخلاقيات العمل", "instructor": "Dr.Sameh sherif", "location": "مدرج 1 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "معالجة الملفات", "instructor": "TA.Omnia", "location": "معمل 002" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة البرمجة الشيئية", "instructor": "Dr.Mohamed Hussein", "location": "مدرج 7" },
+                    { "period": "الفترة الرابعة", "subject": "بحوث عمليات", "instructor": "TA.Alaa Mohamed", "location": "مدرج 5" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة معالجة الملفات", "instructor": "Dr.Osama Shafik", "location": "مدرج 1 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "تنظيم الحاسب", "instructor": "TA.Farah", "location": "معمل 303" },
+                    { "period": "الفترة الثالثة", "subject": "البرمجة الشيئية", "instructor": "TA.Layla", "location": "معمل 004" }
+                ]
+            },
+            "5": {
+                "الأحد": [],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "إحصاء واحتمالات", "instructor": "TA.Eman", "location": "مدرج 4" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة تنظيم الحاسب ولغة التجميع", "instructor": "Dr.Tarek Salah", "location": "مدرج 7" }
+                ],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "معالجة الملفات", "instructor": "TA.Omnia", "location": "معمل 103" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة إحصاء واحتمالات", "instructor": "Dr.Helmy", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة بحوث عمليات", "instructor": "Dr.Mohamed Mostafa", "location": "مدرج 7" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة أخلاقيات العمل", "instructor": "Dr.Sameh sherif", "location": "مدرج 1 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "تنظيم الحاسب", "instructor": "TA.Farah", "location": "معمل 218 Al" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة البرمجة الشيئية", "instructor": "Dr.Mohamed Hussein", "location": "مدرج 7" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة معالجة الملفات", "instructor": "Dr.Osama Shafik", "location": "مدرج 1 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "بحوث عمليات", "instructor": "TA.Alaa Mohamed", "location": "مدرج 5" }
+                ]
+            },
+            "6": {
+                "الأحد": [],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "إحصاء واحتمالات", "instructor": "TA.Eman", "location": "مدرج 4" },
+                    { "period": "الفترة الثانية", "subject": "تنظيم الحاسب", "instructor": "TA.Farah", "location": "معمل 201 Al" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة تنظيم الحاسب ولغة التجميع", "instructor": "Dr.Tarek Salah", "location": "مدرج 7" }
+                ],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "معالجة الملفات", "instructor": "TA.Omnia", "location": "معمل 103" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة إحصاء واحتمالات", "instructor": "Dr.Helmy", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة بحوث عمليات", "instructor": "Dr.Mohamed Mostafa", "location": "مدرج 7" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة أخلاقيات العمل", "instructor": "Dr.Sameh sherif", "location": "مدرج 1 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "البرمجة الشيئية", "instructor": "TA.Layla", "location": "معمل 104" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة البرمجة الشيئية", "instructor": "Dr.Mohamed Hussein", "location": "مدرج 7" },
+                    { "period": "الفترة الرابعة", "subject": "معالجة الملفات", "instructor": "TA.Omnia", "location": "معمل 101" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة معالجة الملفات", "instructor": "Dr.Osama Shafik", "location": "مدرج 1 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "بحوث عمليات", "instructor": "TA.Alaa Mohamed", "location": "مدرج 5" }
+                ]
+            },
+            "7": {
+                "الأحد": [],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "تنظيم الحاسب", "instructor": "TA.Farah", "location": "معمل 201 Al" },
+                    { "period": "الفترة الثانية", "subject": "بحوث عمليات", "instructor": "TA.Ahmed Hazem", "location": "مدرج 1" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة تنظيم الحاسب ولغة التجميع", "instructor": "Dr.Tarek Salah", "location": "مدرج 7" }
+                ],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة إحصاء واحتمالات", "instructor": "Dr.Helmy", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة بحوث عمليات", "instructor": "Dr.Mohamed Mostafa", "location": "مدرج 7" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة أخلاقيات العمل", "instructor": "Dr.Sameh sherif", "location": "مدرج 1 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "إحصاء واحتمالات", "instructor": "TA.Eman", "location": "مدرج 3" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة البرمجة الشيئية", "instructor": "Dr.Mohamed Hussein", "location": "مدرج 7" },
+                    { "period": "الفترة الرابعة", "subject": "معالجة الملفات", "instructor": "TA.Omnia", "location": "معمل 101" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة معالجة الملفات", "instructor": "Dr.Osama Shafik", "location": "مدرج 1 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "البرمجة الشيئية", "instructor": "TA.Layla", "location": "معمل 218 Al" }
+                ]
+            },
+            "8": {
+                "الأحد": [],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "معالجة الملفات", "instructor": "TA.Salma Tarek", "location": "معمل 104" },
+                    { "period": "الفترة الثانية", "subject": "بحوث عمليات", "instructor": "TA.Ahmed Hazem", "location": "مدرج 1" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة تنظيم الحاسب ولغة التجميع", "instructor": "Dr.Tarek Salah", "location": "مدرج 7" }
+                ],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "تنظيم الحاسب", "instructor": "TA.Malak", "location": "معمل 203" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة إحصاء واحتمالات", "instructor": "Dr.Helmy", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الثالثة", "subject": "البرمجة الشيئية", "instructor": "TA.Layla", "location": "معمل 104" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة أخلاقيات العمل", "instructor": "Dr.Sameh sherif", "location": "مدرج 1 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "إحصاء واحتمالات", "instructor": "TA.Eman", "location": "مدرج 3" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة البرمجة الشيئية", "instructor": "Dr.Mohamed Hussein", "location": "مدرج 7" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة معالجة الملفات", "instructor": "Dr.Osama Shafik", "location": "مدرج 1 اعلام" }
+                ]
+            },
+            "9": {
+                "الأحد": [],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "معالجة الملفات", "instructor": "TA.Salma Tarek", "location": "معمل 205" },
+                    { "period": "الفترة الثانية", "subject": "البرمجة الشيئية", "instructor": "TA.Ethar", "location": "معمل 222 Al" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة تنظيم الحاسب ولغة التجميع", "instructor": "Dr.Tarek Salah", "location": "مدرج 7" }
+                ],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة إحصاء واحتمالات", "instructor": "Dr.Helmy", "location": "مدرج 5 اعلام" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة أخلاقيات العمل", "instructor": "Dr.Sameh sherif", "location": "مدرج 1 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "بحوث عمليات", "instructor": "TA.Ahmed Hazem", "location": "مدرج 5" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة البرمجة الشيئية", "instructor": "Dr.Mohamed Hussein", "location": "مدرج 7" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة معالجة الملفات", "instructor": "Dr.Osama Shafik", "location": "مدرج 1 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "تنظيم الحاسب", "instructor": "TA.Malak", "location": "معمل 004" },
+                    { "period": "الفترة الثالثة", "subject": "إحصاء واحتمالات", "instructor": "TA.Alaa Mohamed", "location": "مدرج 1" }
+                ]
+            },
+            "10": {
+                "الأحد": [
+                    { "period": "الفترة الأولى", "subject": "بحوث عمليات", "instructor": "TA. Ahmed Hazem", "location": "مدرج 2" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة البرمجة الشيئية", "instructor": "Dr. Mohamed Hussein", "location": "مدرج 5" }
+                ],
+                "الإثنين": [],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "تنظيم الحاسب", "instructor": "TA. Reham", "location": "معمل 203 Al" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة إحصاء واحتمالات", "instructor": "Dr. Helmy Abdelaziz", "location": "مدرج 1" },
+                    { "period": "الفترة الثالثة", "subject": "البرمجة الشيئية", "instructor": "TA. Ethar", "location": "معمل 101" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة تنظيم الحاسب ولغة التجميع", "instructor": "Dr. Tarek Salah", "location": "مدرج 8" },
+                    { "period": "الفترة الثانية", "subject": "معالجة الملفات", "instructor": "TA. Salma Tarek", "location": "معمل 105" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة بحوث عمليات", "instructor": "Dr. Mohamed Mostafa", "location": "مدرج 3" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة أخلاقيات العمل", "instructor": "Dr. Sameh Sherif", "location": "مدرج 1" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة معالجة الملفات", "instructor": "Dr. Osama Shafik", "location": "مدرج 1" },
+                    { "period": "الفترة الثالثة", "subject": "إحصاء واحتمالات", "instructor": "TA. Alaa Mohamed", "location": "مدرج 1" }
+                ]
+            },
+            "11": {
+                "الأحد": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة البرمجة الشيئية", "instructor": "Dr. Mohamed Hussein", "location": "مدرج 5" }
+                ],
+                "الإثنين": [],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "معالجة الملفات", "instructor": "TA. Salma Tarek", "location": "معمل 103" },
+                    { "period": "الفترة الثانية", "subject": "البرمجة الشيئية", "instructor": "TA. Ethar", "location": "معمل 201 Al" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة إحصاء واحتمالات", "instructor": "Dr. Helmy Abdelaziz", "location": "مدرج 1" },
+                    { "period": "الفترة الرابعة", "subject": "تنظيم الحاسب", "instructor": "TA. Reham", "location": "معمل 201 Al" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة تنظيم الحاسب ولغة التجميع", "instructor": "Dr. Tarek Salah", "location": "مدرج 8" },
+                    { "period": "الفترة الثانية", "subject": "بحوث عمليات", "instructor": "TA. Ahmed Hazem", "location": "مدرج 5" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة بحوث عمليات", "instructor": "Dr. Mohamed Mostafa", "location": "مدرج 3" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "إحصاء واحتمالات", "instructor": "TA. Alaa Mohamed", "location": "مدرج 6" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة أخلاقيات العمل", "instructor": "Dr. Sameh Sherif", "location": "مدرج 1" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة معالجة الملفات", "instructor": "Dr. Osama Shafik", "location": "مدرج 1" }
+                ]
+            },
+            "12": {
+                "الأحد": [
+                    { "period": "الفترة الأولى", "subject": "البرمجة الشيئية", "instructor": "TA. Abrar", "location": "معمل 105" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة البرمجة الشيئية", "instructor": "Dr. Mohamed Hussein", "location": "مدرج 5" },
+                    { "period": "الفترة الثالثة", "subject": "بحوث عمليات", "instructor": "TA. Ahmed Hazem", "location": "مدرج 3" }
+                ],
+                "الإثنين": [],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "تنظيم الحاسب", "instructor": "TA. Reham", "location": "معمل 004" },
+                    { "period": "الفترة الثانية", "subject": "معالجة الملفات", "instructor": "TA. Asmaa Ghoneim", "location": "معمل 103" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة إحصاء واحتمالات", "instructor": "Dr. Helmy Abdelaziz", "location": "مدرج 1" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة تنظيم الحاسب ولغة التجميع", "instructor": "Dr. Tarek Salah", "location": "مدرج 8" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة بحوث عمليات", "instructor": "Dr. Mohamed Mostafa", "location": "مدرج 3" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "إحصاء واحتمالات", "instructor": "TA. Alaa Mohamed", "location": "مدرج 6" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة أخلاقيات العمل", "instructor": "Dr. Sameh Sherif", "location": "مدرج 1" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة معالجة الملفات", "instructor": "Dr. Osama Shafik", "location": "مدرج 1" }
+                ]
+            },
+            "13": {
+                "الأحد": [
+                    { "period": "الفترة الأولى", "subject": "إحصاء واحتمالات", "instructor": "TA. Alaa Mohamed", "location": "مدرج 2" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة البرمجة الشيئية", "instructor": "Dr. Mohamed Hussein", "location": "مدرج 5" },
+                    { "period": "الفترة الثالثة", "subject": "تنظيم الحاسب", "instructor": "TA. Somaya", "location": "معمل 201 Al" }
+                ],
+                "الإثنين": [],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "البرمجة الشيئية", "instructor": "TA. Abrar", "location": "معمل 303" },
+                    { "period": "الفترة الثانية", "subject": "بحوث عمليات", "instructor": "TA. Ahmed Hazem", "location": "مدرج 3" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة إحصاء واحتمالات", "instructor": "Dr. Helmy Abdelaziz", "location": "مدرج 1" },
+                    { "period": "الفترة الرابعة", "subject": "معالجة الملفات", "instructor": "TA. Asmaa Ghoneim", "location": "معمل 205" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة تنظيم الحاسب ولغة التجميع", "instructor": "Dr. Tarek Salah", "location": "مدرج 8" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة بحوث عمليات", "instructor": "Dr. Mohamed Mostafa", "location": "مدرج 3" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة أخلاقيات العمل", "instructor": "Dr. Sameh Sherif", "location": "مدرج 1" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة معالجة الملفات", "instructor": "Dr. Osama Shafik", "location": "مدرج 1" }
+                ]
+            },
+            "14": {
+                "الأحد": [
+                    { "period": "الفترة الأولى", "subject": "إحصاء واحتمالات", "instructor": "TA. Alaa Mohamed", "location": "مدرج 2" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة البرمجة الشيئية", "instructor": "Dr. Mohamed Hussein", "location": "مدرج 5" }
+                ],
+                "الإثنين": [],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "بحوث عمليات", "instructor": "TA. Ahmed Hazem", "location": "مدرج 3" },
+                    { "period": "الفترة الثانية", "subject": "معالجة الملفات", "instructor": "TA. Salma Tarek", "location": "معمل 203" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة إحصاء واحتمالات", "instructor": "Dr. Helmy Abdelaziz", "location": "مدرج 1" },
+                    { "period": "الفترة الرابعة", "subject": "البرمجة الشيئية", "instructor": "TA. Abrar", "location": "معمل 002" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة تنظيم الحاسب ولغة التجميع", "instructor": "Dr. Tarek Salah", "location": "مدرج 8" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة بحوث عمليات", "instructor": "Dr. Mohamed Mostafa", "location": "مدرج 3" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "تنظيم الحاسب", "instructor": "TA. Somaya", "location": "معمل 103" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة أخلاقيات العمل", "instructor": "Dr. Sameh Sherif", "location": "مدرج 1" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة معالجة الملفات", "instructor": "Dr. Osama Shafik", "location": "مدرج 1" }
+                ]
+            }
+        },
+        "2": {}
+    },
+    "3": { "1": {}, "2": {} },
+    "4": { "1": {}, "2": {} }
+};
+exports.cyberScheduleData = {
+    "1": {
+        "1": {
+            "1": {
+                "الأحد": [
+                    { "period": "الفترة الأولى", "subject": "الرياضيات غير المتصلة", "instructor": "T.A Doaa", "location": "مدرج 3" },
+                    { "period": "الفترة الثانية", "subject": "الكترونيات", "instructor": "T.A Asmaa Ghonaim", "location": "مدرج 6" }
+                ],
+                "الإثنين": [],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة الرياضيات غير المتصلة", "instructor": "Dr Maher Zaid", "location": "مدرج 1" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة التفاضل والتكامل", "instructor": "Dr Mahmoud Gabr", "location": "مدرج 6" },
+                    { "period": "الفترة الثالثة", "subject": "مقدمة في علوم الحاسب", "instructor": "T.A- Aya", "location": "Lab 004" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "التفاضل والتكامل", "instructor": "T.A-Alaa Mohamed", "location": "مدرج 2" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة الكترونيات", "instructor": "Dr Shimaa Osman", "location": "مدرج 1 اعلام" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة مقدمة في علوم الحاسب", "instructor": "Dr Hayam Reda", "location": "مدرج 5 اعلام" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة فكر ابداعي ومهارات التواصل", "instructor": "Dr Samah Ayaad", "location": "Online" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة اللغة الانجليزية", "instructor": "Dr Sameh Sherif", "location": "Online" }
+                ]
+            },
+            "2": {
+                "الأحد": [
+                    { "period": "الفترة الأولى", "subject": "الرياضيات غير المتصلة", "instructor": "T.A Doaa", "location": "مدرج 1" },
+                    { "period": "الفترة الثانية", "subject": "مقدمة في علوم الحاسب", "instructor": "T.A-Aya", "location": "Lab 203" },
+                    { "period": "الفترة الثالثة", "subject": "الكترونيات", "instructor": "T.A Malak", "location": "مدرج 4" }
+                ],
+                "الإثنين": [],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة الرياضيات غير المتصلة", "instructor": "Dr Maher Zaid", "location": "مدرج 1" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة التفاضل والتكامل", "instructor": "Dr Mahmoud Gabr", "location": "مدرج 6" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "التفاضل والتكامل", "instructor": "T.A-Alaa Mohamed", "location": "مدرج 2" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة الكترونيات", "instructor": "Dr Shimaa Osman", "location": "مدرج 1 اعلام" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة مقدمة في علوم الحاسب", "instructor": "Dr Hayam Reda", "location": "مدرج 5 اعلام" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة فكر ابداعي ومهارات التواصل", "instructor": "Dr Samah Ayaad", "location": "Online" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة اللغة الانجليزية", "instructor": "Dr Sameh Sherif", "location": "Online" }
+                ]
+            },
+            "3": {
+                "الأحد": [
+                    { "period": "الفترة الأولى", "subject": "مقدمة في علوم الحاسب", "instructor": "T.A-Aya", "location": "Lab 203 Al" }
+                ],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "الرياضيات غير المتصلة", "instructor": "T.A Doaa", "location": "مدرج 4" }
+                ],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة الرياضيات غير المتصلة", "instructor": "Dr Maher Zaid", "location": "مدرج 1" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة التفاضل والتكامل", "instructor": "Dr Mahmoud Gabr", "location": "مدرج 6" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "التفاضل والتكامل", "instructor": "T.A Eman", "location": "مدرج 4" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة الكترونيات", "instructor": "Dr Shimaa Osman", "location": "مدرج 1 اعلام" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة مقدمة في علوم الحاسب", "instructor": "Dr Hayam Reda", "location": "مدرج 5 اعلام" },
+                    { "period": "الفترة الرابعة", "subject": "الكترونيات", "instructor": "T.A Malak", "location": "مدرج 6" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة فكر ابداعي ومهارات التواصل", "instructor": "Dr Samah Ayaad", "location": "Online" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة اللغة الانجليزية", "instructor": "Dr Sameh Sherif", "location": "Online" }
+                ]
+            },
+            "4": {
+                "الأحد": [
+                    { "period": "الفترة الأولى", "subject": "مقدمة في علوم الحاسب", "instructor": "T.A-Aya", "location": "Lab 103" }
+                ],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "الرياضيات غير المتصلة", "instructor": "T.A Doaa", "location": "مدرج 3" }
+                ],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة الرياضيات غير المتصلة", "instructor": "Dr Maher Zaid", "location": "مدرج 1" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة التفاضل والتكامل", "instructor": "Dr Mahmoud Gabr", "location": "مدرج 6" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "التفاضل والتكامل", "instructor": "T.A Eman", "location": "مدرج 4" },
+                    { "period": "الفترة الثانية", "subject": "الكترونيات", "instructor": "T.A Malak", "location": "مدرج 2" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة الكترونيات", "instructor": "Dr Shimaa Osman", "location": "مدرج 1 اعلام" },
+                    { "period": "الفترة الرابعة", "subject": "محاضرة مقدمة في علوم الحاسب", "instructor": "Dr Hayam Reda", "location": "مدرج 5 اعلام" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة فكر ابداعي ومهارات التواصل", "instructor": "Dr Samah Ayaad", "location": "Online" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة اللغة الانجليزية", "instructor": "Dr Sameh Sherif", "location": "Online" }
+                ]
+            },
+            "5": {
+                "الأحد": [
+                    { "period": "الفترة الأولى", "subject": "الكترونيات", "instructor": "T.A Malak", "location": "مدرج 4" }
+                ],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "الرياضيات غير المتصلة", "instructor": "T.A Doaa", "location": "مدرج 3" },
+                    { "period": "الفترة الثانية", "subject": "مقدمة في علوم الحاسب", "instructor": "T.A-Aya", "location": "Lab 222 Al" },
+                    { "period": "الفترة الثالثة", "subject": "التفاضل والتكامل", "instructor": "T.A Eman", "location": "مدرج 6" }
+                ],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة الرياضيات غير المتصلة", "instructor": "Dr Maher Zaid", "location": "مدرج 1" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة التفاضل والتكامل", "instructor": "Dr Mahmoud Gabr", "location": "مدرج 6" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة الكترونيات", "instructor": "Dr Shimaa Osman", "location": "مدرج 1 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة مقدمة في علوم الحاسب", "instructor": "Dr Hayam Reda", "location": "مدرج 5 اعلام" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة فكر ابداعي ومهارات التواصل", "instructor": "Dr Samah Ayaad", "location": "Online" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة اللغة الانجليزية", "instructor": "Dr Sameh Sherif", "location": "Online" }
+                ]
+            }
+        },
+        "2": {}
+    },
+    "2": {
+        "1": {
+            "1": {
+                "الأحد": [
+                    { "period": "الفترة الأولى", "subject": "البرمجة الشيئية", "instructor": "T.A Ethar", "location": "Lab 303" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة تنظيم الحاسب ولغة التجميع", "instructor": "Dr Tarek Salah", "location": "مدرج 1 اعلام" }
+                ],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "مقدمة في نظم قواعد البيانات", "instructor": "T.A Esraa Safwat", "location": "Lab 303" },
+                    { "period": "الفترة الثانية", "subject": "تنظيم الحاسب", "instructor": "T.A Somia", "location": "Lab 205" }
+                ],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة إحصاء واحتمالات", "instructor": "Dr Helmy Abdel Aziz", "location": "مدرج 2" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة أخلاقيات العمل", "instructor": "Dr Sameh Sherif", "location": "مدرج 7" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة تراسل البيانات", "instructor": "Dr Mohamed Mokhtar", "location": "مدرج 4" },
+                    { "period": "الفترة الرابعة", "subject": "احصاء واحتمالات", "instructor": "T.A Ahmed Hazem", "location": "مدرج 4" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "تراسل البيانات", "instructor": "T.A Farah", "location": "Lab 002" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة البرمجة الشيئية", "instructor": "Dr Osama Shafik", "location": "مدرج 4" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة مقدمة في نظم قواعد البيانات", "instructor": "Dr Hayam Reda", "location": "مدرج 1 اعلام" }
+                ]
+            },
+            "2": {
+                "الأحد": [
+                    { "period": "الفترة الأولى", "subject": "مقدمة في نظم قواعد البيانات", "instructor": "T.A Esraa", "location": "Lab 002" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة تنظيم الحاسب ولغة التجميع", "instructor": "Dr Tarek Salah", "location": "مدرج 1 اعلام" }
+                ],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "إحصاء واحتمالات", "instructor": "T.A Adel", "location": "مدرج 1" },
+                    { "period": "الفترة الثانية", "subject": "تنظيم الحاسب", "instructor": "T.A Somia", "location": "Lab 203" },
+                    { "period": "الفترة الثالثة", "subject": "البرمجة الشيئية", "instructor": "T.A Ethar", "location": "Lab 102" }
+                ],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة إحصاء واحتمالات", "instructor": "Dr Helmy Abdel Aziz", "location": "مدرج 2" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة أخلاقيات العمل", "instructor": "Dr Sameh Sherif", "location": "مدرج 7" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة تراسل البيانات", "instructor": "Dr Mohamed Mokhtar", "location": "مدرج 4" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "تراسل البيانات", "instructor": "T.A Farah", "location": "Lab 105" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة البرمجة الشيئية", "instructor": "Dr Osama Shafik", "location": "مدرج 4" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة مقدمة في نظم قواعد البيانات", "instructor": "Dr Hayam Reda", "location": "مدرج 1 اعلام" }
+                ]
+            },
+            "3": {
+                "الأحد": [
+                    { "period": "الفترة الأولى", "subject": "تنظيم الحاسب", "instructor": "T.A Somia", "location": "Lab 222 Al" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة تنظيم الحاسب ولغة التجميع", "instructor": "Dr Tarek Salah", "location": "مدرج 1 اعلام" }
+                ],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "مقدمة في نظم قواعد البيانات", "instructor": "T.A Esraa Safwat", "location": "Lab 203 A" },
+                    { "period": "الفترة الثانية", "subject": "احصاء واحتمالات", "instructor": "T.A Ahmed Hazem", "location": "مدرج 6" }
+                ],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة إحصاء واحتمالات", "instructor": "Dr Helmy Abdel Aziz", "location": "مدرج 2" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة أخلاقيات العمل", "instructor": "Dr Sameh Sherif", "location": "مدرج 7" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة تراسل البيانات", "instructor": "Dr Mohamed Mokhtar", "location": "مدرج 4" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "البرمجة الشيئية", "instructor": "T.A Rania", "location": "Lab 102" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة البرمجة الشيئية", "instructor": "Dr Osama Shafik", "location": "مدرج 4" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة مقدمة في نظم قواعد البيانات", "instructor": "Dr Hayam Reda", "location": "مدرج 1 اعلام" },
+                    { "period": "الفترة الثالثة", "subject": "تراسل البيانات", "instructor": "T.A Fatma", "location": "Lab 201 Al" }
+                ]
+            },
+            "4": {
+                "الأحد": [
+                    { "period": "الفترة الأولى", "subject": "تراسل البيانات", "instructor": "T.A Fatma", "location": "Lab 105" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة تنظيم الحاسب ولغة التجميع", "instructor": "Dr Tarek Salah", "location": "مدرج 1 اعلام" }
+                ],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "احصاء واحتمالات", "instructor": "T.A Ahmed Hazem", "location": "مدرج 6" }
+                ],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة إحصاء واحتمالات", "instructor": "Dr Helmy Abdel Aziz", "location": "مدرج 2" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة أخلاقيات العمل", "instructor": "Dr Sameh Sherif", "location": "مدرج 7" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة تراسل البيانات", "instructor": "Dr Mohamed Mokhtar", "location": "مدرج 4" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "البرمجة الشيئية", "instructor": "T.A Rania", "location": "Lab 201 Al" },
+                    { "period": "الفترة الثانية", "subject": "مقدمة في نظم قواعد البيانات", "instructor": "T.A Roaa", "location": "Lab 102" },
+                    { "period": "الفترة الثالثة", "subject": "تنظيم الحاسب", "instructor": "T.A Somia", "location": "Lab 219 Al" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة البرمجة الشيئية", "instructor": "Dr Osama Shafik", "location": "مدرج 4" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة مقدمة في نظم قواعد البيانات", "instructor": "Dr Hayam Reda", "location": "مدرج 1 اعلام" }
+                ]
+            },
+            "5": {
+                "الأحد": [
+                    { "period": "الفترة الأولى", "subject": "مقدمة في نظم قواعد البيانات", "instructor": "T.A Roaa", "location": "Lab 102" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة تنظيم الحاسب ولغة التجميع", "instructor": "Dr Tarek Salah", "location": "مدرج 1 اعلام" }
+                ],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "إحصاء واحتمالات", "instructor": "T.A Adel", "location": "مدرج 1" },
+                    { "period": "الفترة الثانية", "subject": "تنظيم الحاسب", "instructor": "T.A Fatma", "location": "Lab 103" },
+                    { "period": "الفترة الثالثة", "subject": "تراسل البيانات", "instructor": "T.A Somia", "location": "Lab 203" }
+                ],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة إحصاء واحتمالات", "instructor": "Dr Helmy Abdel Aziz", "location": "مدرج 2" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة أخلاقيات العمل", "instructor": "Dr Sameh Sherif", "location": "مدرج 7" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة تراسل البيانات", "instructor": "Dr Mohamed Mokhtar", "location": "مدرج 4" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "البرمجة الشيئية", "instructor": "T.A Rania", "location": "Lab 303" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة البرمجة الشيئية", "instructor": "Dr Osama Shafik", "location": "مدرج 4" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة مقدمة في نظم قواعد البيانات", "instructor": "Dr Hayam Reda", "location": "مدرج 1 اعلام" }
+                ]
+            }
+        },
+        "2": {}
+    },
+    "3": { "1": {}, "2": {} },
+    "4": { "1": {}, "2": {} }
+};
+// AI department schedule data
+exports.aiScheduleData = {
+    "1": {
+        "1": {
+            "1": {
+                "الأحد": [
+                    { "period": "الفترة الأولى", "subject": "الكترونيات", "instructor": "T.A Nadine Kadry", "location": "مدرج 5" },
+                    { "period": "الفترة الثانية", "subject": "مقدمة في علوم الحاسب", "instructor": "T.A-Salma Anwar", "location": "Lab 222-Al" }
+                ],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "الرياضيات غير المتصلة", "instructor": "T.A Doaa", "location": "مدرج 2" },
+                    { "period": "الفترة الثانية", "subject": "التفاضل والتكامل", "instructor": "T.A-Eman", "location": "مدرج 5" }
+                ],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة التفاضل والتكامل", "instructor": "Dr Mahmoud Gabr", "location": "مدرج 4" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة الرياضيات غير المتصلة", "instructor": "Dr Maher Zaid", "location": "مدرج 3" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة الكترونيات", "instructor": "Dr Shimaa Osman", "location": "مدرج 1 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة مقدمة في علوم الحاسب", "instructor": "Dr Hayam Reda", "location": "مدرج 5 اعلام" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة فكر ابداعي ومهارات التواصل", "instructor": "Dr Samah Ayaad", "location": "Online" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة اللغة الانجليزية", "instructor": "Dr Sameh Sherif", "location": "Online" }
+                ]
+            },
+            "2": {
+                "الأحد": [
+                    { "period": "الفترة الأولى", "subject": "مقدمة في علوم الحاسب", "instructor": "T.A-Salma Anwar", "location": "Lab 203" }
+                ],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "الرياضيات غير المتصلة", "instructor": "T.A Doaa", "location": "مدرج 2" },
+                    { "period": "الفترة الثانية", "subject": "الكترونيات", "instructor": "T.A-Nadine Kadry", "location": "مدرج 6" },
+                    { "period": "الفترة الثالثة", "subject": "التفاضل والتكامل", "instructor": "T.A Eman", "location": "مدرج 5" }
+                ],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة التفاضل والتكامل", "instructor": "Dr Mahmoud Gabr", "location": "مدرج 4" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة الرياضيات غير المتصلة", "instructor": "Dr Maher Zaid", "location": "مدرج 3" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة الكترونيات", "instructor": "Dr Shimaa Osman", "location": "مدرج 1 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة مقدمة في علوم الحاسب", "instructor": "Dr Hayam Reda", "location": "مدرج 5 اعلام" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة فكر ابداعي ومهارات التواصل", "instructor": "Dr Samah Ayaad", "location": "Online" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة اللغة الانجليزية", "instructor": "Dr Sameh Sherif", "location": "Online" }
+                ]
+            },
+            "3": {
+                "الأحد": [
+                    { "period": "الفترة الأولى", "subject": "مقدمة في علوم الحاسب", "instructor": "T.A-Salma Anwar", "location": "Lab 205" },
+                    { "period": "الفترة الثانية", "subject": "الرياضيات غير المتصلة", "instructor": "T.A Doaa", "location": "مدرج 2" },
+                    { "period": "الفترة الثالثة", "subject": "الكترونيات", "instructor": "T.A-Nadine Kadry", "location": "مدرج 2" }
+                ],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "التفاضل والتكامل", "instructor": "T.A Eman", "location": "مدرج 5" }
+                ],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة التفاضل والتكامل", "instructor": "Dr Mahmoud Gabr", "location": "مدرج 4" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة الرياضيات غير المتصلة", "instructor": "Dr Maher Zaid", "location": "مدرج 3" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة الكترونيات", "instructor": "Dr Shimaa Osman", "location": "مدرج 1 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة مقدمة في علوم الحاسب", "instructor": "Dr Hayam Reda", "location": "مدرج 5 اعلام" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة فكر ابداعي ومهارات التواصل", "instructor": "Dr Samah Ayaad", "location": "Online" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة اللغة الانجليزية", "instructor": "Dr Sameh Sherif", "location": "Online" }
+                ]
+            },
+            "4": {
+                "الأحد": [
+                    { "period": "الفترة الأولى", "subject": "الرياضيات غير المتصلة", "instructor": "T.A Doaa", "location": "مدرج 2" }
+                ],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "الكترونيات", "instructor": "T.A-Nadine Kadry", "location": "مدرج 3" },
+                    { "period": "الفترة الثانية", "subject": "التفاضل والتكامل", "instructor": "T.A Eman", "location": "مدرج 5" }
+                ],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "مقدمة في علوم الحاسب", "instructor": "T.A-Menna Allah Khaled", "location": "Lab 102" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة التفاضل والتكامل", "instructor": "Dr Mahmoud Gabr", "location": "مدرج 4" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة الرياضيات غير المتصلة", "instructor": "Dr Maher Zaid", "location": "مدرج 3" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة الكترونيات", "instructor": "Dr Shimaa Osman", "location": "مدرج 1 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة مقدمة في علوم الحاسب", "instructor": "Dr Hayam Reda", "location": "مدرج 5 اعلام" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة فكر ابداعي ومهارات التواصل", "instructor": "Dr Samah Ayaad", "location": "Online" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة اللغة الانجليزية", "instructor": "Dr Sameh Sherif", "location": "Online" }
+                ]
+            },
+            "5": {
+                "الأحد": [
+                    { "period": "الفترة الأولى", "subject": "الكترونيات", "instructor": "T.A Nadine Kadry", "location": "مدرج 2" },
+                    { "period": "الفترة الثانية", "subject": "الرياضيات غير المتصلة", "instructor": "T.A Doaa", "location": "مدرج 1" }
+                ],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "التفاضل والتكامل", "instructor": "T.A Eman", "location": "مدرج 6" }
+                ],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "مقدمة في علوم الحاسب", "instructor": "T.A-Menna Allah Khaled", "location": "Lab 303" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة التفاضل والتكامل", "instructor": "Dr Mahmoud Gabr", "location": "مدرج 4" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة الرياضيات غير المتصلة", "instructor": "Dr Maher Zaid", "location": "مدرج 3" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة الكترونيات", "instructor": "Dr Shimaa Osman", "location": "مدرج 1 اعلام" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة مقدمة في علوم الحاسب", "instructor": "Dr Hayam Reda", "location": "مدرج 5 اعلام" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة فكر ابداعي ومهارات التواصل", "instructor": "Dr Samah Ayaad", "location": "Online" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة اللغة الانجليزية", "instructor": "Dr Sameh Sherif", "location": "Online" }
+                ]
+            }
+        },
+        "2": {}
+    },
+    "2": {
+        "1": {
+            "1": {
+                "الأحد": [
+                    { "period": "الفترة الأولى", "subject": "البرمجة الشيئية", "instructor": "T.A Wafaa", "location": "Lab 103" },
+                    { "period": "الفترة الثانية", "subject": "احصاء واحتمالات", "instructor": "T.A Ahmed Hazem", "location": "مدرج 6" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة تنظيم الحاسب ولغة التجميع", "instructor": "Dr Tarek Salah", "location": "مدرج 1 اعلام" }
+                ],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "مقدمة في نظم قواعد البيانات", "instructor": "T.A Asmaa Hassan", "location": "Lab 303" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة التحليل العددي", "instructor": "Dr Hamdy", "location": "مدرج 6" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة البرمجة الشيئية", "instructor": "Dr Osama Shafik", "location": "مدرج 6" }
+                ],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة أخلاقيات العمل", "instructor": "Dr Sameh Sherif", "location": "مدرج 7" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة احصاء واحتمالات", "instructor": "Dr Helmy", "location": "مدرج 2" }
+                ],
+                "الأربعاء": [],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "تنظيم الحاسب", "instructor": "T.A Menna Allah Khaled", "location": "Lab 101" },
+                    { "period": "الفترة الثانية", "subject": "التحليل العددي", "instructor": "T.A Adel", "location": "مدرج 3" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة مقدمة في نظم قواعد البيانات", "instructor": "Dr Hayam Reda", "location": "مدرج 1 اعلام" }
+                ]
+            },
+            "2": {
+                "الأحد": [
+                    { "period": "الفترة الأولى", "subject": "احصاء واحتمالات", "instructor": "T.A Ahmed Hazem", "location": "مدرج 6" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة تنظيم الحاسب ولغة التجميع", "instructor": "Dr Tarek Salah", "location": "مدرج 1 اعلام" }
+                ],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة التحليل العددي", "instructor": "Dr Hamdy", "location": "مدرج 6" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة البرمجة الشيئية", "instructor": "Dr Osama Shafik", "location": "مدرج 6" }
+                ],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "مقدمة في نظم قواعد البيانات", "instructor": "T.A Asmaa Hassan", "location": "Lab 203" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة أخلاقيات العمل", "instructor": "Dr Sameh Sherif", "location": "مدرج 7" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة احصاء واحتمالات", "instructor": "Dr Helmy", "location": "مدرج 2" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "تنظيم الحاسب", "instructor": "T.A Menna Allah Khaled", "location": "Lab 103" },
+                    { "period": "الفترة الثانية", "subject": "البرمجة الشيئية", "instructor": "T.A Wafaa", "location": "Lab 101" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "التحليل العددي", "instructor": "T.A Adel", "location": "مدرج 3" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة مقدمة في نظم قواعد البيانات", "instructor": "Dr Hayam Reda", "location": "مدرج 1 اعلام" }
+                ]
+            },
+            "3": {
+                "الأحد": [
+                    { "period": "الفترة الأولى", "subject": "البرمجة الشيئية", "instructor": "T.A Wafaa", "location": "Lab 201 Al" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة تنظيم الحاسب ولغة التجميع", "instructor": "Dr Tarek Salah", "location": "مدرج 1 اعلام" }
+                ],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "مقدمة في نظم قواعد البيانات", "instructor": "T.A Asmaa Hassan", "location": "Lab 222 Al" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة التحليل العددي", "instructor": "Dr Hamdy", "location": "مدرج 6" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة البرمجة الشيئية", "instructor": "Dr Osama Shafik", "location": "مدرج 6" }
+                ],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة أخلاقيات العمل", "instructor": "Dr Sameh Sherif", "location": "مدرج 7" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة احصاء واحتمالات", "instructor": "Dr Helmy", "location": "مدرج 2" }
+                ],
+                "الأربعاء": [
+                    { "period": "الفترة الأولى", "subject": "تنظيم الحاسب", "instructor": "T.A Menna Allah Khaled", "location": "Lab 218 Al" }
+                ],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "التحليل العددي", "instructor": "T.A Adel", "location": "مدرج 3" },
+                    { "period": "الفترة الثانية", "subject": "احصاء واحتمالات", "instructor": "T.A Adel", "location": "مدرج 3" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة مقدمة في نظم قواعد البيانات", "instructor": "Dr Hayam Reda", "location": "مدرج 1 اعلام" }
+                ]
+            },
+            "4": {
+                "الأحد": [
+                    { "period": "الفترة الأولى", "subject": "تنظيم الحاسب", "instructor": "T.A Menna Allah Khaled", "location": "Lab 218 Al" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة تنظيم الحاسب ولغة التجميع", "instructor": "Dr Tarek Salah", "location": "مدرج 1 اعلام" }
+                ],
+                "الإثنين": [
+                    { "period": "الفترة الأولى", "subject": "مقدمة في نظم قواعد البيانات", "instructor": "T.A Asmaa Hassan", "location": "Lab 105" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة التحليل العددي", "instructor": "Dr Hamdy", "location": "مدرج 6" },
+                    { "period": "الفترة الثالثة", "subject": "محاضرة البرمجة الشيئية", "instructor": "Dr Osama Shafik", "location": "مدرج 6" }
+                ],
+                "الثلاثاء": [
+                    { "period": "الفترة الأولى", "subject": "محاضرة أخلاقيات العمل", "instructor": "Dr Sameh Sherif", "location": "مدرج 7" },
+                    { "period": "الفترة الثانية", "subject": "محاضرة احصاء واحتمالات", "instructor": "Dr Helmy", "location": "مدرج 2" }
+                ],
+                "الأربعاء": [],
+                "الخميس": [
+                    { "period": "الفترة الأولى", "subject": "التحليل العددي", "instructor": "T.A Adel", "location": "مدرج 3" },
+                    { "period": "الفترة الثانية", "subject": "البرمجة الشيئية", "instructor": "TA-Layla", "location": "Lab 222-Al" },
+                    { "period": "الفترة الثالثة", "subject": "احصاء واحتمالات", "instructor": "T.A Adel", "location": "مدرج 3" },
+                    { "period": "الفترة الرابعة", "subject": "محاضرة مقدمة في نظم قواعد البيانات", "instructor": "Dr Hayam Reda", "location": "مدرج 1 اعلام" }
+                ]
+            }
+        },
+        "2": {}
+    },
+    "3": { "1": {}, "2": {} },
+    "4": { "1": {}, "2": {} }
+};
+exports.scheduleData = exports.csScheduleData;

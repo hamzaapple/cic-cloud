@@ -735,7 +735,15 @@ const AdminDashboard = () => {
                     <Select value={courseId} onValueChange={setCourseId}>
                       <SelectTrigger className="bg-secondary/50"><SelectValue placeholder={t("admin.selectCourse")} /></SelectTrigger>
                       <SelectContent>
-                        {filteredCourses.map(c => <SelectItem key={c.id} value={c.id}>{c.code ? `[${c.code}] ` : ""}{translateCourseName(c.name, lang)}</SelectItem>)}
+                        {filteredCourses.map(c => {
+                          const cDept = departments.find(d => d.id === c.department_id);
+                          const cDeptName = cDept ? (lang === "ar" ? cDept.name_ar : cDept.name_en) : "";
+                          return (
+                            <SelectItem key={c.id} value={c.id}>
+                              {c.code ? `[${c.code}] ` : ""}{translateCourseName(c.name, lang)} {cDeptName ? `(${cDeptName})` : ""}
+                            </SelectItem>
+                          );
+                        })}
                       </SelectContent>
                     </Select>
                     {!isPdfOnly && (
@@ -915,9 +923,15 @@ const AdminDashboard = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">{lang === "ar" ? "كل المقررات" : "All Courses"}</SelectItem>
-                      {filteredCourses.map(c => (
-                        <SelectItem key={c.id} value={c.id}>{c.code ? `[${c.code}] ` : ""}{translateCourseName(c.name, lang)}</SelectItem>
-                      ))}
+                      {filteredCourses.map(c => {
+                        const cDept = departments.find(d => d.id === c.department_id);
+                        const cDeptName = cDept ? (lang === "ar" ? cDept.name_ar : cDept.name_en) : "";
+                        return (
+                          <SelectItem key={c.id} value={c.id}>
+                            {c.code ? `[${c.code}] ` : ""}{translateCourseName(c.name, lang)} {cDeptName ? `(${cDeptName})` : ""}
+                          </SelectItem>
+                        );
+                      })}
                     </SelectContent>
                   </Select>
                   <Select value={materialCategoryFilter} onValueChange={setMaterialCategoryFilter}>

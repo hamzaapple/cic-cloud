@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { HardDriveDownload, Loader2, CheckCircle2 } from "lucide-react";
+import { useState, useRef } from "react";
+import { HardDriveDownload, Loader2, CheckCircle2, X } from "lucide-react";
 import { useOfflineStorage } from "@/hooks/use-offline-storage";
 import { useI18n } from "@/lib/i18n";
 import { toast } from "sonner";
@@ -26,6 +26,7 @@ export const BulkOfflineDownloadButton = ({
   const { lang } = useI18n();
   const [isDownloading, setIsDownloading] = useState(false);
   const [progress, setProgress] = useState({ completed: 0, total: 0, pct: 0 });
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   if (!isSupported) return null;
 
@@ -47,20 +48,35 @@ export const BulkOfflineDownloadButton = ({
     setIsDownloading(true);
     setProgress({ completed: 0, total: uncachedUrls.length, pct: 0 });
     
+    abortControllerRef.current = new AbortController();
+    
     try {
-      const success = await saveMultipleToOffline(uncachedUrls, (completed, total, pct) => {
-        setProgress({ completed, total, pct });
-      });
+      const success = await saveMultipleToOffline(
+        uncachedUrls, 
+        (completed, total, pct) => setProgress({ completed, total, pct }),
+        abortControllerRef.current.signal
+      );
       
       if (success) {
         toast.success(lang === "ar" ? "تم تحميل الملفات للعمل بدون إنترنت!" : "Files downloaded for offline use!");
-      } else {
+      } else if (!abortControllerRef.current.signal.aborted) {
         toast.error(lang === "ar" ? "حدث خطأ أثناء التحميل. يرجى التحقق من اتصالك." : "Error downloading. Please check your connection.");
       }
     } catch (err) {
       console.error("Bulk download failed:", err);
     } finally {
       setIsDownloading(false);
+      abortControllerRef.current = null;
+    }
+  };
+
+  const handleCancel = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    playClickSfx();
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      toast.info(lang === "ar" ? "تم إلغاء التحميل" : "Download cancelled");
     }
   };
 
@@ -69,18 +85,29 @@ export const BulkOfflineDownloadButton = ({
 
   if (isDownloading) {
     return (
-      <Button variant={variant} size={size} disabled className={cn("gap-2 w-full sm:w-auto relative overflow-hidden", className)}>
-        <div 
-          className="absolute inset-0 bg-primary/20 transition-all duration-300"
-          style={{ width: `${progress.pct}%` }}
-        />
-        <Loader2 className="w-4 h-4 animate-spin relative z-10" />
-        <span className="relative z-10 font-bold">
-          {lang === "ar" 
-            ? `جاري التحميل... ${progress.completed}/${progress.total} (${progress.pct}%)` 
-            : `Downloading... ${progress.completed}/${progress.total} (${progress.pct}%)`}
-        </span>
-      </Button>
+      <div className={cn("flex items-center gap-1 w-full sm:w-auto", className)}>
+        <Button variant={variant} size={size} disabled className="gap-2 flex-1 relative overflow-hidden pointer-events-none">
+          <div 
+            className="absolute inset-0 bg-primary/20 transition-all duration-300"
+            style={{ width: `${progress.pct}%` }}
+          />
+          <Loader2 className="w-4 h-4 animate-spin relative z-10 shrink-0" />
+          <span className="relative z-10 font-bold truncate">
+            {lang === "ar" 
+              ? `جاري التحميل... ${progress.completed}/${progress.total} (${progress.pct}%)` 
+              : `Downloading... ${progress.completed}/${progress.total} (${progress.pct}%)`}
+          </span>
+        </Button>
+        <Button 
+          variant="destructive" 
+          size="icon" 
+          onClick={handleCancel}
+          className="shrink-0 rounded-md"
+          title={lang === "ar" ? "إلغاء التحميل" : "Cancel download"}
+        >
+          <X className="w-4 h-4" />
+        </Button>
+      </div>
     );
   }
 

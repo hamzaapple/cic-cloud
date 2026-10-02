@@ -44,6 +44,9 @@ const CourseManager = ({ courses, departments, deptFilter, onUpdate, canEdit, ca
   const [editYear, setEditYear] = useState("1");
   const [editSemester, setEditSemester] = useState("2");
 
+  const [courseTargetDepts, setCourseTargetDepts] = useState<string[]>([]);
+  const [editTargetDepts, setEditTargetDepts] = useState<string[]>([]);
+
   // Shared courses state
   const [showSharePanel, setShowSharePanel] = useState(false);
   const [shareDeptId, setShareDeptId] = useState("");
@@ -95,9 +98,12 @@ const CourseManager = ({ courses, departments, deptFilter, onUpdate, canEdit, ca
     e.preventDefault();
     if (!courseName || !courseCode) { toast.error(t("admin.titleAndCourseReq")); return; }
     try {
-      await db.addCourse({ name: courseName, code: courseCode, description: courseDesc, department_id: courseDeptId === "none" ? null : (courseDeptId || null), academic_year: courseYear, semester: courseSemester });
+      const newCourse = await db.addCourse({ name: courseName, code: courseCode, description: courseDesc, department_id: courseDeptId === "none" ? null : (courseDeptId || null), academic_year: courseYear, semester: courseSemester });
+      if (courseTargetDepts.length > 0) {
+        await db.setTargetDepartmentsForCourse(newCourse.id, courseTargetDepts);
+      }
       onUpdate();
-      setCourseName(""); setCourseCode(""); setCourseDesc(""); setCourseYear("1"); setCourseSemester("2");
+      setCourseName(""); setCourseCode(""); setCourseDesc(""); setCourseYear("1"); setCourseSemester("2"); setCourseTargetDepts([]);
       toast.success(t("admin.uploadSuccess"));
     } catch (err: any) {
       console.error(err);
@@ -105,10 +111,25 @@ const CourseManager = ({ courses, departments, deptFilter, onUpdate, canEdit, ca
     }
   };
 
-  const startEdit = (c: Course) => { setEditingId(c.id); setEditName(translateCourseName(c.name, lang)); setEditCode(c.code); setEditDesc(c.description); setEditYear(c.academic_year || "1"); setEditSemester(c.semester || "2"); };
+  const startEdit = async (c: Course) => { 
+    setEditingId(c.id); 
+    setEditName(translateCourseName(c.name, lang)); 
+    setEditCode(c.code); 
+    setEditDesc(c.description || ""); 
+    setEditYear(c.academic_year || "1"); 
+    setEditSemester(c.semester || "2");
+    
+    try {
+      const shared = await db.getTargetDepartmentsForCourse(c.id);
+      setEditTargetDepts(shared);
+    } catch (e) {
+      setEditTargetDepts([]);
+    }
+  };
 
   const saveEdit = async (id: string) => {
     await db.updateCourse(id, { name: editName, code: editCode, description: editDesc, academic_year: editYear, semester: editSemester });
+    await db.setTargetDepartmentsForCourse(id, editTargetDepts);
     onUpdate();
     setEditingId(null);
     toast.success(t("courseMgr.allCourses"));
@@ -205,6 +226,22 @@ const CourseManager = ({ courses, departments, deptFilter, onUpdate, canEdit, ca
                     ))}
                   </SelectContent>
                 </Select>
+                {departments.length > 1 && (
+                  <div className="space-y-2 pt-2 border-t border-border">
+                    <p className="text-xs font-medium text-muted-foreground">{lang === "ar" ? "مشاركة مع أقسام أخرى:" : "Share with other departments:"}</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {departments.filter(d => d.id !== courseDeptId).map(d => (
+                        <label key={d.id} className="flex items-center gap-2 text-xs cursor-pointer">
+                          <Checkbox
+                            checked={courseTargetDepts.includes(d.id)}
+                            onCheckedChange={() => setCourseTargetDepts(prev => prev.includes(d.id) ? prev.filter(id => id !== d.id) : [...prev, d.id])}
+                          />
+                          {lang === "ar" ? d.name_ar : d.name_en}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <div className="grid grid-cols-2 gap-2">
                   <Select value={courseYear} onValueChange={setCourseYear} disabled={!isOwner}>
                     <SelectTrigger className="bg-secondary/50"><SelectValue placeholder="Year" /></SelectTrigger>
@@ -259,6 +296,22 @@ const CourseManager = ({ courses, departments, deptFilter, onUpdate, canEdit, ca
                         </SelectContent>
                       </Select>
                     </div>
+                    {departments.length > 1 && (
+                      <div className="space-y-2 pt-2 border-t border-border">
+                        <p className="text-xs font-medium text-muted-foreground">{lang === "ar" ? "مشاركة مع أقسام أخرى:" : "Share with other departments:"}</p>
+                        <div className="grid grid-cols-2 gap-2">
+                          {departments.filter(d => d.id !== course.department_id).map(d => (
+                            <label key={d.id} className="flex items-center gap-2 text-xs cursor-pointer">
+                              <Checkbox
+                                checked={editTargetDepts.includes(d.id)}
+                                onCheckedChange={() => setEditTargetDepts(prev => prev.includes(d.id) ? prev.filter(id => id !== d.id) : [...prev, d.id])}
+                              />
+                              {lang === "ar" ? d.name_ar : d.name_en}
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                     <div className="flex gap-2">
                       <Button size="sm" onClick={() => saveEdit(course.id)}><Check className="w-3 h-3 ml-1" /> {t("schedule.saveEdit")}</Button>
                       <Button size="sm" variant="ghost" onClick={() => setEditingId(null)}><X className="w-3 h-3 ml-1" /> {t("mod.cancel")}</Button>

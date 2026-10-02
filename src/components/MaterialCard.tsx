@@ -73,6 +73,7 @@ const MaterialCard = ({
   );
   const [editPdfDisplayName, setEditPdfDisplayName] = useState(material.pdf_display_name || "");
   const [editIsList, setEditIsList] = useState(material.is_list || false);
+  const [editIsReference, setEditIsReference] = useState(material.is_reference || false);
   const [editListContent, setEditListContent] = useState(material.list_content || "");
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -116,6 +117,7 @@ const MaterialCard = ({
     setEditDeadline(material.deadline ? material.deadline.slice(0, 16) : "");
     setEditPdfDisplayName(material.pdf_display_name || "");
     setEditIsList(material.is_list || false);
+    setEditIsReference(material.is_reference || false);
     setEditListContent(material.list_content || "");
     setEditOpen(true);
   };
@@ -136,6 +138,7 @@ const MaterialCard = ({
         deadline: editDeadline || null,
         pdf_display_name: editPdfDisplayName || null,
         is_list: editIsList,
+        is_reference: editIsReference,
         list_content: editIsList ? editListContent : null,
       });
       toast.success(lang === "ar" ? "تم التعديل بنجاح ✅" : "Updated successfully ✅");
@@ -573,6 +576,19 @@ const MaterialCard = ({
                   />
                   <label htmlFor={`editIsList-${material.id}`} className="text-sm font-medium cursor-pointer">
                     {lang === "ar" ? "هذه المادة عبارة عن قائمة منسدلة (Playlist)" : "This material is a dropdown list (Playlist)"}
+                  </label>
+                </div>
+
+                <div className="flex items-center gap-2 mt-1 mb-2">
+                  <input
+                    type="checkbox"
+                    id={`editIsReference-${material.id}`}
+                    checked={editIsReference}
+                    onChange={(e) => setEditIsReference(e.target.checked)}
+                    className="accent-amber-500"
+                  />
+                  <label htmlFor={`editIsReference-${material.id}`} className="text-sm font-medium cursor-pointer">
+                    {lang === "ar" ? "هذه المادة تعتبر (مرجع) Course Reference" : "This material is a Course Reference"}
                   </label>
                 </div>
 
