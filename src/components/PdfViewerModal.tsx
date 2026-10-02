@@ -48,6 +48,8 @@ const PdfViewerModal = ({
     let cancelled = false;
     let objectUrl: string | null = null;
 
+    setViewerUrl(null);
+
     const initViewer = async () => {
       setIsLoading(true);
       
