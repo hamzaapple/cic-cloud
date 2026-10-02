@@ -31,7 +31,6 @@ const PdfViewerModal = ({
   const [isMaximized, setIsMaximized] = useState(false);
   const [viewerUrl, setViewerUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [useNativeViewer, setUseNativeViewer] = useState(false);
 
   // Auto-maximize on mobile
   useEffect(() => {
@@ -56,14 +55,14 @@ const PdfViewerModal = ({
         
         if (cachedUrl) {
           objectUrl = cachedUrl;
-          setViewerUrl(useNativeViewer ? objectUrl : `/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(objectUrl)}`);
+          setViewerUrl(`/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(objectUrl)}`);
         } else {
-          setViewerUrl(useNativeViewer ? pdfUrl : `/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(pdfUrl)}`);
+          setViewerUrl(`/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(pdfUrl)}`);
         }
       } catch (err) {
         console.error("PDF cache check error:", err);
         if (!cancelled) {
-          setViewerUrl(useNativeViewer ? pdfUrl : `/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(pdfUrl)}`);
+          setViewerUrl(`/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(pdfUrl)}`);
         }
       } finally {
         if (!cancelled) {
@@ -83,14 +82,13 @@ const PdfViewerModal = ({
         URL.revokeObjectURL(objectUrl);
       }
     };
-  }, [open, pdfUrl, getCachedUrl, useNativeViewer]);
+  }, [open, pdfUrl, getCachedUrl]);
 
   const handleOpenChange = useCallback(
     (value: boolean) => {
       if (!value) {
         setViewerUrl(null);
         if (!isMobile) setIsMaximized(false);
-        setUseNativeViewer(false);
       }
       onOpenChange(value);
     },
@@ -129,15 +127,6 @@ const PdfViewerModal = ({
               </DialogDescription>
             </div>
             <div className="flex items-center gap-2 shrink-0">
-              <Button
-                size="sm"
-                variant={useNativeViewer ? "default" : "secondary"}
-                onClick={() => setUseNativeViewer(!useNativeViewer)}
-                className="gap-1.5 text-xs h-9"
-                title="إذا كانت الشاشة سوداء، اضغط هنا لتغيير طريقة العرض"
-              >
-                {useNativeViewer ? "العودة للعارض الأساسي" : "شاشة سوداء؟ جرب هذا"}
-              </Button>
               {!isMobile && (
                 <Button
                   size="sm"
