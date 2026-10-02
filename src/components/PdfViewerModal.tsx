@@ -181,10 +181,17 @@ const PdfViewerModal = ({
                 title="PDF Viewer"
                 allow="fullscreen"
               />
-            ) : (
+            ) : pdfUrl.match(/\.(jpg|jpeg|png|gif|webp|svg|bmp)(\?.*)?$/i) || displayName?.match(/\.(jpg|jpeg|png|gif|webp|svg|bmp)$/i) ? (
               <div className="w-full h-full flex items-center justify-center overflow-auto bg-[#323639]">
                 <img src={viewerUrl} alt={displayName || title} className="max-w-full max-h-full object-contain" />
               </div>
+            ) : (
+              <iframe
+                src={viewerUrl}
+                className="w-full h-full border-0"
+                title="PDF Viewer (Native)"
+                allow="fullscreen"
+              />
             )
           )}
         </div>

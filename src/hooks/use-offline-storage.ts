@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
-const CACHE_NAME = 'cic-offline-materials-v1';
+const CACHE_NAME = 'cic-offline-materials-v2';
 
 export interface CachedItem {
   url: string;

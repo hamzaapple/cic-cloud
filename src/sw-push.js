@@ -16,7 +16,16 @@ self.addEventListener("install", () => {
 });
 
 self.addEventListener("activate", (event) => {
-  event.waitUntil(self.clients.claim());
+  event.waitUntil(
+    // Delete old/corrupted material caches, then claim clients
+    caches.keys().then((cacheNames) =>
+      Promise.all(
+        cacheNames
+          .filter((name) => name === 'cic-offline-materials-v1')
+          .map((name) => caches.delete(name))
+      )
+    ).then(() => self.clients.claim())
+  );
 });
 
 // ─── 3) SPA Navigation Route — serves precached index.html on ANY route offline
@@ -76,17 +85,19 @@ registerRoute(
   })
 );
 
-// ─── 5) Supabase Storage & Cloudflare R2 (Cache-first for offline materials and media)
+// ─── 5) Supabase Storage & Cloudflare R2 (Stale-While-Revalidate for materials)
+// Uses SWR so cached files load instantly but are refreshed in the background,
+// preventing stale/corrupted PDFs from persisting forever.
 registerRoute(
   ({ url }) =>
     (url.hostname.includes('supabase.co') && url.pathname.includes('/storage/')) ||
     url.hostname.includes('r2.cloudflarestorage.com') ||
     url.hostname.includes('r2.dev'),
-  new CacheFirst({
-    cacheName: 'cic-offline-materials-v1',
+  new StaleWhileRevalidate({
+    cacheName: 'cic-offline-materials-v2',
     plugins: [
       new CacheableResponsePlugin({
-        statuses: [0, 200],
+        statuses: [200],
       }),
       new ExpirationPlugin({
         maxEntries: 300,
