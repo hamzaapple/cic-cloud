@@ -35,11 +35,15 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Only allow video MIME types for R2
-    const allowedTypes = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime'];
+    // Only allow media MIME types for R2
+    const allowedTypes = [
+      'video/mp4', 'video/webm', 'video/ogg', 'video/quicktime',
+      'audio/mpeg', 'audio/wav', 'audio/aac', 'audio/x-m4a', 'audio/m4a', 'audio/ogg',
+      'application/octet-stream'
+    ];
     if (!allowedTypes.includes(contentType)) {
       return new Response(
-        JSON.stringify({ error: 'Only video files are allowed for R2 upload' }),
+        JSON.stringify({ error: 'Only media files are allowed for R2 upload' }),
         { status: 400, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
