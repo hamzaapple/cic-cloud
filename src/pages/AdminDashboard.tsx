@@ -267,6 +267,8 @@ const AdminDashboard = () => {
     if (!title || !courseId) { toast.error(t("admin.titleAndCourseReq")); return; }
 
     if (isAssignment && !isAssignmentOpenEnded && !deadline) { toast.error(t("admin.deadlineRequired")); return; }
+    if (pdfMode === "upload" && !pdfFile && !isList && !isReference) { toast.error(lang === "ar" ? "يجب اختيار ملف للرفع" : "You must select a file to upload"); return; }
+    if (pdfMode === "url" && !pdfExternalUrl && !isList && !isReference) { toast.error(lang === "ar" ? "يجب إدخال رابط الملف" : "You must enter the file URL"); return; }
 
     if (!navigator.onLine) {
       toast.error(lang === "ar" ? "لا يوجد اتصال بالإنترنت! يرجى الاتصال بالإنترنت أولاً." : "No internet connection! Please connect to the internet first.");
