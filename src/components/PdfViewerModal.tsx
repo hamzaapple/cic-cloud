@@ -55,14 +55,14 @@ const PdfViewerModal = ({
         
         if (cachedUrl) {
           objectUrl = cachedUrl;
-          setViewerUrl(objectUrl);
+          setViewerUrl(`/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(objectUrl)}`);
         } else {
-          setViewerUrl(pdfUrl);
+          setViewerUrl(`/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(pdfUrl)}`);
         }
       } catch (err) {
         console.error("PDF cache check error:", err);
         if (!cancelled) {
-          setViewerUrl(pdfUrl);
+          setViewerUrl(`/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(pdfUrl)}`);
         }
       } finally {
         if (!cancelled) {
