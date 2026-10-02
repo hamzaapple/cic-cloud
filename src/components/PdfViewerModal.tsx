@@ -49,20 +49,23 @@ const PdfViewerModal = ({
 
     const initViewer = async () => {
       setIsLoading(true);
+      
+      const isImg = pdfUrl.match(/\.(jpg|jpeg|png|gif|webp|svg|bmp)(\?.*)?$/i) || displayName?.match(/\.(jpg|jpeg|png|gif|webp|svg|bmp)$/i);
+
       try {
         const cachedUrl = await getCachedUrl(pdfUrl);
         if (cancelled) return;
         
         if (cachedUrl) {
           objectUrl = cachedUrl;
-          setViewerUrl(`/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(objectUrl)}`);
+          setViewerUrl(isImg ? objectUrl : `/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(objectUrl)}`);
         } else {
-          setViewerUrl(`/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(pdfUrl)}`);
+          setViewerUrl(isImg ? pdfUrl : `/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(pdfUrl)}`);
         }
       } catch (err) {
         console.error("PDF cache check error:", err);
         if (!cancelled) {
-          setViewerUrl(`/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(pdfUrl)}`);
+          setViewerUrl(isImg ? pdfUrl : `/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(pdfUrl)}`);
         }
       } finally {
         if (!cancelled) {
@@ -159,12 +162,18 @@ const PdfViewerModal = ({
              </div>
           )}
           {open && viewerUrl && !isOfflineButNotCached && (
-            <iframe
-              src={viewerUrl}
-              className="w-full h-full border-0"
-              title="PDF Viewer"
-              allow="fullscreen"
-            />
+            viewerUrl.includes("pdfjs-viewer") ? (
+              <iframe
+                src={viewerUrl}
+                className="w-full h-full border-0"
+                title="PDF Viewer"
+                allow="fullscreen"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center overflow-auto bg-[#323639]">
+                <img src={viewerUrl} alt={displayName || title} className="max-w-full max-h-full object-contain" />
+              </div>
+            )
           )}
         </div>
       </DialogContent>

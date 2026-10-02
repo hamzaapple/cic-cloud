@@ -130,6 +130,12 @@ export function useOfflineStorage() {
       const match = await cache.match(url);
       if (match) {
         const blob = await match.blob();
+        if (blob.size < 1024) {
+          console.warn("Cached file is suspiciously small or corrupted, removing from cache:", url);
+          await cache.delete(url);
+          refreshCacheInfo();
+          return null;
+        }
         return URL.createObjectURL(blob);
       }
     } catch (err) {
