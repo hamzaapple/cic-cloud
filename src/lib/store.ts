@@ -678,10 +678,11 @@ export const db = {
       throw new Error('نوع الملف غير مسموح به. يُسمح بملفات PDF، الفيديو، والصوتيات.');
     }
     // Route videos/audios to Cloudflare R2, PDFs to Supabase Storage
-    const { isVideoFile, uploadVideoToR2 } = await import("@/lib/r2");
-    if (isVideoFile(file) || file.type.startsWith('audio/') || hasAllowedExtension && !file.name.toLowerCase().endsWith('.pdf')) {
-      return uploadVideoToR2(file);
-    }
+    // Bypassed R2 because the configuration is missing from the environment
+    // const { isVideoFile, uploadVideoToR2 } = await import("@/lib/r2");
+    // if (isVideoFile(file) || file.type.startsWith('audio/') || hasAllowedExtension && !file.name.toLowerCase().endsWith('.pdf')) {
+    //   return uploadVideoToR2(file);
+    // }
     // Use sanitized Supabase upload path for PDFs
     return db._uploadToSupabase(file);
   },
@@ -696,10 +697,11 @@ export const db = {
       throw new Error('نوع الملف غير مسموح به. يُسمح بملفات PDF، الفيديو، والصوتيات.');
     }
     // Route videos/audios to Cloudflare R2, PDFs to Supabase Storage
-    const { isVideoFile, uploadVideoToR2 } = await import("@/lib/r2");
-    if (isVideoFile(file) || file.type.startsWith('audio/') || hasAllowedExtension && !file.name.toLowerCase().endsWith('.pdf')) {
-      return uploadVideoToR2(file);
-    }
+    // Bypassed R2 because the configuration is missing from the environment
+    // const { isVideoFile, uploadVideoToR2 } = await import("@/lib/r2");
+    // if (isVideoFile(file) || file.type.startsWith('audio/') || hasAllowedExtension && !file.name.toLowerCase().endsWith('.pdf')) {
+    //   return uploadVideoToR2(file);
+    // }
     return db._uploadToSupabase(file);
   },
 
