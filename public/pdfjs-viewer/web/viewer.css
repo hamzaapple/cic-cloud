@@ -1509,7 +1509,7 @@
       pointer-events: none;
     }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: none) {
 
 .altText .tooltip.show {
         --alt-text-tooltip-bg: #1c1b22;
@@ -1575,7 +1575,7 @@
   box-shadow: var(--dialog-shadow);
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: none) {
 
 #altTextDialog {
     --dialog-bg-color: #1c1b22;
@@ -2095,7 +2095,7 @@
   --inline-end: left;
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: none) {
   :root {
     --main-color: rgba(249, 249, 250, 1);
     --body-bg-color: rgba(42, 42, 46, 1);
