@@ -31,6 +31,7 @@ const PdfViewerModal = ({
   const [isMaximized, setIsMaximized] = useState(false);
   const [viewerUrl, setViewerUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [useNativeViewer, setUseNativeViewer] = useState(false);
 
   // Auto-maximize on mobile
   useEffect(() => {
@@ -58,14 +59,14 @@ const PdfViewerModal = ({
         
         if (cachedUrl) {
           objectUrl = cachedUrl;
-          setViewerUrl(isImg ? objectUrl : `/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(objectUrl)}`);
+          setViewerUrl(useNativeViewer && !isImg ? objectUrl : (isImg ? objectUrl : `/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(objectUrl)}`));
         } else {
-          setViewerUrl(isImg ? pdfUrl : `/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(pdfUrl)}`);
+          setViewerUrl(useNativeViewer && !isImg ? pdfUrl : (isImg ? pdfUrl : `/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(pdfUrl)}`));
         }
       } catch (err) {
         console.error("PDF cache check error:", err);
         if (!cancelled) {
-          setViewerUrl(isImg ? pdfUrl : `/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(pdfUrl)}`);
+          setViewerUrl(useNativeViewer && !isImg ? pdfUrl : (isImg ? pdfUrl : `/pdfjs-viewer/web/viewer.html?file=${encodeURIComponent(pdfUrl)}`));
         }
       } finally {
         if (!cancelled) {
@@ -85,13 +86,14 @@ const PdfViewerModal = ({
         URL.revokeObjectURL(objectUrl);
       }
     };
-  }, [open, pdfUrl, getCachedUrl]);
+  }, [open, pdfUrl, getCachedUrl, useNativeViewer]);
 
   const handleOpenChange = useCallback(
     (value: boolean) => {
       if (!value) {
         setViewerUrl(null);
         if (!isMobile) setIsMaximized(false);
+        setUseNativeViewer(false);
       }
       onOpenChange(value);
     },
@@ -130,6 +132,16 @@ const PdfViewerModal = ({
               </DialogDescription>
             </div>
             <div className="flex items-center gap-2 shrink-0">
+              <Button
+                size="sm"
+                variant={useNativeViewer ? "default" : "outline"}
+                onClick={() => setUseNativeViewer(!useNativeViewer)}
+                className="gap-1.5 text-xs h-9"
+                title={useNativeViewer ? "العودة للعارض الأساسي" : "تبديل العارض (إذا كانت الشاشة سوداء)"}
+              >
+                <FileText className="w-4 h-4" />
+                {!isMobile && (useNativeViewer ? "العارض الأساسي" : "تبديل العارض")}
+              </Button>
               {!isMobile && (
                 <Button
                   size="sm"
