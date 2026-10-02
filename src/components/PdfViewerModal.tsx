@@ -6,7 +6,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Maximize, Minimize, Loader2, WifiOff } from "lucide-react";
+import { Maximize, Minimize, Loader2, WifiOff, FileText } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useState, useCallback, useEffect } from "react";
 import { cn } from "@/lib/utils";
