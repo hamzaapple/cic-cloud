@@ -371,8 +371,8 @@ const AdminDashboard = () => {
         sent_by: "system",
       }).catch(err => console.warn("Auto-notification failed (material was uploaded):", err));
 
-    } catch {
-      toast.error(t("admin.uploadFail"));
+    } catch (err: any) {
+      toast.error(err.message || t("admin.uploadFail"));
     } finally {
       setUploading(false);
     }
