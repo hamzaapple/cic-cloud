@@ -54,6 +54,17 @@ const VideoViewerModal = ({
       } else {
         setActualVideoUrl(videoUrl);
       }
+
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: title || displayName || "تسجيل صوتي",
+          artist: "CIC Cloud",
+          album: "محاضرات",
+          artwork: [
+            { src: '/icon-512x512.png', sizes: '512x512', type: 'image/png' }
+          ]
+        });
+      }
     };
 
     initViewer();
@@ -63,10 +74,14 @@ const VideoViewerModal = ({
       if (objectUrl) {
         URL.revokeObjectURL(objectUrl);
       }
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = null;
+      }
     };
-  }, [open, videoUrl, getCachedUrl]);
+  }, [open, videoUrl, getCachedUrl, title, displayName]);
 
   const fileName = title ? `${title}.mp4` : (displayName ? `${displayName}.mp4` : `video.mp4`);
+  const isAudio = videoUrl.match(/\.(mp3|wav|m4a|aac|ogg)$/i) || displayName?.match(/\.(mp3|wav|m4a|aac|ogg)$/i);
 
   const handleDownload = useCallback(async () => {
     playClickSfx();
@@ -77,7 +92,7 @@ const VideoViewerModal = ({
       const blob = await res.blob();
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = fileName;
+      a.download = isAudio ? fileName.replace('.mp4', '.mp3') : fileName;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -86,7 +101,7 @@ const VideoViewerModal = ({
     } catch {
       toast.error(t("material.downloadFail"), { id: "dl-viewer" });
     }
-  }, [videoUrl, fileName, t]);
+  }, [videoUrl, fileName, isAudio, t]);
 
   const handleOpenChange = useCallback(
     (value: boolean) => {
@@ -113,7 +128,7 @@ const VideoViewerModal = ({
                 {title}
               </DialogTitle>
               <DialogDescription className="truncate text-xs mt-0.5 text-left" dir="ltr">
-                {fileName}
+                {isAudio ? fileName.replace('.mp4', '.mp3') : fileName}
               </DialogDescription>
             </div>
             <div className="flex items-center gap-2 shrink-0">
@@ -145,15 +160,28 @@ const VideoViewerModal = ({
         {/* Body */}
         <div className="flex-1 relative min-h-0 flex items-center justify-center bg-black">
           {actualVideoUrl && (
-            <video
-              src={actualVideoUrl}
-              controls
-              autoPlay
-              className="w-full h-full object-contain"
-              controlsList="nodownload"
-            >
-              {lang === "ar" ? "متصفحك لا يدعم تشغيل الفيديو." : "Your browser does not support the video tag."}
-            </video>
+            isAudio ? (
+              <audio
+                src={actualVideoUrl}
+                controls
+                autoPlay
+                className="w-full max-w-md"
+                controlsList="nodownload"
+              >
+                {lang === "ar" ? "متصفحك لا يدعم تشغيل الصوت." : "Your browser does not support the audio tag."}
+              </audio>
+            ) : (
+              <video
+                src={actualVideoUrl}
+                controls
+                autoPlay
+                playsInline
+                className="w-full h-full object-contain"
+                controlsList="nodownload"
+              >
+                {lang === "ar" ? "متصفحك لا يدعم تشغيل الفيديو." : "Your browser does not support the video tag."}
+              </video>
+            )
           )}
         </div>
       </DialogContent>

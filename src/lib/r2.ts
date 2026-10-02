@@ -37,11 +37,8 @@ interface PresignResponse {
  * 3. Returns the public URL
  */
 export async function uploadVideoToR2(file: File): Promise<string> {
-  // Get the content type
-  const contentType =
-    (VIDEO_MIME_TYPES as readonly string[]).includes(file.type)
-      ? file.type
-      : "video/mp4"; // fallback
+  // Get the content type, fallback to application/octet-stream if missing
+  const contentType = file.type || "application/octet-stream";
 
   // 1. Get presigned URL from edge function
   const { data, error } = await supabase.functions.invoke<PresignResponse>(
