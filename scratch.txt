@@ -1,0 +1,24 @@
+<USER_REQUEST>
+اهم حاجة دلوقت الجداول!
+D:\جداول دا المسار فيه البديف فيه الجدواول بديف خد منه level 1 , 2 بس كل الاقسام
+واسال لو في حاجة
+استخرج الجداول بهدوء ونظم كل سكشن وكل حاجة فالموقع عشان يطلع جداول السكاشن مظبوطة لكل قسم وكل فصل دراسي دا الاول طبعا
+وكل صف دراسي
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-09-27T15:28:33+03:00.
+
+The user's current state is as follows:
+Active Document: c:\Users\AFAQE\Downloads\12\cic-cloud-main\cic-cloud-main\.env (LANGUAGE_UNSPECIFIED)
+Cursor is on line: 1
+Other open documents:
+- c:\Users\AFAQE\Downloads\12\cic-cloud-main\cic-cloud-main\src\pages\AdminDashboard.tsx (LANGUAGE_TSX)
+- c:\Users\AFAQE\Downloads\12\cic-cloud-main\cic-cloud-main\src\lib\i18n.tsx (LANGUAGE_TSX)
+- c:\Users\AFAQE\Downloads\12\cic-cloud-main\cic-cloud-main\supabase\migrations\20260607000000_add_academic_year_and_semester.sql (LANGUAGE_SQL)
+- c:\Users\AFAQE\Downloads\12\cic-cloud-main\cic-cloud-main\src\components\OfflineBanner.tsx (LANGUAGE_TSX)
+- c:\Users\AFAQE\Downloads\12\cic-cloud-main\cic-cloud-main\src\components\Navbar.tsx (LANGUAGE_TSX)
+No browser pages are currently open.
+</ADDITIONAL_METADATA>
+<USER_SETTINGS_CHANGE>
+The user changed setting `Model Selection` from None to Gemini 3.1 Pro (High). No need to comment on this change if the user doesn't ask about it. If reporting what model you are, please use a human readable name instead of the exact string.
+</USER_SETTINGS_CHANGE>
