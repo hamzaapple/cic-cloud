@@ -394,6 +394,7 @@ export const db = {
     deadline?: string | null;
     is_assignment?: boolean;
     is_list?: boolean;
+    is_reference?: boolean;
     list_content?: string | null;
   }) => {
     const { error } = await supabase.from("materials").update(updates).eq("id", id);
