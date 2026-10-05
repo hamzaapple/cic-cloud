@@ -99,9 +99,16 @@ const AnnouncementBanner = () => {
     };
 
     fetchData();
-    // Poll every 60 seconds to reflect admin changes (reduced from 15s to improve performance)
-    const interval = setInterval(fetchData, 60 * 1000);
-    return () => clearInterval(interval);
+    // Poll every 60s, but only while the tab is visible (saves network/battery)
+    const interval = setInterval(() => {
+      if (document.visibilityState === "visible") fetchData();
+    }, 60 * 1000);
+    const onVisible = () => { if (document.visibilityState === "visible") fetchData(); };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
   }, [lang, year]);
 
   const allItems = [

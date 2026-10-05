@@ -109,9 +109,11 @@ registerRoute(
   })
 );
 
+// Uploaded files have unique timestamped names and never change, so cache-first
+// avoids re-downloading the whole PDF in the background on every open.
 registerRoute(
   ({ url }) => isMaterialRequest(url),
-  new StaleWhileRevalidate({
+  new CacheFirst({
     cacheName: 'cic-offline-materials-v2',
     plugins: [
       new CacheableResponsePlugin({
