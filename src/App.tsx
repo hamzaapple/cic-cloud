@@ -7,6 +7,7 @@ import { I18nProvider } from "@/lib/i18n";
 import { lazy, Suspense, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Analytics } from "@vercel/analytics/react";
+import { Settings } from "lucide-react";
 import Navbar from "./components/Navbar";
 import NotificationPrompt from "./components/NotificationPrompt";
 import InstallPrompt from "./components/InstallPrompt";
@@ -108,16 +109,17 @@ const AppContent = () => {
   return (
     <>
       <Suspense fallback={null}><ParticleBackground /></Suspense>
-      <Navbar />
-      <OfflineBanner />
-      <OfflineIntroPrompt />
-      <AnnouncementBanner />
-      <DhikrBanner />
-      <NotificationPrompt />
-      <InstallPrompt />
-      <YearPickerModal />
-      <div className="relative z-10">
-        <AnimatedRoutes />
+      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center p-4 text-center">
+        <Settings 
+          className="w-32 h-32 text-primary animate-spin mb-8 mx-auto" 
+          style={{ animationDuration: '4s' }} 
+        />
+        <h1 className="text-3xl md:text-5xl font-bold mb-6 text-foreground">
+          نعمل على صيانة الموقع
+        </h1>
+        <p className="text-xl md:text-2xl text-muted-foreground" style={{ lineHeight: '1.8' }}>
+          استغل أوقات الانتظار بالاستغفار 🤎
+        </p>
       </div>
     </>
   );
