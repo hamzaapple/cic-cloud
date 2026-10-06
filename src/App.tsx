@@ -4,9 +4,11 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { I18nProvider } from "@/lib/i18n";
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Analytics } from "@vercel/analytics/react";
+import { Heart } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import Navbar from "./components/Navbar";
 import NotificationPrompt from "./components/NotificationPrompt";
 import InstallPrompt from "./components/InstallPrompt";
@@ -93,6 +95,8 @@ const AnimatedRoutes = () => {
 };
 
 const AppContent = () => {
+  const [showWelcome, setShowWelcome] = useState(true);
+
   useEffect(() => {
     if ("serviceWorker" in navigator) {
       const handler = (event: MessageEvent) => {
@@ -108,6 +112,22 @@ const AppContent = () => {
   return (
     <>
       <Suspense fallback={null}><ParticleBackground /></Suspense>
+      {showWelcome && (
+        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center w-full h-full bg-background p-4 text-center">
+          <Heart 
+            className="w-32 h-32 text-red-500 mb-8 animate-pulse" 
+          />
+          <h1 className="text-3xl md:text-5xl font-bold mb-6 text-foreground">
+            عاد الموقع للعمل
+          </h1>
+          <p className="text-xl md:text-2xl text-muted-foreground mb-8" style={{ lineHeight: '1.8' }}>
+            شكراً لانتظاركم 🤎
+          </p>
+          <Button onClick={() => setShowWelcome(false)} size="lg" className="text-lg px-8 py-6 rounded-full shadow-lg hover:scale-105 transition-transform">
+            انتقال للموقع
+          </Button>
+        </div>
+      )}
       <Navbar />
       <OfflineBanner />
       <OfflineIntroPrompt />
