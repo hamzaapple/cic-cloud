@@ -109,10 +109,10 @@ const AppContent = () => {
   return (
     <>
       <Suspense fallback={null}><ParticleBackground /></Suspense>
-      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center p-4 text-center">
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center w-full h-full bg-background/95 p-4 text-center">
         <Settings 
-          className="w-32 h-32 text-primary animate-spin mb-8 mx-auto" 
-          style={{ animationDuration: '4s' }} 
+          className="w-32 h-32 text-primary mb-8" 
+          style={{ animation: 'spin 4s linear infinite' }} 
         />
         <h1 className="text-3xl md:text-5xl font-bold mb-6 text-foreground">
           نعمل على صيانة الموقع
