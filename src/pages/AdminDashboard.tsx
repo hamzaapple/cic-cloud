@@ -252,15 +252,28 @@ const AdminDashboard = () => {
 
   // Filter courses by department, year, and semester
   const filteredCourses = courses.filter(c => {
+    const courseSem = c.semester || "2";
+    const matchesSemester = semesterFilter === "all" || courseSem === semesterFilter;
+    if (!matchesSemester) return false;
+
     // If it's a moderator and the course is from a different department/year, it's a shared course
-    // which they should always have access to regardless of the current filters.
+    // which they should have access to IF it matches the semester filter
     const isSharedCourseForMod = user.role === "moderator" && (c.department_id !== user.departmentId || c.academic_year !== user.academicYear);
     if (isSharedCourseForMod) return true;
     
     return (deptFilter === "all" || c.department_id === deptFilter) &&
-           (yearFilter === "all" || c.academic_year === yearFilter) &&
-           (semesterFilter === "all" || c.semester === semesterFilter);
+           (yearFilter === "all" || (c.academic_year || "1") === yearFilter);
   });
+
+  // Reset courseId or materialCourseFilter if current filteredCourses no longer contains it
+  useEffect(() => {
+    if (courseId && !filteredCourses.some(c => c.id === courseId)) {
+      setCourseId("");
+    }
+    if (materialCourseFilter !== "all" && !filteredCourses.some(c => c.id === materialCourseFilter)) {
+      setMaterialCourseFilter("all");
+    }
+  }, [semesterFilter, yearFilter, deptFilter, filteredCourses, courseId, materialCourseFilter]);
 
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -612,7 +625,7 @@ const AdminDashboard = () => {
   // Sync local order state when query data or filters change
   useEffect(() => {
     setOrderedFiltered(filtered);
-  }, [materials, materialCourseFilter, materialCategoryFilter, showArchived, yearFilter, deptFilter, courses]);
+  }, [materials, materialCourseFilter, materialCategoryFilter, showArchived, yearFilter, deptFilter, semesterFilter, courses]);
 
   const dndSensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -668,8 +681,8 @@ const AdminDashboard = () => {
         </motion.div>
 
         {/* Filters */}
-        {isOwner && (
-          <div className="flex flex-col gap-4 mb-8">
+        <div className="flex flex-col gap-4 mb-8">
+          {isOwner && (
             <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
               {[
                 { id: "all", label: lang === "ar" ? "كل الصفوف" : "All Years" },
@@ -692,42 +705,46 @@ const AdminDashboard = () => {
                 </button>
               ))}
             </div>
+          )}
 
-            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-              {[
-                { id: "all", label: lang === "ar" ? "كل الفصول" : "All Semesters" },
-                { id: "1", label: lang === "ar" ? "الفصل الأول" : "First Semester" },
-                { id: "2", label: lang === "ar" ? "الفصل الثاني" : "Second Semester" },
-              ].map((s) => (
-                <button
-                  key={s.id}
-                  onClick={() => setSemesterFilter(s.id)}
-                  className={`px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
-                    semesterFilter === s.id
-                      ? "bg-primary text-primary-foreground shadow-md scale-[1.02]"
-                      : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-                  }`}
-                >
-                  {s.label}
-                </button>
-              ))}
-            </div>
-
-            {departments.length > 0 && (
-              <Select value={deptFilter} onValueChange={setDeptFilter}>
-                <SelectTrigger className="w-64 bg-secondary/50">
-                  <SelectValue placeholder={t("admin.filterDept")} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">{t("admin.allDepts")}</SelectItem>
-                  {departments.map(d => (
-                    <SelectItem key={d.id} value={d.id}>{lang === "ar" ? d.name_ar : d.name_en}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
+          {/* Semester Filter - available for both Owner and Moderator */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
+            <span className="text-xs font-semibold text-muted-foreground whitespace-nowrap ml-1">
+              {lang === "ar" ? "الفصل الدراسي:" : "Semester:"}
+            </span>
+            {[
+              { id: "all", label: lang === "ar" ? "كل الفصول" : "All Semesters" },
+              { id: "1", label: lang === "ar" ? "الفصل الدراسي الأول" : "First Semester" },
+              { id: "2", label: lang === "ar" ? "الفصل الدراسي الثاني" : "Second Semester" },
+            ].map((s) => (
+              <button
+                key={s.id}
+                onClick={() => setSemesterFilter(s.id)}
+                className={`px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
+                  semesterFilter === s.id
+                    ? "bg-primary text-primary-foreground shadow-md scale-[1.02]"
+                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                }`}
+              >
+                {s.label}
+              </button>
+            ))}
           </div>
-        )}
+
+          {isOwner && departments.length > 0 && (
+            <Select value={deptFilter} onValueChange={setDeptFilter}>
+              <SelectTrigger className="w-64 bg-secondary/50">
+                <SelectValue placeholder={t("admin.filterDept")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t("admin.allDepts")}</SelectItem>
+                {departments.map(d => (
+                  <SelectItem key={d.id} value={d.id}>{lang === "ar" ? d.name_ar : d.name_en}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        </div>
 
         <div className="flex gap-1 mb-8 bg-secondary/50 rounded-xl p-1 max-w-3xl overflow-x-auto">
           {sections.map(tab => (
@@ -756,9 +773,10 @@ const AdminDashboard = () => {
                         {filteredCourses.map(c => {
                           const cDept = departments.find(d => d.id === c.department_id);
                           const cDeptName = cDept ? (lang === "ar" ? cDept.name_ar : cDept.name_en) : "";
+                          const semLabel = (c.semester || "2") === "1" ? (lang === "ar" ? "[فصل 1]" : "[S1]") : (lang === "ar" ? "[فصل 2]" : "[S2]");
                           return (
                             <SelectItem key={c.id} value={c.id}>
-                              {c.code ? `[${c.code}] ` : ""}{translateCourseName(c.name, lang)} {cDeptName ? `(${cDeptName})` : ""}
+                              {c.code ? `[${c.code}] ` : ""}{translateCourseName(c.name, lang)} {semLabel} {cDeptName ? `(${cDeptName})` : ""}
                             </SelectItem>
                           );
                         })}
@@ -944,9 +962,10 @@ const AdminDashboard = () => {
                       {filteredCourses.map(c => {
                         const cDept = departments.find(d => d.id === c.department_id);
                         const cDeptName = cDept ? (lang === "ar" ? cDept.name_ar : cDept.name_en) : "";
+                        const semLabel = (c.semester || "2") === "1" ? (lang === "ar" ? "[فصل 1]" : "[S1]") : (lang === "ar" ? "[فصل 2]" : "[S2]");
                         return (
                           <SelectItem key={c.id} value={c.id}>
-                            {c.code ? `[${c.code}] ` : ""}{translateCourseName(c.name, lang)} {cDeptName ? `(${cDeptName})` : ""}
+                            {c.code ? `[${c.code}] ` : ""}{translateCourseName(c.name, lang)} {semLabel} {cDeptName ? `(${cDeptName})` : ""}
                           </SelectItem>
                         );
                       })}
@@ -1011,9 +1030,17 @@ const AdminDashboard = () => {
         )}
 
         {activeSection === "courses" && (
-          <CourseManager courses={filteredCourses} departments={departments} deptFilter={deptFilter} onUpdate={loadData}
-            canEdit={canEdit} canDelete={canDelete}
-            canCreate={isOwner || auth.hasPermission("add_courses")} />
+          <CourseManager 
+            courses={filteredCourses} 
+            departments={departments} 
+            deptFilter={deptFilter} 
+            semesterFilter={semesterFilter}
+            onSemesterFilterChange={setSemesterFilter}
+            onUpdate={loadData}
+            canEdit={canEdit} 
+            canDelete={canDelete}
+            canCreate={isOwner || auth.hasPermission("add_courses")} 
+          />
         )}
 
         {activeSection === "links" && canAddExtLinks && (

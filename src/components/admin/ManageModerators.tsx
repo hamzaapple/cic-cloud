@@ -271,18 +271,22 @@ const ManageModerators = ({ departments }: Props) => {
                 <p className="text-xs text-muted-foreground">{lang === "ar" ? "لا توجد مقررات خارجية" : "No external courses"}</p>
               ) : (
                 <div className="max-h-40 overflow-y-auto space-y-1.5 border border-border/30 rounded-lg p-2 bg-background/50">
-                  {addExternalCourses.map(c => (
-                    <label key={c.id} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-secondary/20 p-1 rounded">
-                      <Checkbox
-                        checked={selectedSharedCourses.includes(c.id)}
-                        onCheckedChange={() => setSelectedSharedCourses(prev =>
-                          prev.includes(c.id) ? prev.filter(id => id !== c.id) : [...prev, c.id]
-                        )}
-                      />
-                      <span>{c.name}</span>
-                      <span className="text-[10px] text-muted-foreground">({getDeptName(c.department_id)})</span>
-                    </label>
-                  ))}
+                    {addExternalCourses.map(c => {
+                      const semBadge = (c.semester || "2") === "1" ? (lang === "ar" ? "[فصل 1]" : "[S1]") : (lang === "ar" ? "[فصل 2]" : "[S2]");
+                      return (
+                        <label key={c.id} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-secondary/20 p-1 rounded">
+                          <Checkbox
+                            checked={selectedSharedCourses.includes(c.id)}
+                            onCheckedChange={() => setSelectedSharedCourses(prev =>
+                              prev.includes(c.id) ? prev.filter(id => id !== c.id) : [...prev, c.id]
+                            )}
+                          />
+                          <span>{c.name}</span>
+                          <span className="text-[10px] text-primary font-medium">{semBadge}</span>
+                          <span className="text-[10px] text-muted-foreground">({getDeptName(c.department_id)})</span>
+                        </label>
+                      );
+                    })}
                 </div>
               )}
             </div>
@@ -446,18 +450,22 @@ const ManageModerators = ({ departments }: Props) => {
               <p className="text-xs text-muted-foreground">{lang === "ar" ? "لا توجد مقررات خارجية" : "No external courses"}</p>
             ) : (
               <div className="max-h-40 overflow-y-auto space-y-1.5 border border-border/30 rounded-lg p-2">
-                {externalCourses.map(c => (
-                  <label key={c.id} className="flex items-center gap-2 text-sm cursor-pointer">
-                    <Checkbox
-                      checked={editSharedCourses.includes(c.id)}
-                      onCheckedChange={() => setEditSharedCourses(prev =>
-                        prev.includes(c.id) ? prev.filter(id => id !== c.id) : [...prev, c.id]
-                      )}
-                    />
-                    <span>{c.name}</span>
-                    <span className="text-[10px] text-muted-foreground">({getDeptName(c.department_id)})</span>
-                  </label>
-                ))}
+                {externalCourses.map(c => {
+                  const semBadge = (c.semester || "2") === "1" ? (lang === "ar" ? "[فصل 1]" : "[S1]") : (lang === "ar" ? "[فصل 2]" : "[S2]");
+                  return (
+                    <label key={c.id} className="flex items-center gap-2 text-sm cursor-pointer">
+                      <Checkbox
+                        checked={editSharedCourses.includes(c.id)}
+                        onCheckedChange={() => setEditSharedCourses(prev =>
+                          prev.includes(c.id) ? prev.filter(id => id !== c.id) : [...prev, c.id]
+                        )}
+                      />
+                      <span>{c.name}</span>
+                      <span className="text-[10px] text-primary font-medium">{semBadge}</span>
+                      <span className="text-[10px] text-muted-foreground">({getDeptName(c.department_id)})</span>
+                    </label>
+                  );
+                })}
               </div>
             )}
           </div>
