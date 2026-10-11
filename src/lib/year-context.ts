@@ -58,3 +58,31 @@ export const onYearChange = (cb: (year: string | null) => void) => {
   window.addEventListener(EVENT, handler);
   return () => window.removeEventListener(EVENT, handler);
 };
+
+const CLASS_ROUTE_KEY = "cic_student_class_route";
+
+export const getStoredClassRoute = (): string | null => {
+  try {
+    return localStorage.getItem(CLASS_ROUTE_KEY);
+  } catch {
+    return null;
+  }
+};
+
+export const setStoredClassRoute = (route: string) => {
+  try {
+    localStorage.setItem(CLASS_ROUTE_KEY, route);
+  } catch {
+    /* ignore */
+  }
+};
+
+export const getStudentHomeRoute = (): string => {
+  const storedRoute = getStoredClassRoute();
+  if (storedRoute && storedRoute.startsWith("/year/")) {
+    return storedRoute;
+  }
+  const year = getStoredYear();
+  if (!year) return "/";
+  return ["1", "2"].includes(year) ? `/year/${year}/departments` : `/year/${year}/semesters`;
+};

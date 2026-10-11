@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams, Navigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { ArrowLeft, ArrowRight, BookOpen, Layers, Monitor, Cpu, GraduationCap, Network } from "lucide-react";
 
@@ -7,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { db } from "@/lib/store";
 import { BulkOfflineDownloadButton } from "@/components/BulkOfflineDownloadButton";
 import { playClickSfx } from "@/hooks/use-sfx";
-import { setStoredYear } from "@/lib/year-context";
+import { setStoredYear, getStoredYear, getStudentHomeRoute, setStoredClassRoute } from "@/lib/year-context";
 
 const YEARS = [
   { id: "1", name_ar: "الفرقة الأولى", name_en: "First Year", icon: GraduationCap, color: "190 80% 45%", route: "departments", desc_ar: "المواد العامة والأساسية", desc_en: "General & Basic Courses" },
@@ -47,7 +47,9 @@ const YearCard = ({ year, idx }: { year: typeof YEARS[0], idx: number }) => {
         to={targetRoute} 
         onClick={() => {
           playClickSfx();
+          sessionStorage.removeItem("cic_view_all_years");
           setStoredYear(year.id);
+          setStoredClassRoute(targetRoute);
         }} 
         className="block h-full outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-2xl"
         style={{ "--year-color": `hsl(${year.color})` } as React.CSSProperties}
@@ -97,6 +99,16 @@ const YearCard = ({ year, idx }: { year: typeof YEARS[0], idx: number }) => {
 const Index = () => {
   const { t, lang } = useI18n();
   const Arrow = lang === "ar" ? ArrowLeft : ArrowRight;
+  const [searchParams] = useSearchParams();
+
+  const allowAllYears = searchParams.get("change") === "true" || sessionStorage.getItem("cic_view_all_years") === "true";
+  const storedYear = getStoredYear();
+
+  // If student already selected their academic year/class, navigate directly to their class
+  if (storedYear && !allowAllYears) {
+    const destination = getStudentHomeRoute();
+    return <Navigate to={destination} replace />;
+  }
 
 
 

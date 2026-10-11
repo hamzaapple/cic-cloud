@@ -201,6 +201,12 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
       } else if (err.message === "INVALID_API_KEY" || err.message === "NO_API_KEY") {
         toast.error(lang === "ar" ? "مفتاح Gemini API غير صالح، يرجى التحقق منه" : "Invalid Gemini API key");
         setShowKeyDialog(true);
+      } else if (err?.message?.includes("fetch") || err?.message?.includes("NetworkError")) {
+        toast.error(
+          lang === "ar"
+            ? "تعذر الاتصال بالذكاء الاصطناعي بسبب الشبكة. يمكنك استخدام تبويب 'النماذج الخارجية' مجاناً!"
+            : "Network issue connecting to AI. Try the External Models tab!"
+        );
       } else {
         toast.error(err?.message || (lang === "ar" ? "حدث خطأ أثناء الاتصال بالذكاء الاصطناعي" : "AI generation failed"));
       }

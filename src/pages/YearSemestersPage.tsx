@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowRight, CalendarDays } from "lucide-react";
 import { playBackSfx, playClickSfx } from "@/hooks/use-sfx";
 import { useEffect } from "react";
 import { setPushAudience } from "@/lib/push-registration";
+import { setStoredYear, setStoredClassRoute } from "@/lib/year-context";
 
 const container: Variants = {
   hidden: { opacity: 0 },
@@ -30,7 +31,12 @@ const YearSemestersPage = () => {
     if (yearId === "2b") {
       setPushAudience("bachelor");
     }
-  }, [yearId]);
+    if (yearId) {
+      setStoredYear(yearId);
+      const current = deptId ? `/year/${yearId}/semesters?dept=${deptId}` : `/year/${yearId}/semesters`;
+      setStoredClassRoute(current);
+    }
+  }, [yearId, deptId]);
 
   const Arrow = lang === "ar" ? ArrowLeft : ArrowRight;
   const BackArrow = lang === "ar" ? ArrowRight : ArrowLeft;
@@ -50,8 +56,15 @@ const YearSemestersPage = () => {
           </motion.div>
         ) : (
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-            <Link to="/" onClick={playBackSfx} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors">
-              <BackArrow className="w-4 h-4" /> {lang === "ar" ? "العودة للرئيسية" : "Back to Home"}
+            <Link
+              to="/?change=true"
+              onClick={() => {
+                playBackSfx();
+                sessionStorage.setItem("cic_view_all_years", "true");
+              }}
+              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
+            >
+              <BackArrow className="w-4 h-4" /> {lang === "ar" ? "الرجوع للرئيسية (كل الصفوف)" : "Back to All Years"}
             </Link>
           </motion.div>
         )}

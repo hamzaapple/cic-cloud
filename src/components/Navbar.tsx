@@ -11,6 +11,8 @@ import { useI18n } from "@/lib/i18n";
 import { useOfflineStorage } from "@/hooks/use-offline-storage";
 import { HardDrive } from "lucide-react";
 
+import { getStudentHomeRoute } from "@/lib/year-context";
+
 const OfflineFilesModal = lazy(() =>
   import("./OfflineFilesModal").then((m) => ({ default: m.OfflineFilesModal }))
 );
@@ -25,13 +27,17 @@ const Navbar = () => {
   const { year } = useYear();
   const { totalSize, formatSize, isSupported } = useOfflineStorage();
 
+  const homeRoute = useMemo(() => {
+    return year ? getStudentHomeRoute() : "/";
+  }, [year, location.pathname]);
+
   const coursesRoute = useMemo(() => {
     if (!year) return "/";
     return ["1", "2"].includes(year) ? `/year/${year}/departments` : `/year/${year}/semesters`;
   }, [year]);
 
   const navItems = [
-    { to: "/", label: t("nav.home") || "الرئيسية", icon: Home, exact: true },
+    { to: homeRoute, label: t("nav.home") || "الرئيسية", icon: Home, exact: homeRoute === "/" },
     { to: coursesRoute, label: t("nav.courses"), icon: BookOpen, exact: false },
     { to: "/calendar", label: t("nav.calendar"), icon: Calendar, exact: false },
     { to: "/links", label: t("nav.links"), icon: Link2, exact: false },
@@ -41,7 +47,7 @@ const Navbar = () => {
   return (
     <motion.nav initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="fixed top-0 left-0 right-0 z-50 glass-card border-b">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
+        <Link to={homeRoute} className="flex items-center gap-2">
           <img src="/logo.png" alt="CIC Logo" className="w-9 h-9 rounded-lg object-contain" loading="lazy" />
           <span className="font-display font-bold text-lg">CIC</span>
         </Link>
@@ -50,7 +56,9 @@ const Navbar = () => {
           {navItems.map((item) => {
             const isActive = item.exact 
               ? location.pathname === item.to 
-              : location.pathname.startsWith(item.to) && item.to !== "/";
+              : item.icon === Home
+                ? location.pathname === item.to
+                : location.pathname.startsWith(item.to) && item.to !== "/";
               
             return (
               <Link key={item.label} to={item.to}
@@ -117,7 +125,9 @@ const Navbar = () => {
           {navItems.map((item) => {
             const isActive = item.exact 
               ? location.pathname === item.to 
-              : location.pathname.startsWith(item.to) && item.to !== "/";
+              : item.icon === Home
+                ? location.pathname === item.to
+                : location.pathname.startsWith(item.to) && item.to !== "/";
               
             return (
               <Link key={item.label} to={item.to} onClick={() => setOpen(false)}

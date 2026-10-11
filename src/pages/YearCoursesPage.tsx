@@ -8,7 +8,7 @@ import { BulkOfflineDownloadButton } from "@/components/BulkOfflineDownloadButto
 import { playBackSfx, playClickSfx } from "@/hooks/use-sfx";
 import { useEffect } from "react";
 import { setPushAudience, syncPushPreferences } from "@/lib/push-registration";
-import { setStoredYear } from "@/lib/year-context";
+import { setStoredYear, setStoredClassRoute } from "@/lib/year-context";
 import { coursePath } from "@/lib/utils";
 
 const container: Variants = {
@@ -31,8 +31,14 @@ const YearCoursesPage = () => {
     if (yearId === "2b") {
       setPushAudience("bachelor");
     }
-    if (yearId) setStoredYear(yearId);
-  }, [yearId]);
+    if (yearId) {
+      setStoredYear(yearId);
+      const current = deptId
+        ? `/year/${yearId}/courses?dept=${deptId}&semester=${semesterId}`
+        : `/year/${yearId}/courses?semester=${semesterId}`;
+      setStoredClassRoute(current);
+    }
+  }, [yearId, deptId, semesterId]);
 
   const { data: departments = [] } = useQuery({
     queryKey: ["departments"],

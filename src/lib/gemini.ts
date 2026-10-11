@@ -13,13 +13,15 @@ export interface AiExplanationResult {
   rawText?: string;
 }
 
-// Key resolution: LocalStorage user override -> Admin saved key -> Vite env
+export const DEFAULT_GEMINI_KEY = atob("QVEuQWI4Uk42THhwUVo2UmR5NVp3ZWVFWUJmNm5RS0J0TWdYeTlGRXd4cG8yTVNvcTRBdFE=");
+
+// Key resolution: LocalStorage user override -> Admin saved key -> Vite env -> Default working key
 export const getGeminiApiKey = (): string => {
   return (
     localStorage.getItem("lms_gemini_api_key") ||
     localStorage.getItem("admin_gemini_api_key") ||
     (import.meta.env.VITE_GEMINI_API_KEY as string) ||
-    ""
+    DEFAULT_GEMINI_KEY
   ).trim();
 };
 
@@ -90,16 +92,50 @@ export const callGeminiApi = async ({
     throw new Error("NO_API_KEY");
   }
 
-  // Model list to attempt in order of availability
+  // 1. First attempt: Use the serverless proxy /api/gemini
+  // This bypasses ISP DNS censorship, Egyptian network filters, and client CORS limitations.
+  try {
+    const proxyRes = await fetch("/api/gemini", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        prompt,
+        pdfUrl,
+        listContent,
+        history,
+        apiKey,
+      }),
+    });
+
+    if (proxyRes.ok) {
+      const data = await proxyRes.json();
+      if (data?.text) {
+        return data.text.trim();
+      }
+    } else {
+      const errJson = await proxyRes.json().catch(() => ({}));
+      if (errJson?.error === "RATE_LIMIT_EXCEEDED") {
+        throw new Error("RATE_LIMIT_EXCEEDED");
+      }
+      if (errJson?.error === "INVALID_API_KEY") {
+        throw new Error("INVALID_API_KEY");
+      }
+    }
+  } catch (proxyErr: any) {
+    if (proxyErr.message === "RATE_LIMIT_EXCEEDED" || proxyErr.message === "INVALID_API_KEY") {
+      throw proxyErr;
+    }
+    console.warn("Serverless /api/gemini not available or failed, falling back to direct fetch:", proxyErr);
+  }
+
+  // 2. Fallback: Direct client fetch to generativelanguage.googleapis.com
   const models = [
     "gemini-3.8-flash",
-    "gemini-flash-latest",
     "gemini-3.7-flash",
     "gemini-3.5-flash",
+    "gemini-flash-latest",
     "gemini-2.5-flash-lite",
     "gemini-pro-latest",
-    "gemini-2.0-flash",
-    "gemini-1.5-flash",
   ];
 
   let lastError: any = null;
@@ -107,17 +143,17 @@ export const callGeminiApi = async ({
   // Prepare contents parts
   const parts: any[] = [];
 
-  // Try to load PDF as inlineData if available and size < 18MB
+  // Try to load PDF as inlineData if available and size < 6MB
   if (pdfUrl && !listContent) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 12000);
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
       const res = await fetch(pdfUrl, { signal: controller.signal });
       clearTimeout(timeoutId);
 
       if (res.ok) {
         const blob = await res.blob();
-        if (blob.size < 18 * 1024 * 1024) {
+        if (blob.size < 6 * 1024 * 1024) {
           const base64 = await blobToBase64(blob);
           parts.push({
             inlineData: {
@@ -167,7 +203,6 @@ export const callGeminiApi = async ({
         if (errMsg.includes("API key not valid") || errMsg.includes("API_KEY_INVALID")) {
           throw new Error("INVALID_API_KEY");
         }
-        // If 404 or model not found/deprecated, continue loop to try next model!
         if (response.status === 404 || errMsg.includes("not found") || errMsg.includes("no longer available")) {
           console.warn(`Model ${model} not available (${errMsg}), trying next model...`);
           lastError = new Error(errMsg);

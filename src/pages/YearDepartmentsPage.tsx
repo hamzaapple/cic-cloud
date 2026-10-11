@@ -8,7 +8,7 @@ import { BulkOfflineDownloadButton } from "@/components/BulkOfflineDownloadButto
 import { playBackSfx, playClickSfx } from "@/hooks/use-sfx";
 import { useEffect } from "react";
 import { setPushAudience, syncPushPreferences } from "@/lib/push-registration";
-import { setStoredYear } from "@/lib/year-context";
+import { setStoredYear, setStoredClassRoute } from "@/lib/year-context";
 
 const container: Variants = {
   hidden: { opacity: 0 },
@@ -37,7 +37,10 @@ const YearDepartmentsPage = () => {
     if (yearId === "2b") {
       setPushAudience("bachelor");
     }
-    if (yearId) setStoredYear(yearId);
+    if (yearId) {
+      setStoredYear(yearId);
+      setStoredClassRoute(`/year/${yearId}/departments`);
+    }
   }, [yearId]);
   const { data: allDepartments = [] } = useQuery({
     queryKey: ["departments"],
@@ -75,8 +78,15 @@ const YearDepartmentsPage = () => {
     <div className="min-h-screen pt-24 pb-12 px-4">
       <div className="container mx-auto max-w-5xl">
         <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-          <Link to="/" onClick={playBackSfx} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors">
-            <BackArrow className="w-4 h-4" /> {lang === "ar" ? "الرجوع للرئيسية" : "Back to Home"}
+          <Link
+            to="/?change=true"
+            onClick={() => {
+              playBackSfx();
+              sessionStorage.setItem("cic_view_all_years", "true");
+            }}
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
+          >
+            <BackArrow className="w-4 h-4" /> {lang === "ar" ? "الرجوع للرئيسية (كل الصفوف)" : "Back to All Years"}
           </Link>
         </motion.div>
 
