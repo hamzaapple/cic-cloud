@@ -1,13 +1,14 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { GraduationCap } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { YEARS, yearLabel } from "@/lib/year-context";
+import { YEARS, yearLabel, setStoredYear, setStoredClassRoute } from "@/lib/year-context";
 import { useYear } from "@/hooks/use-year";
 import { syncPushPreferences } from "@/lib/push-registration";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { db } from "@/lib/store";
+import { playClickSfx } from "@/hooks/use-sfx";
 
 interface Props {
   /** Force the picker open even when a year is already saved */
@@ -23,9 +24,13 @@ const YearPickerModal = ({ open, onClose }: Props) => {
   const { lang } = useI18n();
   const { year, setYear } = useYear();
   const location = useLocation();
-  // Never show the picker on admin/auth pages
+  const navigate = useNavigate();
+
+  // Never show the picker on admin/auth pages, nor when already on year/course pages
+  const isNavigatingYear = location.pathname.startsWith("/year/") || location.pathname.startsWith("/course/");
   const isAdminRoute = location.pathname.startsWith("/admin") || location.pathname.startsWith("/login");
-  const visible = !isAdminRoute && (open ?? (!year || !localStorage.getItem("cic_dept_context")));
+  const visible = !isAdminRoute && !isNavigatingYear && (open ?? (!year || !localStorage.getItem("cic_dept_context")));
+
   const [step, setStep] = useState<1 | 2>(!year ? 1 : 2);
   const [selectedYear, setSelectedYear] = useState<string | null>(year);
 
@@ -35,18 +40,47 @@ const YearPickerModal = ({ open, onClose }: Props) => {
   const availableDepts = allDepartments.filter(d => d.name_en !== "Bachelor");
 
   const chooseYear = (y: string) => {
+    playClickSfx();
     setSelectedYear(y);
-    setStep(2);
+    if (["3", "4"].includes(y)) {
+      setYear(y);
+      setStoredYear(y);
+      setStoredClassRoute(`/year/${y}/semesters`);
+      navigate(`/year/${y}/semesters`);
+      onClose?.();
+    } else {
+      setStep(2);
+    }
   };
 
-  const chooseDept = (deptContext: string) => {
-    if (selectedYear) {
-      setYear(selectedYear);
-    }
+  const chooseDept = (deptContext: string, deptId?: string) => {
+    playClickSfx();
+    const targetYear = selectedYear || year || "2";
+    setYear(targetYear);
+    setStoredYear(targetYear);
+
     localStorage.setItem("cic_dept_context", deptContext);
     localStorage.setItem("cic_push_dept", deptContext);
-    syncPushPreferences(deptContext, selectedYear);
+    syncPushPreferences(deptContext, targetYear);
     window.dispatchEvent(new CustomEvent("cic-dept-change", { detail: deptContext }));
+
+    const dept = availableDepts.find(d =>
+      deptId ? d.id === deptId : (d.name_en === "CS" ? "cs" : "ai_cyber") === deptContext
+    );
+    const actualDeptId = dept?.id || deptId;
+
+    if (["1", "2"].includes(targetYear) && actualDeptId && actualDeptId !== "all") {
+      const targetUrl = `/year/${targetYear}/semesters?dept=${actualDeptId}`;
+      setStoredClassRoute(targetUrl);
+      navigate(targetUrl);
+    } else {
+      const targetUrl = ["1", "2"].includes(targetYear)
+        ? `/year/${targetYear}/departments`
+        : `/year/${targetYear}/semesters`;
+      setStoredClassRoute(targetUrl);
+      navigate(targetUrl);
+    }
+
     onClose?.();
   };
 
@@ -116,7 +150,7 @@ const YearPickerModal = ({ open, onClose }: Props) => {
                   {availableDepts.map(d => (
                     <button
                       key={d.id}
-                      onClick={() => chooseDept(d.name_en === "CS" ? "cs" : "ai_cyber")}
+                      onClick={() => chooseDept(d.name_en === "CS" ? "cs" : "ai_cyber", d.id)}
                       className="px-4 py-3 rounded-xl text-sm font-medium border border-border hover:bg-secondary/60 transition-colors"
                     >
                       {lang === "ar" ? d.name_ar : d.name_en}
