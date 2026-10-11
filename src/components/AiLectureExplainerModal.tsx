@@ -25,7 +25,10 @@ import {
   Share2,
   ChevronRight,
   Zap,
+  Maximize2,
+  Minimize2,
 } from "lucide-react";
+import { FormattedAiText } from "@/components/FormattedAiText";
 import { toast } from "sonner";
 import { useI18n } from "@/lib/i18n";
 import {
@@ -60,6 +63,7 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
 }) => {
   const { lang } = useI18n();
   const [activeTab, setActiveTab] = useState<TabType>("summary");
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   // AI Content States
   const [summary, setSummary] = useState<string>("");
@@ -240,7 +244,7 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
       const contextSummary = summary || explanation || "";
       const contextSnippet = contextSummary ? `\nملخص وأفكار المحاضرة المساعدة:\n${contextSummary.slice(0, 3000)}` : "";
 
-      const prompt = `سؤال الطالب حول المحاضرة "${material.title}"${course?.name ? ` في مقرر ${course.name}` : ""}:${contextSnippet}\nسؤال الطالب المباشر:\n"${question}"\nأجب بدقة وسرعة ووضوح باللغة العربية مع القوانين والأمثلة الموضحة.`;
+      const prompt = `سؤال الطالب حول المحاضرة "${material.title}"${course?.name ? ` في مقرر ${course.name}` : ""}:${contextSnippet}\nسؤال الطالب المباشر:\n"${question}"\nأجب بدقة وسرعة ووضوح باللغة العربية مع القوانين والأمثلة الموضحة. في حال وجود أي معادلات أو رموز رياضية أو إحصائية، استخدم دائماً صيغة LaTeX القياسية (مثل $$...$$ للمعادلات المستقلة و $...$ للرموز داخل السطور) لتنسيقها بشكل جميل.`;
 
       const reply = await callGeminiApi({
         prompt,
@@ -307,9 +311,15 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col p-0 overflow-hidden bg-background/95 backdrop-blur-xl border-border/60 shadow-2xl">
+        <DialogContent
+          className={
+            isFullscreen
+              ? "!fixed !top-0 !left-0 !right-0 !bottom-0 !translate-x-0 !translate-y-0 !w-screen !h-[100dvh] !max-w-none !max-h-none !rounded-none flex flex-col p-0 overflow-hidden bg-background/98 backdrop-blur-2xl border-none shadow-none z-50 transition-all duration-200"
+              : "max-w-4xl max-h-[90vh] flex flex-col p-0 overflow-hidden bg-background/95 backdrop-blur-xl border-border/60 shadow-2xl rounded-2xl transition-all duration-200"
+          }
+        >
           {/* Header */}
-          <DialogHeader className="p-5 pb-3 border-b border-border/40 bg-secondary/30">
+          <DialogHeader className="p-5 pb-3 border-b border-border/40 bg-secondary/30 ltr:pr-12 rtl:pl-12">
             <div className="flex items-start justify-between gap-4">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
@@ -326,7 +336,7 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
                 </p>
               </div>
 
-              {/* API Key settings & status */}
+              {/* API Key settings, Fullscreen & status */}
               <div className="flex items-center gap-2 shrink-0">
                 {isFromCache && (
                   <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
@@ -345,6 +355,37 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
                   <span className="hidden sm:inline">
                     {hasGeminiApiKey() ? (lang === "ar" ? "مفتاح API مفعل" : "API Active") : (lang === "ar" ? "إدخال API" : "Set API Key")}
                   </span>
+                </Button>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    playClickSfx();
+                    setIsFullscreen((prev) => !prev);
+                  }}
+                  className="h-8 text-xs gap-1.5 bg-background/50 border-border/50 hover:bg-secondary"
+                  title={
+                    isFullscreen
+                      ? lang === "ar"
+                        ? "تصغير النافذة (خروج من ملء الشاشة)"
+                        : "Exit Fullscreen"
+                      : lang === "ar"
+                      ? "تكبير النافذة لملء الشاشة"
+                      : "Fullscreen"
+                  }
+                >
+                  {isFullscreen ? (
+                    <>
+                      <Minimize2 className="w-3.5 h-3.5 text-primary" />
+                      <span className="hidden sm:inline">{lang === "ar" ? "تصغير" : "Minimize"}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Maximize2 className="w-3.5 h-3.5 text-primary" />
+                      <span className="hidden sm:inline">{lang === "ar" ? "شاشة كاملة" : "Fullscreen"}</span>
+                    </>
+                  )}
                 </Button>
               </div>
             </div>
@@ -451,8 +492,8 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
                     <p className="text-xs text-muted-foreground">{lang === "ar" ? "يتم تلخيص النقاط الأساسية وتوضيح المفاهيم" : "Synthesizing key topics and core concepts"}</p>
                   </div>
                 ) : summary ? (
-                  <div className="prose prose-sm dark:prose-invert max-w-none p-5 rounded-2xl bg-secondary/30 border border-border/40 whitespace-pre-line leading-relaxed text-sm">
-                    {summary}
+                  <div className="p-5 rounded-2xl bg-secondary/30 border border-border/40 leading-relaxed text-sm">
+                    <FormattedAiText content={summary} />
                   </div>
                 ) : (
                   <div className="py-12 text-center text-muted-foreground space-y-3">
@@ -499,8 +540,8 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
                     <p className="text-sm font-medium">{lang === "ar" ? "جاري تبسيط مفاهيم المحاضرة وابتكار أمثلة عملية..." : "Simplifying core lecture concepts..."}</p>
                   </div>
                 ) : explanation ? (
-                  <div className="prose prose-sm dark:prose-invert max-w-none p-5 rounded-2xl bg-secondary/30 border border-border/40 whitespace-pre-line leading-relaxed text-sm">
-                    {explanation}
+                  <div className="p-5 rounded-2xl bg-secondary/30 border border-border/40 leading-relaxed text-sm">
+                    <FormattedAiText content={explanation} />
                   </div>
                 ) : (
                   <div className="py-12 text-center text-muted-foreground space-y-3">
@@ -553,12 +594,14 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
 
                       return (
                         <div key={qIndex} className="p-4 rounded-xl bg-secondary/30 border border-border/40 space-y-3">
-                          <p className="font-bold text-sm flex items-start gap-2">
+                          <div className="font-bold text-sm flex items-start gap-2">
                             <span className="w-6 h-6 rounded-full bg-primary/10 text-primary text-xs flex items-center justify-center shrink-0 mt-0.5">
                               {qIndex + 1}
                             </span>
-                            <span>{q.question}</span>
-                          </p>
+                            <div className="flex-1">
+                              <FormattedAiText content={q.question} />
+                            </div>
+                          </div>
 
                           <div className="grid gap-2 sm:grid-cols-2 pt-1">
                             {q.options.map((opt, optIndex) => {
@@ -583,9 +626,11 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
                                     setUserAnswers((prev) => ({ ...prev, [qIndex]: optIndex }));
                                     setShowExplanations((prev) => ({ ...prev, [qIndex]: true }));
                                   }}
-                                  className={`p-3 rounded-lg border text-xs text-right transition-all flex items-center justify-between ${btnStyle}`}
+                                  className={`p-3 rounded-lg border text-xs text-right transition-all flex items-center justify-between gap-2 ${btnStyle}`}
                                 >
-                                  <span>{opt}</span>
+                                  <div className="flex-1 text-right">
+                                    <FormattedAiText content={opt} className="text-xs" />
+                                  </div>
                                   {isAnswered && isChoiceCorrect && <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 ml-2" />}
                                   {isAnswered && isChoiceSelected && !isCorrect && <XCircle className="w-4 h-4 text-destructive shrink-0 ml-2" />}
                                 </button>
@@ -594,9 +639,9 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
                           </div>
 
                           {showReason && q.explanation && (
-                            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="p-3 rounded-lg bg-secondary/60 text-xs text-muted-foreground leading-relaxed border border-border/30">
+                            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="p-3 rounded-lg bg-secondary/60 text-xs text-muted-foreground leading-relaxed border border-border/30 space-y-1">
                               <span className="font-bold text-foreground">💡 التعليل: </span>
-                              {q.explanation}
+                              <FormattedAiText content={q.explanation} className="text-xs" />
                             </motion.div>
                           )}
                         </div>
@@ -604,8 +649,8 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
                     })}
                   </div>
                 ) : quizText ? (
-                  <div className="prose prose-sm dark:prose-invert max-w-none p-5 rounded-2xl bg-secondary/30 border border-border/40 whitespace-pre-line text-sm">
-                    {quizText}
+                  <div className="p-5 rounded-2xl bg-secondary/30 border border-border/40 text-sm">
+                    <FormattedAiText content={quizText} />
                   </div>
                 ) : (
                   <div className="py-12 text-center text-muted-foreground space-y-3">
@@ -618,7 +663,11 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
 
             {/* TAB 4: CHAT WITH LECTURE */}
             {activeTab === "chat" && (
-              <div className="space-y-4 flex flex-col h-[500px]">
+              <div
+                className={`space-y-4 flex flex-col transition-all ${
+                  isFullscreen ? "h-[calc(100dvh-175px)]" : "h-[500px]"
+                }`}
+              >
                 <div className="pb-2 border-b border-border/40">
                   <h3 className="font-display font-bold text-sm flex items-center gap-2">
                     <MessageSquare className="w-4 h-4 text-primary" />
@@ -645,13 +694,16 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
                         className={`flex gap-2.5 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                       >
                         <div
-                          className={`max-w-[85%] rounded-2xl p-3.5 text-xs sm:text-sm leading-relaxed whitespace-pre-line ${
+                          className={`max-w-[85%] rounded-2xl p-3.5 text-xs sm:text-sm leading-relaxed ${
                             msg.role === "user"
                               ? "bg-primary text-primary-foreground rounded-br-none"
                               : "bg-card border border-border/50 text-foreground rounded-bl-none shadow-sm"
                           }`}
                         >
-                          {msg.text}
+                          <FormattedAiText
+                            content={msg.text}
+                            className={msg.role === "user" ? "!text-primary-foreground" : ""}
+                          />
                         </div>
                       </div>
                     ))
