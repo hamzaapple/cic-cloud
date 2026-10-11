@@ -74,8 +74,9 @@ serve(async (req: Request) => {
     let sentCount = 0;
     for (const { material, type } of toSend) {
       const courseName = (material as any).courses?.name || "";
-      const dept = (material as any).courses?.departments?.name_en || "all";
-      const targetYear = (material as any).courses?.academic_year || "all";
+      const rawDept = (material as any).courses?.departments?.name_en || "all";
+      const dept = rawDept === "CS" ? "cs" : rawDept === "AI, Cyber" ? "ai_cyber" : rawDept === "Bachelor" ? "bachelor" : "all";
+      const targetYear = (material as any).courses?.academic_year || "1";
       const label = type === "24h" ? "خلال 24 ساعة ⏰" : type === "6h" ? "خلال 6 ساعات ⚠️" : "خلال ساعة واحدة 🚨";
 
       const pushRes = await fetch(`${SUPABASE_URL}/functions/v1/send-push`, {

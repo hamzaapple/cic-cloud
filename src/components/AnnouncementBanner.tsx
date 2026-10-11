@@ -30,13 +30,36 @@ const AnnouncementBanner = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [anns, materials, courses] = await Promise.all([
+        const [anns, materials, courses, departments] = await Promise.all([
           db.getAnnouncements(),
           db.getMaterials(),
-          db.getCourses()
+          db.getCourses(),
+          db.getDepartments()
         ]);
         
         const deptContext = localStorage.getItem("cic_dept_context");
+
+        const courseMatchesUser = (course?: Course | null) => {
+          if (!course) return false;
+          if (course.code === "BACHELOR-PROG") return false;
+
+          // Filter by Academic Year:
+          if (year && year !== "all" && (course.academic_year || "1") !== year) {
+            return false;
+          }
+
+          // Filter by Department:
+          if (deptContext && deptContext !== "all" && course.department_id) {
+            const courseDept = departments.find(d => d.id === course.department_id);
+            if (courseDept) {
+              const isCs = courseDept.name_en === "CS";
+              if (deptContext === "cs" && !isCs) return false;
+              if (deptContext === "ai_cyber" && isCs) return false;
+              if (deptContext === "bachelor" && courseDept.name_en !== "Bachelor") return false;
+            }
+          }
+          return true;
+        };
         
         const filteredAnns = anns.filter(a => {
           const yearMatch = !a.target_year || a.target_year === "all" || a.target_year === year;
@@ -45,13 +68,13 @@ const AnnouncementBanner = () => {
         });
         setAnnouncements(filteredAnns);
         
-        // Find assignments due in less than 24 hours
+        // Find assignments due in less than 24 hours (filtered for this user's year & dept)
         const now = new Date();
         const urgent = materials
-          .filter(m => m.is_assignment && m.deadline && !m.archived)
+          .filter(m => m.is_assignment && m.deadline && !m.archived && !m.deleted_at)
           .filter(m => {
             const course = courses.find(c => c.id === m.course_id);
-            return !course || course.code !== "BACHELOR-PROG";
+            return courseMatchesUser(course);
           })
           .map(m => {
             // Force Cairo/Local time end-of-day for date-only strings from DB
@@ -73,14 +96,13 @@ const AnnouncementBanner = () => {
           
         setUrgentAssignments(urgent);
 
-        // Find recent materials uploaded in the last 72 hours for the visitor's year
+        // Find recent materials uploaded in the last 72 hours for the visitor's year & dept
         const threeDaysAgo = new Date(Date.now() - 72 * 60 * 60 * 1000);
         const recent = materials
           .filter(m => !m.archived && !m.deleted_at && m.created_at && new Date(m.created_at) > threeDaysAgo)
           .filter(m => {
-            if (!year || year === "all") return true;
             const course = courses.find(c => c.id === m.course_id);
-            return (course?.academic_year || "1") === year;
+            return courseMatchesUser(course);
           })
           .slice(0, 3)
           .map(m => {
@@ -104,10 +126,13 @@ const AnnouncementBanner = () => {
       if (document.visibilityState === "visible") fetchData();
     }, 60 * 1000);
     const onVisible = () => { if (document.visibilityState === "visible") fetchData(); };
+    const onDeptChange = () => fetchData();
     document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("cic-dept-change", onDeptChange);
     return () => {
       clearInterval(interval);
       document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("cic-dept-change", onDeptChange);
     };
   }, [lang, year]);
 

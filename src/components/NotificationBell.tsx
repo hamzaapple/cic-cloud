@@ -71,7 +71,7 @@ const NotificationBell = () => {
         applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
       });
 
-      await registerPushSubscription(subscription, "all");
+      await registerPushSubscription(subscription);
 
       toast({
         title: lang === "ar" ? "تم تفعيل الإشعارات ✓" : "Notifications enabled ✓",

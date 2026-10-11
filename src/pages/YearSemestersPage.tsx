@@ -27,7 +27,9 @@ const YearSemestersPage = () => {
   const { lang } = useI18n();
 
   useEffect(() => {
-    setPushAudience(yearId === "2b" ? "bachelor" : "all");
+    if (yearId === "2b") {
+      setPushAudience("bachelor");
+    }
   }, [yearId]);
 
   const Arrow = lang === "ar" ? ArrowLeft : ArrowRight;

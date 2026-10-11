@@ -12,6 +12,15 @@ function getCorsHeaders(req: Request) {
   };
 }
 
+function normalizeDept(d?: string | null): string {
+  if (!d) return "all";
+  const s = String(d).trim().toLowerCase();
+  if (s === "cs" || s.includes("حاسب")) return "cs";
+  if (s === "ai, cyber" || s === "ai_cyber" || s === "ai" || s.includes("cyber") || s.includes("سيبر") || s.includes("ذكاء")) return "ai_cyber";
+  if (s === "bachelor" || s.includes("بكالور")) return "bachelor";
+  return s;
+}
+
 serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: getCorsHeaders(req) });
 
@@ -100,28 +109,30 @@ serve(async (req: Request) => {
 
     // Use Promise.allSettled to handle multiple requests without failing the whole process
     const results = await Promise.allSettled(subs.map(async (sub) => {
-      // Filter by department if target_audience is provided
-      if (target_audience === "bachelor") {
-        if (sub.department !== "bachelor") return { skipped: true };
+      const targetDept = normalizeDept(target_audience);
+      const subDept = normalizeDept(sub.department);
+
+      // Bachelor segregation
+      if (targetDept === "bachelor") {
+        if (subDept !== "bachelor") return { skipped: true };
       } else {
-        // Any other target (including "all") skips bachelor devices
-        if (sub.department === "bachelor") return { skipped: true };
-        
-        // Existing filtering for other departments
-        if (
-          target_audience &&
-          target_audience !== "all" &&
-          sub.department &&
-          sub.department !== "all" &&
-          sub.department !== target_audience
-        ) {
-          return { skipped: true };
+        if (subDept === "bachelor") return { skipped: true };
+
+        // Strict department filtering: if notification is targeted to a specific department,
+        // subscriber MUST match that department.
+        if (targetDept !== "all") {
+          if (subDept !== targetDept) {
+            return { skipped: true };
+          }
         }
       }
 
       // Filter by academic year if target_year is provided
-      if (target_year && target_year !== "all") {
-        if (!sub.academic_year || sub.academic_year !== target_year) {
+      const normTargetYear = target_year ? String(target_year).trim() : "all";
+      const normSubYear = sub.academic_year ? String(sub.academic_year).trim() : null;
+
+      if (normTargetYear && normTargetYear !== "all") {
+        if (!normSubYear || normSubYear !== normTargetYear) {
           return { skipped: true };
         }
       }

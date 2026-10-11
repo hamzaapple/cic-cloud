@@ -3,7 +3,7 @@ import { GraduationCap } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { YEARS, yearLabel } from "@/lib/year-context";
 import { useYear } from "@/hooks/use-year";
-import { setPushYear } from "@/lib/push-registration";
+import { syncPushPreferences } from "@/lib/push-registration";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "react-router-dom";
@@ -42,9 +42,11 @@ const YearPickerModal = ({ open, onClose }: Props) => {
   const chooseDept = (deptContext: string) => {
     if (selectedYear) {
       setYear(selectedYear);
-      setPushYear(selectedYear);
     }
     localStorage.setItem("cic_dept_context", deptContext);
+    localStorage.setItem("cic_push_dept", deptContext);
+    syncPushPreferences(deptContext, selectedYear);
+    window.dispatchEvent(new CustomEvent("cic-dept-change", { detail: deptContext }));
     onClose?.();
   };
 

@@ -339,10 +339,18 @@ const AdminDashboard = () => {
         console.error("Failed to fetch templates", e);
       }
 
-      // Academic year of course
-      const courseYear = course?.academic_year || "all";
+      // Academic year and department of course
+      const courseYear = course?.academic_year || "1";
       const yearName = yearLabel(courseYear, "ar");
       const cleanTitle = pdfDisplayName || title;
+
+      const courseDept = departments.find(d => d.id === course?.department_id);
+      let targetAudience = "all";
+      if (courseDept) {
+        if (courseDept.name_en === "CS") targetAudience = "cs";
+        else if (courseDept.name_en === "AI, Cyber") targetAudience = "ai_cyber";
+        else if (courseDept.name_en === "Bachelor") targetAudience = "bachelor";
+      }
 
       // Replace variables
       let notifTitle = titleTemplate
@@ -365,8 +373,8 @@ const AdminDashboard = () => {
       db.addNotification({
         title: notifTitle,
         message: notifMessage,
-        target_audience: "all",
-        target_year: courseYear === "all" ? null : courseYear,
+        target_audience: targetAudience,
+        target_year: courseYear,
         link: `/course/${courseId}`,
         sent_by: "system",
       }).catch(err => console.warn("Auto-notification failed (material was uploaded):", err));
@@ -481,8 +489,16 @@ const AdminDashboard = () => {
       console.error("Failed to fetch templates", e);
     }
 
-    const courseYear = course?.academic_year || "all";
+    const courseYear = course?.academic_year || "1";
     const yearName = yearLabel(courseYear, "ar");
+
+    const courseDept = departments.find(d => d.id === course?.department_id);
+    let targetAudienceBulk = "all";
+    if (courseDept) {
+      if (courseDept.name_en === "CS") targetAudienceBulk = "cs";
+      else if (courseDept.name_en === "AI, Cyber") targetAudienceBulk = "ai_cyber";
+      else if (courseDept.name_en === "Bachelor") targetAudienceBulk = "bachelor";
+    }
 
     let notifTitleBulk = bulkTitleTemplate
       .replace(/{count}/g, successCount.toString())
@@ -502,8 +518,8 @@ const AdminDashboard = () => {
     db.addNotification({
       title: notifTitleBulk,
       message: notifMessageBulk,
-      target_audience: "all",
-      target_year: courseYear === "all" ? null : courseYear,
+      target_audience: targetAudienceBulk,
+      target_year: courseYear,
       link: `/course/${courseId}`,
       sent_by: "system",
     }).catch(err => console.warn("Auto-notification failed (bulk upload):", err));

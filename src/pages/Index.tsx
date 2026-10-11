@@ -2,8 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { ArrowLeft, ArrowRight, BookOpen, Layers, Monitor, Cpu, GraduationCap, Network } from "lucide-react";
-import { useEffect } from "react";
-import { setPushAudience } from "@/lib/push-registration";
+
 import { useQuery } from "@tanstack/react-query";
 import { db } from "@/lib/store";
 import { BulkOfflineDownloadButton } from "@/components/BulkOfflineDownloadButton";
@@ -99,9 +98,7 @@ const Index = () => {
   const { t, lang } = useI18n();
   const Arrow = lang === "ar" ? ArrowLeft : ArrowRight;
 
-  useEffect(() => {
-    setPushAudience("all");
-  }, []);
+
 
   return (
     <div className="min-h-screen pt-20 md:pt-24 pb-32 px-4 relative z-10">

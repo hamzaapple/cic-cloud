@@ -7,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { BulkOfflineDownloadButton } from "@/components/BulkOfflineDownloadButton";
 import { playBackSfx, playClickSfx } from "@/hooks/use-sfx";
 import { useEffect } from "react";
-import { setPushAudience } from "@/lib/push-registration";
+import { setPushAudience, syncPushPreferences } from "@/lib/push-registration";
 import { setStoredYear } from "@/lib/year-context";
 
 const container: Variants = {
@@ -34,7 +34,9 @@ const YearDepartmentsPage = () => {
   const { t, lang } = useI18n();
 
   useEffect(() => {
-    setPushAudience(yearId === "2b" ? "bachelor" : "all");
+    if (yearId === "2b") {
+      setPushAudience("bachelor");
+    }
     if (yearId) setStoredYear(yearId);
   }, [yearId]);
   const { data: allDepartments = [] } = useQuery({
@@ -111,6 +113,8 @@ const YearDepartmentsPage = () => {
                     // Set context for Schedules and Announcements
                     const deptContext = dept.name_en === "CS" ? "cs" : "ai_cyber";
                     localStorage.setItem("cic_dept_context", deptContext);
+                    syncPushPreferences(deptContext, yearId);
+                    window.dispatchEvent(new CustomEvent("cic-dept-change", { detail: deptContext }));
                   }}
                 >
                   <motion.div

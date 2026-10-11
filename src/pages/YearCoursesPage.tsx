@@ -7,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { BulkOfflineDownloadButton } from "@/components/BulkOfflineDownloadButton";
 import { playBackSfx, playClickSfx } from "@/hooks/use-sfx";
 import { useEffect } from "react";
-import { setPushAudience } from "@/lib/push-registration";
+import { setPushAudience, syncPushPreferences } from "@/lib/push-registration";
 import { setStoredYear } from "@/lib/year-context";
 import { coursePath } from "@/lib/utils";
 
@@ -28,7 +28,9 @@ const YearCoursesPage = () => {
   const { t, tCourse, lang } = useI18n();
 
   useEffect(() => {
-    setPushAudience(yearId === "2b" ? "bachelor" : "all");
+    if (yearId === "2b") {
+      setPushAudience("bachelor");
+    }
     if (yearId) setStoredYear(yearId);
   }, [yearId]);
 
@@ -72,13 +74,15 @@ const YearCoursesPage = () => {
 
   const department = departments.find(d => d.id === deptId);
 
-  // Save department context for schedule page
+  // Save department context for schedule page and notifications
   useQuery({
     queryKey: ["dept-context", department?.name_en],
     queryFn: () => {
       if (department) {
         const ctx = department.name_en === "CS" ? "cs" : "ai_cyber";
         localStorage.setItem("cic_dept_context", ctx);
+        syncPushPreferences(ctx, yearId);
+        window.dispatchEvent(new CustomEvent("cic-dept-change", { detail: ctx }));
       }
       return null;
     },
