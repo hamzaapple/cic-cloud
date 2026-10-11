@@ -72,13 +72,35 @@ export default async function handler(req: any, res: any) {
     parts.push({ text: prompt });
 
     const models = [
-      'gemini-3.8-flash',
-      'gemini-flash-latest',
-      'gemini-3.7-flash',
+      'gemini-3.5-flash-lite',
       'gemini-3.5-flash',
-      'gemini-2.5-flash-lite',
+      'gemini-flash-latest',
+      'gemini-3.8-flash',
+      'gemini-3.7-flash',
       'gemini-pro-latest',
     ];
+
+    // Normalize history so consecutive user/model roles are merged properly
+    let safeContents: any[] = [];
+    if (history && history.length > 0) {
+      const merged: any[] = [];
+      for (const h of history) {
+        if (!h.parts || h.parts.length === 0) continue;
+        if (merged.length > 0 && merged[merged.length - 1].role === h.role) {
+          merged[merged.length - 1].parts[0].text += `\n${h.parts.map((p: any) => p.text).join('')}`;
+        } else {
+          merged.push({ role: h.role, parts: [{ text: h.parts.map((p: any) => p.text).join('') }] });
+        }
+      }
+      if (merged.length > 0 && merged[merged.length - 1].role === 'user') {
+        merged[merged.length - 1].parts.push(...parts);
+        safeContents = merged;
+      } else {
+        safeContents = [...merged, { role: 'user', parts }];
+      }
+    } else {
+      safeContents = [{ role: 'user', parts }];
+    }
 
     let lastError = '';
 
@@ -87,10 +109,10 @@ export default async function handler(req: any, res: any) {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
         const requestBody: any = {
-          contents: history ? [...history, { role: 'user', parts }] : [{ role: 'user', parts }],
+          contents: safeContents,
           generationConfig: {
             temperature: 0.3,
-            maxOutputTokens: 3000,
+            maxOutputTokens: 1800,
           },
         };
 

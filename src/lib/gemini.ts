@@ -130,11 +130,11 @@ export const callGeminiApi = async ({
 
   // 2. Fallback: Direct client fetch to generativelanguage.googleapis.com
   const models = [
-    "gemini-3.8-flash",
-    "gemini-3.7-flash",
+    "gemini-3.5-flash-lite",
     "gemini-3.5-flash",
     "gemini-flash-latest",
-    "gemini-2.5-flash-lite",
+    "gemini-3.8-flash",
+    "gemini-3.7-flash",
     "gemini-pro-latest",
   ];
 
@@ -175,15 +175,37 @@ export const callGeminiApi = async ({
   // Add the prompt text
   parts.push({ text: prompt });
 
+  // Normalize history so consecutive user/model roles are merged properly
+  let safeContents: any[] = [];
+  if (history && history.length > 0) {
+    const merged: any[] = [];
+    for (const h of history) {
+      if (!h.parts || h.parts.length === 0) continue;
+      if (merged.length > 0 && merged[merged.length - 1].role === h.role) {
+        merged[merged.length - 1].parts[0].text += `\n${h.parts.map((p: any) => p.text).join('')}`;
+      } else {
+        merged.push({ role: h.role, parts: [{ text: h.parts.map((p: any) => p.text).join('') }] });
+      }
+    }
+    if (merged.length > 0 && merged[merged.length - 1].role === "user") {
+      merged[merged.length - 1].parts.push(...parts);
+      safeContents = merged;
+    } else {
+      safeContents = [...merged, { role: "user", parts }];
+    }
+  } else {
+    safeContents = [{ role: "user", parts }];
+  }
+
   for (const model of models) {
     try {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
       const requestBody: any = {
-        contents: history ? [...history, { role: "user", parts }] : [{ role: "user", parts }],
+        contents: safeContents,
         generationConfig: {
           temperature: 0.3,
-          maxOutputTokens: 3000,
+          maxOutputTokens: 1800,
         },
       };
 

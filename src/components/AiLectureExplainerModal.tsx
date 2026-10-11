@@ -237,18 +237,30 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
         parts: [{ text: m.text }],
       }));
 
-      const prompt = `سؤال الطالب حول المحاضرة "${material.title}":\n"${question}"\nأجب بدقة ووضوح باللغة العربية بناءً على محتوى المحاضرة.`;
+      const contextSummary = summary || explanation || "";
+      const contextSnippet = contextSummary ? `\nملخص وأفكار المحاضرة المساعدة:\n${contextSummary.slice(0, 3000)}` : "";
+
+      const prompt = `سؤال الطالب حول المحاضرة "${material.title}"${course?.name ? ` في مقرر ${course.name}` : ""}:${contextSnippet}\nسؤال الطالب المباشر:\n"${question}"\nأجب بدقة وسرعة ووضوح باللغة العربية مع القوانين والأمثلة الموضحة.`;
 
       const reply = await callGeminiApi({
         prompt,
-        pdfUrl: material.pdf_url,
-        listContent: material.list_content,
+        listContent: material.list_content || (contextSummary ? contextSummary.slice(0, 4000) : null),
         history: historyFormatted,
       });
 
       setChatMessages((prev) => [...prev, { role: "model", text: reply }]);
     } catch (err: any) {
-      toast.error(lang === "ar" ? "فشل إرسال السؤال للذكاء الاصطناعي" : "Failed to get AI answer");
+      console.error("Chat error:", err);
+      setChatMessages((prev) => [
+        ...prev,
+        {
+          role: "model",
+          text: lang === "ar"
+            ? "عذراً، حدث بطء في الاتصال أثناء الإجابة. يمكنك إعادة إرسال السؤال أو استخدام تبويب 'النماذج الخارجية' لسؤال ChatGPT أو NotebookLM مجاناً بنقرة واحدة."
+            : "Could not get an answer due to network timeout. Please retry or try External Models.",
+        },
+      ]);
+      toast.error(lang === "ar" ? "تعذر الرد، يرجى إعادة المحاولة" : "Failed to get AI answer");
     } finally {
       setIsChatLoading(false);
     }
