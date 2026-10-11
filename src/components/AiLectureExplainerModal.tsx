@@ -27,8 +27,14 @@ import {
   Zap,
   Maximize2,
   Minimize2,
+  Edit3,
+  FileText,
+  FileDown,
+  Eye,
+  Undo2,
 } from "lucide-react";
 import { FormattedAiText } from "@/components/FormattedAiText";
+import { exportToWordDocument, exportToPdfPrint } from "@/lib/export-doc";
 import { toast } from "sonner";
 import { useI18n } from "@/lib/i18n";
 import {
@@ -70,6 +76,12 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
   const [explanation, setExplanation] = useState<string>("");
   const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>([]);
   const [quizText, setQuizText] = useState<string>("");
+
+  // Editing state for Summary & Explanation
+  const [isEditingSummary, setIsEditingSummary] = useState<boolean>(false);
+  const [editedSummary, setEditedSummary] = useState<string>("");
+  const [isEditingExplanation, setIsEditingExplanation] = useState<boolean>(false);
+  const [editedExplanation, setEditedExplanation] = useState<string>("");
 
   // Quiz interactive state: questionIndex -> selectedOptionIndex
   const [userAnswers, setUserAnswers] = useState<Record<number, number>>({});
@@ -278,6 +290,44 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleStartEditSummary = () => {
+    playClickSfx();
+    setEditedSummary(summary);
+    setIsEditingSummary(true);
+  };
+
+  const handleSaveSummary = () => {
+    playClickSfx();
+    setSummary(editedSummary);
+    setCachedAiContent(material.id, "summary", editedSummary);
+    setIsEditingSummary(false);
+    toast.success(lang === "ar" ? "تم حفظ التعديلات بنجاح ✨" : "Edits saved ✨");
+  };
+
+  const handleCancelEditSummary = () => {
+    playClickSfx();
+    setIsEditingSummary(false);
+  };
+
+  const handleStartEditExplanation = () => {
+    playClickSfx();
+    setEditedExplanation(explanation);
+    setIsEditingExplanation(true);
+  };
+
+  const handleSaveExplanation = () => {
+    playClickSfx();
+    setExplanation(editedExplanation);
+    setCachedAiContent(material.id, "explain", editedExplanation);
+    setIsEditingExplanation(false);
+    toast.success(lang === "ar" ? "تم حفظ التعديلات بنجاح ✨" : "Edits saved ✨");
+  };
+
+  const handleCancelEditExplanation = () => {
+    playClickSfx();
+    setIsEditingExplanation(false);
+  };
+
   const handleSaveApiKey = () => {
     if (inputKey.trim()) {
       setGeminiApiKey(inputKey.trim());
@@ -458,29 +508,115 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
             {/* TAB 1: SUMMARY */}
             {activeTab === "summary" && (
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1 border-b border-border/40">
                   <h3 className="font-display font-bold text-sm flex items-center gap-2">
                     <BookOpen className="w-4 h-4 text-primary" />
-                    {lang === "ar" ? "الملخص الأكاديمي الشامل" : "Comprehensive Summary"}
+                    <span>{lang === "ar" ? "الملخص الأكاديمي الشامل" : "Comprehensive Summary"}</span>
                   </h3>
-                  <div className="flex items-center gap-2">
-                    {summary && (
-                      <Button variant="ghost" size="sm" onClick={() => handleCopy(summary)} className="h-8 text-xs gap-1">
-                        {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-                        {lang === "ar" ? "نسخ" : "Copy"}
+
+                  {summary && !loading && (
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {/* Edit Toggle */}
+                      {isEditingSummary ? (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="default"
+                            onClick={handleSaveSummary}
+                            className="h-7 text-xs gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold"
+                          >
+                            <Check className="w-3.5 h-3.5" />
+                            <span>{lang === "ar" ? "حفظ التعديلات" : "Save"}</span>
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={handleCancelEditSummary}
+                            className="h-7 text-xs gap-1"
+                          >
+                            <Undo2 className="w-3.5 h-3.5" />
+                            <span>{lang === "ar" ? "إلغاء" : "Cancel"}</span>
+                          </Button>
+                        </>
+                      ) : (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={handleStartEditSummary}
+                          className="h-7 text-xs gap-1.5 bg-background border-border/60 hover:bg-secondary font-medium"
+                          title={lang === "ar" ? "تعديل نص الملخص وإضافة ملاحظاتك" : "Edit Summary"}
+                        >
+                          <Edit3 className="w-3.5 h-3.5 text-primary" />
+                          <span>{lang === "ar" ? "تعديل" : "Edit"}</span>
+                        </Button>
+                      )}
+
+                      {/* Download Word */}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          playClickSfx();
+                          exportToWordDocument({
+                            title: material.title,
+                            courseName: course?.name,
+                            content: isEditingSummary ? editedSummary : summary,
+                            typeLabel: lang === "ar" ? "ملخص المحاضرة" : "Lecture Summary",
+                          });
+                          toast.success(lang === "ar" ? "جاري تنزيل ملف Word (.doc) 📄" : "Downloading Word (.doc) 📄");
+                        }}
+                        className="h-7 text-xs gap-1.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500/20 border-blue-500/30 font-semibold"
+                        title={lang === "ar" ? "تنزيل بصيغة Microsoft Word قابلة للتعديل" : "Download as Word (.doc)"}
+                      >
+                        <FileText className="w-3.5 h-3.5" />
+                        <span>{lang === "ar" ? "Word" : "Word"}</span>
                       </Button>
-                    )}
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleGenerate("summary", true)}
-                      disabled={loading}
-                      className="h-8 text-xs gap-1"
-                    >
-                      <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
-                      {lang === "ar" ? "إعادة التوليد" : "Regenerate"}
-                    </Button>
-                  </div>
+
+                      {/* Download PDF */}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          playClickSfx();
+                          exportToPdfPrint({
+                            title: material.title,
+                            courseName: course?.name,
+                            content: isEditingSummary ? editedSummary : summary,
+                            typeLabel: lang === "ar" ? "ملخص المحاضرة" : "Lecture Summary",
+                          });
+                          toast.success(lang === "ar" ? "فتح نافذة تصدير وحفظ PDF 🖨️" : "Opening PDF export 🖨️");
+                        }}
+                        className="h-7 text-xs gap-1.5 bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20 border-rose-500/30 font-semibold"
+                        title={lang === "ar" ? "تنزيل كملف PDF عالي الجودة أو طباعة" : "Download / Print as PDF"}
+                      >
+                        <FileDown className="w-3.5 h-3.5" />
+                        <span>{lang === "ar" ? "PDF" : "PDF"}</span>
+                      </Button>
+
+                      {/* Copy */}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleCopy(isEditingSummary ? editedSummary : summary)}
+                        className="h-7 text-xs gap-1"
+                      >
+                        {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                        <span>{lang === "ar" ? "نسخ" : "Copy"}</span>
+                      </Button>
+
+                      {/* Regenerate */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleGenerate("summary", true)}
+                        disabled={loading}
+                        className="h-7 text-xs gap-1"
+                      >
+                        <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
+                        <span>{lang === "ar" ? "إعادة التوليد" : "Regenerate"}</span>
+                      </Button>
+                    </div>
+                  )}
                 </div>
 
                 {loading ? (
@@ -492,9 +628,34 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
                     <p className="text-xs text-muted-foreground">{lang === "ar" ? "يتم تلخيص النقاط الأساسية وتوضيح المفاهيم" : "Synthesizing key topics and core concepts"}</p>
                   </div>
                 ) : summary ? (
-                  <div className="p-5 rounded-2xl bg-secondary/30 border border-border/40 leading-relaxed text-sm">
-                    <FormattedAiText content={summary} />
-                  </div>
+                  isEditingSummary ? (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between text-xs text-muted-foreground px-1">
+                        <span>{lang === "ar" ? "✏️ وضع التعديل المباشر: يمكنك تعديل وحذف وإضافة ما تراه مناسباً:" : "Direct Edit Mode: Add or modify notes:"}</span>
+                        <span className="font-mono text-[11px]">{editedSummary.length} حرف</span>
+                      </div>
+                      <Textarea
+                        value={editedSummary}
+                        onChange={(e) => setEditedSummary(e.target.value)}
+                        className="w-full min-h-[360px] p-4 text-sm leading-relaxed font-sans bg-background border-border/80 focus:border-primary rounded-xl"
+                        dir="rtl"
+                        placeholder={lang === "ar" ? "اكتب أو عدّل هنا..." : "Type edits here..."}
+                      />
+                      <div className="space-y-1.5 pt-2">
+                        <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
+                          <Eye className="w-3.5 h-3.5 text-primary" />
+                          <span>{lang === "ar" ? "معاينة التنسيق الرياضي والمحتوى مباشرة:" : "Live Formatted Preview:"}</span>
+                        </div>
+                        <div className="p-4 rounded-xl bg-secondary/20 border border-border/40 text-sm">
+                          <FormattedAiText content={editedSummary} />
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-5 rounded-2xl bg-secondary/30 border border-border/40 leading-relaxed text-sm">
+                      <FormattedAiText content={summary} />
+                    </div>
+                  )
                 ) : (
                   <div className="py-12 text-center text-muted-foreground space-y-3">
                     <p className="text-sm">{lang === "ar" ? "اضغط على الزر أدناه لبدء تلخيص المحاضرة" : "Click below to generate lecture summary"}</p>
@@ -507,29 +668,115 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
             {/* TAB 2: EXPLAIN KEY CONCEPTS */}
             {activeTab === "explain" && (
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1 border-b border-border/40">
                   <h3 className="font-display font-bold text-sm flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-primary" />
-                    {lang === "ar" ? "تبسيط المفاهيم الصعبة وأمثلة واقعية" : "Simplified Explanations & Examples"}
+                    <span>{lang === "ar" ? "تبسيط المفاهيم الصعبة وأمثلة واقعية" : "Simplified Explanations & Examples"}</span>
                   </h3>
-                  <div className="flex items-center gap-2">
-                    {explanation && (
-                      <Button variant="ghost" size="sm" onClick={() => handleCopy(explanation)} className="h-8 text-xs gap-1">
-                        {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-                        {lang === "ar" ? "نسخ" : "Copy"}
+
+                  {explanation && !loading && (
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {/* Edit Toggle */}
+                      {isEditingExplanation ? (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="default"
+                            onClick={handleSaveExplanation}
+                            className="h-7 text-xs gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold"
+                          >
+                            <Check className="w-3.5 h-3.5" />
+                            <span>{lang === "ar" ? "حفظ التعديلات" : "Save"}</span>
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={handleCancelEditExplanation}
+                            className="h-7 text-xs gap-1"
+                          >
+                            <Undo2 className="w-3.5 h-3.5" />
+                            <span>{lang === "ar" ? "إلغاء" : "Cancel"}</span>
+                          </Button>
+                        </>
+                      ) : (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={handleStartEditExplanation}
+                          className="h-7 text-xs gap-1.5 bg-background border-border/60 hover:bg-secondary font-medium"
+                          title={lang === "ar" ? "تعديل نص الشرح وإضافة ملاحظاتك" : "Edit Explanation"}
+                        >
+                          <Edit3 className="w-3.5 h-3.5 text-primary" />
+                          <span>{lang === "ar" ? "تعديل" : "Edit"}</span>
+                        </Button>
+                      )}
+
+                      {/* Download Word */}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          playClickSfx();
+                          exportToWordDocument({
+                            title: material.title,
+                            courseName: course?.name,
+                            content: isEditingExplanation ? editedExplanation : explanation,
+                            typeLabel: lang === "ar" ? "تبسيط المفاهيم والشرح" : "Key Concepts & Explanation",
+                          });
+                          toast.success(lang === "ar" ? "جاري تنزيل ملف Word (.doc) 📄" : "Downloading Word (.doc) 📄");
+                        }}
+                        className="h-7 text-xs gap-1.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500/20 border-blue-500/30 font-semibold"
+                        title={lang === "ar" ? "تنزيل بصيغة Microsoft Word قابلة للتعديل" : "Download as Word (.doc)"}
+                      >
+                        <FileText className="w-3.5 h-3.5" />
+                        <span>{lang === "ar" ? "Word" : "Word"}</span>
                       </Button>
-                    )}
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleGenerate("explain", true)}
-                      disabled={loading}
-                      className="h-8 text-xs gap-1"
-                    >
-                      <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
-                      {lang === "ar" ? "إعادة الشرح" : "Regenerate"}
-                    </Button>
-                  </div>
+
+                      {/* Download PDF */}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          playClickSfx();
+                          exportToPdfPrint({
+                            title: material.title,
+                            courseName: course?.name,
+                            content: isEditingExplanation ? editedExplanation : explanation,
+                            typeLabel: lang === "ar" ? "تبسيط المفاهيم والشرح" : "Key Concepts & Explanation",
+                          });
+                          toast.success(lang === "ar" ? "فتح نافذة تصدير وحفظ PDF 🖨️" : "Opening PDF export 🖨️");
+                        }}
+                        className="h-7 text-xs gap-1.5 bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20 border-rose-500/30 font-semibold"
+                        title={lang === "ar" ? "تنزيل كملف PDF عالي الجودة أو طباعة" : "Download / Print as PDF"}
+                      >
+                        <FileDown className="w-3.5 h-3.5" />
+                        <span>{lang === "ar" ? "PDF" : "PDF"}</span>
+                      </Button>
+
+                      {/* Copy */}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleCopy(isEditingExplanation ? editedExplanation : explanation)}
+                        className="h-7 text-xs gap-1"
+                      >
+                        {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                        <span>{lang === "ar" ? "نسخ" : "Copy"}</span>
+                      </Button>
+
+                      {/* Regenerate */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleGenerate("explain", true)}
+                        disabled={loading}
+                        className="h-7 text-xs gap-1"
+                      >
+                        <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
+                        <span>{lang === "ar" ? "إعادة الشرح" : "Regenerate"}</span>
+                      </Button>
+                    </div>
+                  )}
                 </div>
 
                 {loading ? (
@@ -540,9 +787,34 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
                     <p className="text-sm font-medium">{lang === "ar" ? "جاري تبسيط مفاهيم المحاضرة وابتكار أمثلة عملية..." : "Simplifying core lecture concepts..."}</p>
                   </div>
                 ) : explanation ? (
-                  <div className="p-5 rounded-2xl bg-secondary/30 border border-border/40 leading-relaxed text-sm">
-                    <FormattedAiText content={explanation} />
-                  </div>
+                  isEditingExplanation ? (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between text-xs text-muted-foreground px-1">
+                        <span>{lang === "ar" ? "✏️ وضع التعديل المباشر: يمكنك تعديل وحذف وإضافة ما تراه مناسباً:" : "Direct Edit Mode: Add or modify notes:"}</span>
+                        <span className="font-mono text-[11px]">{editedExplanation.length} حرف</span>
+                      </div>
+                      <Textarea
+                        value={editedExplanation}
+                        onChange={(e) => setEditedExplanation(e.target.value)}
+                        className="w-full min-h-[360px] p-4 text-sm leading-relaxed font-sans bg-background border-border/80 focus:border-primary rounded-xl"
+                        dir="rtl"
+                        placeholder={lang === "ar" ? "اكتب أو عدّل هنا..." : "Type edits here..."}
+                      />
+                      <div className="space-y-1.5 pt-2">
+                        <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
+                          <Eye className="w-3.5 h-3.5 text-primary" />
+                          <span>{lang === "ar" ? "معاينة التنسيق الرياضي والمحتوى مباشرة:" : "Live Formatted Preview:"}</span>
+                        </div>
+                        <div className="p-4 rounded-xl bg-secondary/20 border border-border/40 text-sm">
+                          <FormattedAiText content={editedExplanation} />
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-5 rounded-2xl bg-secondary/30 border border-border/40 leading-relaxed text-sm">
+                      <FormattedAiText content={explanation} />
+                    </div>
+                  )
                 ) : (
                   <div className="py-12 text-center text-muted-foreground space-y-3">
                     <p className="text-sm">{lang === "ar" ? "لم يتم توليد الشرح المبسط بعد" : "No simplified explanation yet"}</p>
@@ -565,16 +837,80 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
                       {lang === "ar" ? "اختبر فهمك بعد قراءة المحاضرة واكتشف الإجابة والتعليل فوراً" : "Test your comprehension with instant feedback"}
                     </p>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleGenerate("quiz", true)}
-                    disabled={loading}
-                    className="h-8 text-xs gap-1"
-                  >
-                    <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
-                    {lang === "ar" ? "أسئلة جديدة" : "New Questions"}
-                  </Button>
+                  <div className="flex items-center gap-1.5">
+                    {quizQuestions.length > 0 && (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            playClickSfx();
+                            const quizFormatted = quizQuestions
+                              .map(
+                                (q, i) =>
+                                  `### السؤال ${i + 1}: ${q.question}\n` +
+                                  q.options.map((opt, oi) => `* ${oi === q.correctIndex ? `[✓ الإجابة الصحيحة] ` : ""}${opt}`).join("\n") +
+                                  (q.explanation ? `\n💡 التعليل: ${q.explanation}` : "")
+                              )
+                              .join("\n\n---\n\n");
+
+                            exportToWordDocument({
+                              title: material.title,
+                              courseName: course?.name,
+                              content: quizFormatted,
+                              typeLabel: lang === "ar" ? "بنك الأسئلة التدريبي" : "Practice Quiz",
+                            });
+                            toast.success(lang === "ar" ? "جاري تنزيل الأسئلة Word (.doc) 📄" : "Downloading Quiz Word (.doc) 📄");
+                          }}
+                          className="h-8 text-xs gap-1.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500/20 border-blue-500/30 font-semibold"
+                          title={lang === "ar" ? "تنزيل بنك الأسئلة كملف Word" : "Download Quiz as Word (.doc)"}
+                        >
+                          <FileText className="w-3.5 h-3.5" />
+                          <span>{lang === "ar" ? "Word" : "Word"}</span>
+                        </Button>
+
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            playClickSfx();
+                            const quizFormatted = quizQuestions
+                              .map(
+                                (q, i) =>
+                                  `### السؤال ${i + 1}: ${q.question}\n` +
+                                  q.options.map((opt, oi) => `* ${oi === q.correctIndex ? `[✓ الإجابة الصحيحة] ` : ""}${opt}`).join("\n") +
+                                  (q.explanation ? `\n💡 التعليل: ${q.explanation}` : "")
+                              )
+                              .join("\n\n---\n\n");
+
+                            exportToPdfPrint({
+                              title: material.title,
+                              courseName: course?.name,
+                              content: quizFormatted,
+                              typeLabel: lang === "ar" ? "بنك الأسئلة التدريبي" : "Practice Quiz",
+                            });
+                            toast.success(lang === "ar" ? "فتح نافذة تصدير الأسئلة PDF 🖨️" : "Opening Quiz PDF export 🖨️");
+                          }}
+                          className="h-8 text-xs gap-1.5 bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20 border-rose-500/30 font-semibold"
+                          title={lang === "ar" ? "تنزيل بنك الأسئلة كملف PDF" : "Download Quiz as PDF"}
+                        >
+                          <FileDown className="w-3.5 h-3.5" />
+                          <span>{lang === "ar" ? "PDF" : "PDF"}</span>
+                        </Button>
+                      </>
+                    )}
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleGenerate("quiz", true)}
+                      disabled={loading}
+                      className="h-8 text-xs gap-1"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
+                      <span>{lang === "ar" ? "أسئلة جديدة" : "New Questions"}</span>
+                    </Button>
+                  </div>
                 </div>
 
                 {loading ? (
