@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import MaterialCard from "@/components/MaterialCard";
-import { LogOut, Plus, Bell, Link2, Upload, Trash2, BookPlus, Users, Layers, FolderUp } from "lucide-react";
+import { LogOut, Plus, Bell, Link2, Upload, Trash2, BookPlus, Users, Layers, FolderUp, Sparkles } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import ManageModerators from "@/components/admin/ManageModerators";
 import CourseManager from "@/components/admin/CourseManager";
@@ -89,6 +90,8 @@ const AdminDashboard = () => {
   const [deptFilter, setDeptFilter] = useState<string>("all");
   const [yearFilter, setYearFilter] = useState<string>("all");
   const [semesterFilter, setSemesterFilter] = useState<string>("all");
+  const [showAiKeyDialog, setShowAiKeyDialog] = useState(false);
+  const [adminGeminiKey, setAdminGeminiKey] = useState(localStorage.getItem("admin_gemini_api_key") || "");
 
   const loadData = useCallback(async () => {
     const deptId = user.role === "moderator" ? user.departmentId : undefined;
@@ -677,7 +680,20 @@ const AdminDashboard = () => {
                 : `${t("admin.moderator")} (${user.academicYear === "2" ? (lang === "ar" ? "الصف الثاني" : "2nd Year") : user.academicYear === "3" ? (lang === "ar" ? "الصف الثالث" : "3rd Year") : user.academicYear === "4" ? (lang === "ar" ? "الصف الرابع" : "4th Year") : (lang === "ar" ? "الصف الأول" : "1st Year")}${departments.find(d => d.id === user.departmentId) ? ` - ${lang === "ar" ? departments.find(d => d.id === user.departmentId)?.name_ar : departments.find(d => d.id === user.departmentId)?.name_en}` : ""}) — ${user.permissions?.length || 0} ${t("admin.permissions")}`}
             </p>
           </div>
-          <Button variant="ghost" size="sm" onClick={handleLogout}><LogOut className="w-4 h-4 me-1" /> {t("admin.logout")}</Button>
+          <div className="flex items-center gap-2">
+            {isOwner && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowAiKeyDialog(true)}
+                className="gap-1.5 text-xs bg-secondary/50 hover:bg-secondary border-border/60 font-semibold"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-primary" />
+                {lang === "ar" ? "إعدادات AI" : "AI Settings"}
+              </Button>
+            )}
+            <Button variant="ghost" size="sm" onClick={handleLogout}><LogOut className="w-4 h-4 me-1" /> {t("admin.logout")}</Button>
+          </div>
         </motion.div>
 
         {/* Filters */}
@@ -1088,6 +1104,63 @@ const AdminDashboard = () => {
         {activeSection === "moderators" && isOwner && <ManageModerators departments={departments} />}
         {activeSection === "audit_logs" && isOwner && <AuditLog courses={courses} categories={categories} onUpdate={loadData} />}
       </div>
+
+      {/* Global AI Gemini Key Setting Dialog for Owner */}
+      {showAiKeyDialog && (
+        <Dialog open={showAiKeyDialog} onOpenChange={setShowAiKeyDialog}>
+          <DialogContent className="max-w-md bg-background/95 backdrop-blur-xl">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 font-display text-base">
+                <Sparkles className="w-4 h-4 text-primary" />
+                {lang === "ar" ? "مفتاح Google Gemini AI العام للموقع" : "Global Gemini AI Key"}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-2">
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {lang === "ar"
+                  ? "عند حفظ هذا المفتاح، سيتمكن جميع الطلاب من الاستفادة من شرح وتلخيص المحاضرات والـ PDF بالذكاء الاصطناعي فورياً دون الحاجة لإدخال مفتاح من طرفهم."
+                  : "When saved, all students will be able to use AI lecture summaries and explanations directly."}
+              </p>
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold">{lang === "ar" ? "مفتاح Gemini API:" : "API Key:"}</label>
+                <Input
+                  type="password"
+                  placeholder="AIzaSy..."
+                  value={adminGeminiKey}
+                  onChange={(e) => setAdminGeminiKey(e.target.value)}
+                  className="bg-secondary/50 font-mono text-xs"
+                />
+              </div>
+              <p className="text-[11px] text-muted-foreground">
+                {lang === "ar" ? "احصل على مفتاح مجاني في ثوانٍ من: " : "Get a free key from: "}
+                <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-primary hover:underline font-semibold">
+                  Google AI Studio ↗
+                </a>
+              </p>
+              <div className="flex gap-2 pt-2">
+                <Button
+                  onClick={() => {
+                    if (adminGeminiKey.trim()) {
+                      localStorage.setItem("admin_gemini_api_key", adminGeminiKey.trim());
+                      toast.success(lang === "ar" ? "تم حفظ مفتاح AI العام بنجاح ✅" : "Global AI key saved ✅");
+                    } else {
+                      localStorage.removeItem("admin_gemini_api_key");
+                      toast.info(lang === "ar" ? "تمت إزالة المفتاح" : "Key removed");
+                    }
+                    setShowAiKeyDialog(false);
+                  }}
+                  className="flex-1 text-xs"
+                >
+                  {lang === "ar" ? "حفظ المفتاح" : "Save Key"}
+                </Button>
+                <Button variant="outline" onClick={() => setShowAiKeyDialog(false)} className="text-xs">
+                  {lang === "ar" ? "إلغاء" : "Cancel"}
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };

@@ -10,6 +10,7 @@ import { playClickSfx } from "@/hooks/use-sfx";
 import { useState, lazy, Suspense } from "react";
 const PdfViewerModal = lazy(() => import("@/components/PdfViewerModal"));
 const VideoViewerModal = lazy(() => import("@/components/VideoViewerModal"));
+const AiLectureExplainerModal = lazy(() => import("@/components/AiLectureExplainerModal"));
 // const ExternalLinkModal = lazy(() => import("@/components/ExternalLinkModal"));
 import { OfflineMaterialButton } from "./OfflineMaterialButton";
 import { Input } from "@/components/ui/input";
@@ -60,6 +61,7 @@ const MaterialCard = ({
   // Edit modal state
   const [pdfViewerOpen, setPdfViewerOpen] = useState(false);
   const [videoViewerOpen, setVideoViewerOpen] = useState(false);
+  const [aiExplainerOpen, setAiExplainerOpen] = useState(false);
   // const [activeLinkUrl, setActiveLinkUrl] = useState<string | null>(null);
   const [editOpen, setEditOpen] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -426,6 +428,23 @@ const MaterialCard = ({
                 <span>{t("material.share")}</span>
               </button>
 
+              {/* AI Study & Explainer button — visible to everyone */}
+              {(material.pdf_url || material.list_content) && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    playClickSfx();
+                    setAiExplainerOpen(true);
+                  }}
+                  className="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/20 border border-primary/25 transition-all cursor-pointer shadow-sm hover:scale-[1.02]"
+                  title={lang === "ar" ? "شرح وتلخيص المحاضرة بالذكاء الاصطناعي" : "AI Study & Explainer"}
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-primary animate-pulse" />
+                  <span>{lang === "ar" ? "شرح وتلخيص AI" : "AI Explain"}</span>
+                </button>
+              )}
+
             </div>
 
             {/* Submission Link — shown to everyone for assignments */}
@@ -663,6 +682,14 @@ const MaterialCard = ({
             title={material.title}
             displayName={material.pdf_display_name || undefined}
           />
+          {aiExplainerOpen && (
+            <AiLectureExplainerModal
+              open={aiExplainerOpen}
+              onOpenChange={setAiExplainerOpen}
+              material={material}
+              course={courses.find((c) => c.id === material.course_id)}
+            />
+          )}
         </Suspense>
       )}
 

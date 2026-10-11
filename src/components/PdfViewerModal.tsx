@@ -6,11 +6,12 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Maximize, Minimize, Loader2, WifiOff, FileText, RotateCw, AlertTriangle } from "lucide-react";
+import { Maximize, Minimize, Loader2, WifiOff, FileText, RotateCw, AlertTriangle, Sparkles } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef, lazy, Suspense } from "react";
 import { cn } from "@/lib/utils";
 import { useOfflineStorage } from "@/hooks/use-offline-storage";
+const AiLectureExplainerModal = lazy(() => import("@/components/AiLectureExplainerModal"));
 
 interface PdfViewerModalProps {
   open: boolean;
@@ -40,6 +41,7 @@ const PdfViewerModal = ({
   const [useNativeViewer, setUseNativeViewer] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
+  const [aiModalOpen, setAiModalOpen] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   // Auto-maximize on mobile
@@ -244,7 +246,8 @@ const PdfViewerModal = ({
   const showSpinner = (isLoading || !cacheChecked) && !loadError && !isOfflineButNotCached;
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <>
+      <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent
         className={cn(
           "flex flex-col gap-0 p-0 overflow-hidden transition-all duration-300 ease-in-out bg-background",
@@ -267,6 +270,16 @@ const PdfViewerModal = ({
               </DialogDescription>
             </div>
             <div className="flex items-center gap-2 shrink-0">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setAiModalOpen(true)}
+                className="gap-1.5 text-xs h-9 bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 font-semibold"
+                title="شرح وتلخيص المحاضرة بالذكاء الاصطناعي"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-primary animate-pulse" />
+                {!isMobile && "شرح AI"}
+              </Button>
               <Button
                 size="sm"
                 variant={useNativeViewer ? "default" : "outline"}
@@ -351,6 +364,27 @@ const PdfViewerModal = ({
         </div>
       </DialogContent>
     </Dialog>
+
+    {aiModalOpen && (
+      <Suspense fallback={null}>
+        <AiLectureExplainerModal
+          open={aiModalOpen}
+          onOpenChange={setAiModalOpen}
+          material={{
+            id: pdfUrl,
+            title: title || displayName || "المحاضرة",
+            pdf_url: pdfUrl,
+            pdf_display_name: displayName,
+            type: "lecture",
+            is_assignment: false,
+            course_id: "",
+            archived: false,
+            created_at: "",
+          }}
+        />
+      </Suspense>
+    )}
+    </>
   );
 };
 
