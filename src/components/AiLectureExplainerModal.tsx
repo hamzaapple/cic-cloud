@@ -314,8 +314,8 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
         <DialogContent
           className={
             isFullscreen
-              ? "!fixed !top-0 !left-0 !right-0 !bottom-0 !translate-x-0 !translate-y-0 !w-screen !h-[100dvh] !max-w-none !max-h-none !rounded-none flex flex-col p-0 overflow-hidden bg-background/98 backdrop-blur-2xl border-none shadow-none z-50 transition-all duration-200"
-              : "max-w-4xl max-h-[90vh] flex flex-col p-0 overflow-hidden bg-background/95 backdrop-blur-xl border-border/60 shadow-2xl rounded-2xl transition-all duration-200"
+              ? "!fixed !top-0 !left-0 !right-0 !bottom-0 !translate-x-0 !translate-y-0 !w-screen !h-[100dvh] !max-w-none !max-h-none !rounded-none flex flex-col p-0 overflow-hidden bg-background text-foreground border-none shadow-none z-[70] transition-all duration-200"
+              : "max-w-4xl max-h-[90vh] flex flex-col p-0 overflow-hidden bg-background text-foreground border-border/60 shadow-2xl rounded-2xl z-[70] transition-all duration-200"
           }
         >
           {/* Header */}
@@ -806,7 +806,7 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
 
       {/* Gemini API Key Dialog */}
       <Dialog open={showKeyDialog} onOpenChange={setShowKeyDialog}>
-        <DialogContent className="max-w-md bg-background/95 backdrop-blur-xl border-border/60">
+        <DialogContent className="max-w-md bg-background text-foreground border-border/60 z-[80]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 font-display text-base">
               <Key className="w-4 h-4 text-primary" />
