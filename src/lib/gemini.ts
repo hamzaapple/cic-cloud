@@ -90,8 +90,17 @@ export const callGeminiApi = async ({
     throw new Error("NO_API_KEY");
   }
 
-  // Model list to attempt (primary -> fallbacks)
-  const models = ["gemini-1.5-flash", "gemini-2.0-flash", "gemini-1.5-pro"];
+  // Model list to attempt in order of availability
+  const models = [
+    "gemini-3.8-flash",
+    "gemini-flash-latest",
+    "gemini-3.7-flash",
+    "gemini-3.5-flash",
+    "gemini-2.5-flash-lite",
+    "gemini-pro-latest",
+    "gemini-2.0-flash",
+    "gemini-1.5-flash",
+  ];
 
   let lastError: any = null;
 
@@ -138,7 +147,7 @@ export const callGeminiApi = async ({
         contents: history ? [...history, { role: "user", parts }] : [{ role: "user", parts }],
         generationConfig: {
           temperature: 0.3,
-          maxOutputTokens: 2500,
+          maxOutputTokens: 3000,
         },
       };
 
@@ -155,14 +164,22 @@ export const callGeminiApi = async ({
       if (!response.ok) {
         const errJson = await response.json().catch(() => ({}));
         const errMsg = errJson?.error?.message || response.statusText;
-        if (errMsg.includes("API key not valid")) {
+        if (errMsg.includes("API key not valid") || errMsg.includes("API_KEY_INVALID")) {
           throw new Error("INVALID_API_KEY");
+        }
+        // If 404 or model not found/deprecated, continue loop to try next model!
+        if (response.status === 404 || errMsg.includes("not found") || errMsg.includes("no longer available")) {
+          console.warn(`Model ${model} not available (${errMsg}), trying next model...`);
+          lastError = new Error(errMsg);
+          continue;
         }
         throw new Error(errMsg);
       }
 
       const data = await response.json();
-      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      const candidateParts = data?.candidates?.[0]?.content?.parts || [];
+      const text = candidateParts.map((p: any) => p.text || "").join("").trim();
+      
       if (!text) {
         throw new Error("EMPTY_RESPONSE");
       }
@@ -173,7 +190,6 @@ export const callGeminiApi = async ({
       if (err.message === "RATE_LIMIT_EXCEEDED" || err.message === "INVALID_API_KEY") {
         throw err;
       }
-      // If network or model error, try next model in list
       console.warn(`Gemini model ${model} failed, trying next:`, err);
     }
   }

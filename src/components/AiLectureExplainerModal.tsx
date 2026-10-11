@@ -199,10 +199,10 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
         );
         setActiveTab("external");
       } else if (err.message === "INVALID_API_KEY" || err.message === "NO_API_KEY") {
-        toast.error(lang === "ar" ? "يرجى التحقق من مفتاح Gemini API" : "Invalid Gemini API key");
+        toast.error(lang === "ar" ? "مفتاح Gemini API غير صالح، يرجى التحقق منه" : "Invalid Gemini API key");
         setShowKeyDialog(true);
       } else {
-        toast.error(lang === "ar" ? "حدث خطأ أثناء الاتصال بالذكاء الاصطناعي" : "AI generation failed");
+        toast.error(err?.message || (lang === "ar" ? "حدث خطأ أثناء الاتصال بالذكاء الاصطناعي" : "AI generation failed"));
       }
     } finally {
       setLoading(false);
