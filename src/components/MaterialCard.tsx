@@ -674,6 +674,8 @@ const MaterialCard = ({
             pdfUrl={material.pdf_url}
             title={material.title}
             displayName={material.pdf_display_name || undefined}
+            materialId={material.id}
+            course={courses.find((c) => c.id === material.course_id)}
           />
           <VideoViewerModal
             open={videoViewerOpen}

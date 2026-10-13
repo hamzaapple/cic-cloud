@@ -51,26 +51,49 @@ const blobToBase64 = (blob: Blob): Promise<string> => {
 };
 
 // Caching helper
-export const getCachedAiContent = (materialId: string, type: string): string | null => {
+export const getCachedAiContent = (
+  materialId: string,
+  type: string,
+  fallbackKey?: string | null
+): string | null => {
   try {
-    return localStorage.getItem(`ai_cache_${materialId}_${type}`);
+    const val = localStorage.getItem(`ai_cache_${materialId}_${type}`);
+    if (val) return val;
+    if (fallbackKey && fallbackKey !== materialId) {
+      return localStorage.getItem(`ai_cache_${fallbackKey}_${type}`);
+    }
+    return null;
   } catch {
     return null;
   }
 };
 
-export const setCachedAiContent = (materialId: string, type: string, content: string) => {
+export const setCachedAiContent = (
+  materialId: string,
+  type: string,
+  content: string,
+  fallbackKey?: string | null
+) => {
   try {
     localStorage.setItem(`ai_cache_${materialId}_${type}`, content);
+    if (fallbackKey && fallbackKey !== materialId) {
+      localStorage.setItem(`ai_cache_${fallbackKey}_${type}`, content);
+    }
   } catch (e) {
     console.warn("Failed to save AI cache to localStorage (quota exceeded?):", e);
   }
 };
 
-export const clearAiCacheForMaterial = (materialId: string) => {
+export const clearAiCacheForMaterial = (
+  materialId: string,
+  fallbackKey?: string | null
+) => {
   try {
     ["summary", "explain", "quiz", "chat"].forEach((t) => {
       localStorage.removeItem(`ai_cache_${materialId}_${t}`);
+      if (fallbackKey && fallbackKey !== materialId) {
+        localStorage.removeItem(`ai_cache_${fallbackKey}_${t}`);
+      }
     });
   } catch {}
 };

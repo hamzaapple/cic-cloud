@@ -13,12 +13,16 @@ import { cn } from "@/lib/utils";
 import { useOfflineStorage } from "@/hooks/use-offline-storage";
 const AiLectureExplainerModal = lazy(() => import("@/components/AiLectureExplainerModal"));
 
+import type { Course } from "@/lib/store";
+
 interface PdfViewerModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   pdfUrl: string;
   title: string;
   displayName?: string;
+  materialId?: string;
+  course?: Course | null;
 }
 
 // How long we wait for pdf.js to report progress before treating the load as stalled.
@@ -32,6 +36,8 @@ const PdfViewerModal = ({
   pdfUrl,
   title,
   displayName,
+  materialId,
+  course,
 }: PdfViewerModalProps) => {
   const isMobile = useIsMobile();
   const [isMaximized, setIsMaximized] = useState(false);
@@ -371,16 +377,17 @@ const PdfViewerModal = ({
           open={aiModalOpen}
           onOpenChange={setAiModalOpen}
           material={{
-            id: pdfUrl,
+            id: materialId || pdfUrl,
             title: title || displayName || "المحاضرة",
             pdf_url: pdfUrl,
             pdf_display_name: displayName,
             type: "lecture",
             is_assignment: false,
-            course_id: "",
+            course_id: course?.id || "",
             archived: false,
             created_at: "",
           }}
+          course={course}
         />
       </Suspense>
     )}

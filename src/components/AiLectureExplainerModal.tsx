@@ -32,6 +32,7 @@ import {
   FileDown,
   Eye,
   Undo2,
+  Trash2,
 } from "lucide-react";
 import { FormattedAiText } from "@/components/FormattedAiText";
 import { exportToWordDocument, exportToPdfPrint } from "@/lib/export-doc";
@@ -107,9 +108,10 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
   useEffect(() => {
     if (!open) return;
 
-    const cachedSummary = getCachedAiContent(material.id, "summary");
-    const cachedExplain = getCachedAiContent(material.id, "explain");
-    const cachedQuiz = getCachedAiContent(material.id, "quiz");
+    const cachedSummary = getCachedAiContent(material.id, "summary", material.pdf_url);
+    const cachedExplain = getCachedAiContent(material.id, "explain", material.pdf_url);
+    const cachedQuiz = getCachedAiContent(material.id, "quiz", material.pdf_url);
+    const cachedChat = getCachedAiContent(material.id, "chat", material.pdf_url);
 
     if (cachedSummary) setSummary(cachedSummary);
     if (cachedExplain) setExplanation(cachedExplain);
@@ -118,6 +120,16 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
       const parsed = parseQuizFromMarkdown(cachedQuiz);
       if (parsed.length > 0) setQuizQuestions(parsed);
     }
+    if (cachedChat) {
+      try {
+        const parsed = JSON.parse(cachedChat);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setChatMessages(parsed);
+        }
+      } catch (e) {
+        console.warn("Failed to parse cached chat:", e);
+      }
+    }
 
     // Auto-generate summary on open if not already loaded and API key is present
     if (!cachedSummary && hasGeminiApiKey()) {
@@ -125,7 +137,7 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
     } else if (cachedSummary) {
       setIsFromCache(true);
     }
-  }, [open, material.id]);
+  }, [open, material.id, material.pdf_url]);
 
   const handleGenerate = async (type: TabType, forceRefresh = false) => {
     playClickSfx();
@@ -136,7 +148,7 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
 
     // Check cache first unless forced
     if (!forceRefresh) {
-      const cached = getCachedAiContent(material.id, type);
+      const cached = getCachedAiContent(material.id, type, material.pdf_url);
       if (cached) {
         if (type === "summary") setSummary(cached);
         if (type === "explain") setExplanation(cached);
@@ -190,7 +202,7 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
         listContent: material.list_content,
       });
 
-      setCachedAiContent(material.id, type, result);
+      setCachedAiContent(material.id, type, result, material.pdf_url);
 
       if (type === "summary") setSummary(result);
       if (type === "explain") setExplanation(result);
@@ -245,6 +257,8 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
     setChatInput("");
     const newHistory = [...chatMessages, { role: "user" as const, text: question }];
     setChatMessages(newHistory);
+    // Persist user question immediately
+    setCachedAiContent(material.id, "chat", JSON.stringify(newHistory), material.pdf_url);
     setIsChatLoading(true);
 
     try {
@@ -264,22 +278,34 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
         history: historyFormatted,
       });
 
-      setChatMessages((prev) => [...prev, { role: "model", text: reply }]);
+      const updatedHistory = [...newHistory, { role: "model" as const, text: reply }];
+      setChatMessages(updatedHistory);
+      // Persist completed conversation
+      setCachedAiContent(material.id, "chat", JSON.stringify(updatedHistory), material.pdf_url);
     } catch (err: any) {
       console.error("Chat error:", err);
-      setChatMessages((prev) => [
-        ...prev,
+      const errorHistory = [
+        ...newHistory,
         {
-          role: "model",
+          role: "model" as const,
           text: lang === "ar"
             ? "عذراً، حدث بطء في الاتصال أثناء الإجابة. يمكنك إعادة إرسال السؤال أو استخدام تبويب 'النماذج الخارجية' لسؤال ChatGPT أو NotebookLM مجاناً بنقرة واحدة."
             : "Could not get an answer due to network timeout. Please retry or try External Models.",
         },
-      ]);
+      ];
+      setChatMessages(errorHistory);
+      setCachedAiContent(material.id, "chat", JSON.stringify(errorHistory), material.pdf_url);
       toast.error(lang === "ar" ? "تعذر الرد، يرجى إعادة المحاولة" : "Failed to get AI answer");
     } finally {
       setIsChatLoading(false);
     }
+  };
+
+  const handleClearChat = () => {
+    playClickSfx();
+    setChatMessages([]);
+    setCachedAiContent(material.id, "chat", "[]", material.pdf_url);
+    toast.success(lang === "ar" ? "تم مسح المحادثة وبدء جلسة جديدة ✨" : "Chat cleared ✨");
   };
 
   const handleCopy = (text: string) => {
@@ -299,7 +325,7 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
   const handleSaveSummary = () => {
     playClickSfx();
     setSummary(editedSummary);
-    setCachedAiContent(material.id, "summary", editedSummary);
+    setCachedAiContent(material.id, "summary", editedSummary, material.pdf_url);
     setIsEditingSummary(false);
     toast.success(lang === "ar" ? "تم حفظ التعديلات بنجاح ✨" : "Edits saved ✨");
   };
@@ -318,7 +344,7 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
   const handleSaveExplanation = () => {
     playClickSfx();
     setExplanation(editedExplanation);
-    setCachedAiContent(material.id, "explain", editedExplanation);
+    setCachedAiContent(material.id, "explain", editedExplanation, material.pdf_url);
     setIsEditingExplanation(false);
     toast.success(lang === "ar" ? "تم حفظ التعديلات بنجاح ✨" : "Edits saved ✨");
   };
@@ -1004,14 +1030,82 @@ export const AiLectureExplainerModal: React.FC<Props> = ({
                   isFullscreen ? "h-[calc(100dvh-175px)]" : "h-[500px]"
                 }`}
               >
-                <div className="pb-2 border-b border-border/40">
-                  <h3 className="font-display font-bold text-sm flex items-center gap-2">
-                    <MessageSquare className="w-4 h-4 text-primary" />
-                    {lang === "ar" ? "اسأل الذكاء الاصطناعي عن أي جزء في المحاضرة" : "Interactive Chat with Lecture"}
-                  </h3>
-                  <p className="text-xs text-muted-foreground">
-                    {lang === "ar" ? "اطرح أي سؤال أو اطلب توضيح مسألة وسيقوم المساعد بالإجابة فوراً" : "Ask questions and get immediate answers"}
-                  </p>
+                <div className="pb-2 border-b border-border/40 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <h3 className="font-display font-bold text-sm flex items-center gap-2">
+                      <MessageSquare className="w-4 h-4 text-primary" />
+                      <span>{lang === "ar" ? "اسأل الذكاء الاصطناعي عن أي جزء في المحاضرة" : "Interactive Chat with Lecture"}</span>
+                    </h3>
+                    <p className="text-xs text-muted-foreground">
+                      {lang === "ar"
+                        ? "اطرح أي سؤال وسيقوم المساعد بالإجابة فوراً (المحادثة تُحفظ تلقائياً)"
+                        : "Ask questions and get immediate answers (Saved automatically)"}
+                    </p>
+                  </div>
+
+                  {chatMessages.length > 0 && (
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {/* Download Word */}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          playClickSfx();
+                          const formattedChat = chatMessages
+                            .map((m) => `### ${m.role === "user" ? "سؤال الطالب" : "إجابة المساعد الذكي"}:\n\n${m.text}`)
+                            .join("\n\n---\n\n");
+                          exportToWordDocument({
+                            title: material.title,
+                            courseName: course?.name,
+                            content: formattedChat,
+                            typeLabel: lang === "ar" ? "سجل الأسئلة والمحادثة" : "Chat Discussion",
+                          });
+                          toast.success(lang === "ar" ? "جاري تنزيل المحادثة Word (.doc) 📄" : "Downloading Chat Word (.doc) 📄");
+                        }}
+                        className="h-7 text-xs gap-1.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500/20 border-blue-500/30 font-semibold"
+                        title={lang === "ar" ? "تنزيل سجل المحادثة كملف Word" : "Download Chat as Word"}
+                      >
+                        <FileText className="w-3.5 h-3.5" />
+                        <span>Word</span>
+                      </Button>
+
+                      {/* Download PDF */}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          playClickSfx();
+                          const formattedChat = chatMessages
+                            .map((m) => `### ${m.role === "user" ? "سؤال الطالب" : "إجابة المساعد الذكي"}:\n\n${m.text}`)
+                            .join("\n\n---\n\n");
+                          exportToPdfPrint({
+                            title: material.title,
+                            courseName: course?.name,
+                            content: formattedChat,
+                            typeLabel: lang === "ar" ? "سجل الأسئلة والمحادثة" : "Chat Discussion",
+                          });
+                          toast.success(lang === "ar" ? "فتح نافذة تصدير المحادثة PDF 🖨️" : "Opening Chat PDF export 🖨️");
+                        }}
+                        className="h-7 text-xs gap-1.5 bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20 border-rose-500/30 font-semibold"
+                        title={lang === "ar" ? "تنزيل سجل المحادثة كملف PDF" : "Download Chat as PDF"}
+                      >
+                        <FileDown className="w-3.5 h-3.5" />
+                        <span>PDF</span>
+                      </Button>
+
+                      {/* Clear Chat */}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleClearChat}
+                        className="h-7 text-xs gap-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                        title={lang === "ar" ? "مسح المحادثة وبدء جلسة جديدة" : "Clear Chat"}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>{lang === "ar" ? "مسح" : "Clear"}</span>
+                      </Button>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex-1 overflow-y-auto space-y-3 p-3 rounded-xl bg-secondary/20 border border-border/40">
