@@ -22,6 +22,32 @@ if ("serviceWorker" in navigator) {
       const reg = await navigator.serviceWorker.register("/sw-push.js", { scope: "/" });
       reg.update().catch(() => undefined);
 
+      // Check for updates on focus and visibility change
+      window.addEventListener("focus", () => {
+        reg.update().catch(() => undefined);
+      });
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") {
+          reg.update().catch(() => undefined);
+        }
+      });
+
+      // If a worker is waiting, activate it immediately
+      if (reg.waiting) {
+        reg.waiting.postMessage({ type: "SKIP_WAITING" });
+      }
+
+      reg.addEventListener("updatefound", () => {
+        const newWorker = reg.installing;
+        if (newWorker) {
+          newWorker.addEventListener("statechange", () => {
+            if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+              newWorker.postMessage({ type: "SKIP_WAITING" });
+            }
+          });
+        }
+      });
+
       // 3) Ensure subscription is valid
       const { ensurePushSubscription } = await import("./lib/push-resubscribe");
       ensurePushSubscription({ silent: true });
