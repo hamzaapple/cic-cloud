@@ -6,6 +6,7 @@ import { useI18n } from "@/lib/i18n";
 import { translateCourseName } from "@/lib/subject-translations";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import MaterialCard from "@/components/MaterialCard";
 import { LogOut, Plus, Bell, Link2, Upload, Trash2, BookPlus, Users, Layers, FolderUp, Sparkles } from "lucide-react";
@@ -212,15 +213,19 @@ const AdminDashboard = () => {
   const [isList, setIsList] = useState(false);
   const [listContent, setListContent] = useState("");
   const [isReference, setIsReference] = useState(false);
+  const [sectionNumber, setSectionNumber] = useState("all");
+  const [materialNotes, setMaterialNotes] = useState("");
 
   // Bulk folder upload state
   const [isFolderMode, setIsFolderMode] = useState(false);
   const [bulkProgress, setBulkProgress] = useState(0);
   const [bulkTotal, setBulkTotal] = useState(0);
 
-  // Categories scoped to the department of the selected/filtered course
-  const uploadCourseDeptId = courses.find(c => c.id === courseId)?.department_id ?? null;
-  const uploadCategories = categoriesForDepartment(categories, uploadCourseDeptId);
+  // Categories scoped to the department and academic year of the selected/filtered course
+  const uploadCourse = courses.find(c => c.id === courseId);
+  const uploadCourseDeptId = uploadCourse?.department_id ?? null;
+  const uploadCourseYear = uploadCourse?.academic_year ?? null;
+  const uploadCategories = categoriesForDepartment(categories, uploadCourseDeptId, uploadCourseYear);
 
   // Find assignment category
   const assignmentCategory = categories.find(c => c.name_en === "Assignments");
@@ -233,8 +238,10 @@ const AdminDashboard = () => {
 
   const [showArchived, setShowArchived] = useState(false);
   const [materialCourseFilter, setMaterialCourseFilter] = useState<string>("all");
-  const filterCourseDeptId = courses.find(c => c.id === materialCourseFilter)?.department_id ?? null;
-  const filterCategories = materialCourseFilter === "all" ? categories : categoriesForDepartment(categories, filterCourseDeptId);
+  const filterCourse = courses.find(c => c.id === materialCourseFilter);
+  const filterCourseDeptId = filterCourse?.department_id ?? null;
+  const filterCourseYear = filterCourse?.academic_year ?? null;
+  const filterCategories = materialCourseFilter === "all" ? categories : categoriesForDepartment(categories, filterCourseDeptId, filterCourseYear);
   const [materialCategoryFilter, setMaterialCategoryFilter] = useState<string>("all");
 
   useEffect(() => {
@@ -314,11 +321,14 @@ const AdminDashboard = () => {
         is_list: isList,
         list_content: isList ? listContent : null,
         is_reference: isReference,
+        section_number: sectionNumber === "all" ? null : sectionNumber,
+        notes: materialNotes.trim() || null,
       });
 
       await loadData();
       setTitle(""); setExternalLink(""); setSubmissionLink(""); setDeadline(""); setIsAssignmentOpenEnded(false);
       setPdfFile(null); setPdfExternalUrl(""); setPdfDisplayName(""); setIsList(false); setListContent(""); setIsReference(false);
+      setSectionNumber("all"); setMaterialNotes("");
       const fileInput = document.getElementById("pdf-upload") as HTMLInputElement;
       if (fileInput) fileInput.value = "";
       toast.success(t("admin.uploadSuccess"));
@@ -953,6 +963,40 @@ const AdminDashboard = () => {
                         />
                       </div>
                     )}
+
+                    <div className="p-3 bg-secondary/30 rounded-xl border border-border/60 space-y-3 my-2">
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                          <span>📌</span> {lang === "ar" ? "تحديد السكشن (اختياري - للتكليفات والسكاشن):" : "Assign to Section (optional):"}
+                        </label>
+                        <Select value={sectionNumber} onValueChange={setSectionNumber}>
+                          <SelectTrigger className="bg-background/80 text-xs h-9">
+                            <SelectValue placeholder={lang === "ar" ? "عام (جميع السكاشن)" : "All Sections"} />
+                          </SelectTrigger>
+                          <SelectContent className="max-h-56">
+                            <SelectItem value="all">{lang === "ar" ? "🌐 عام (جميع السكاشن)" : "🌐 All Sections (General)"}</SelectItem>
+                            {Array.from({ length: 18 }, (_, idx) => String(idx + 1)).map(num => (
+                              <SelectItem key={num} value={num}>
+                                {lang === "ar" ? `📌 سكشن ${num}` : `📌 Section ${num}`}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                          <span>📝</span> {lang === "ar" ? "ملحوظات على المادة / التكليف (تظهر بخلفية هادئة ملونة):" : "Material Notes (tinted background):"}
+                        </label>
+                        <Textarea
+                          placeholder={lang === "ar" ? "أضف أي ملحوظات، إرشادات للتسليم، أو توجيهات للطلاب ستظهر بخلفية ملونة خفيفة..." : "e.g. Important notes, instructions..."}
+                          value={materialNotes}
+                          onChange={e => setMaterialNotes(e.target.value)}
+                          className="bg-background/80 text-xs min-h-[60px] resize-none"
+                          rows={2}
+                        />
+                      </div>
+                    </div>
                     </>
                     )}
                     {!isFolderMode && (

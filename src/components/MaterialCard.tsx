@@ -77,6 +77,8 @@ const MaterialCard = ({
   const [editIsList, setEditIsList] = useState(material.is_list || false);
   const [editIsReference, setEditIsReference] = useState(material.is_reference || false);
   const [editListContent, setEditListContent] = useState(material.list_content || "");
+  const [editSectionNumber, setEditSectionNumber] = useState(material.section_number || "all");
+  const [editNotes, setEditNotes] = useState(material.notes || "");
   const [isExpanded, setIsExpanded] = useState(false);
 
   const copyListContent = (e: React.MouseEvent) => {
@@ -121,6 +123,8 @@ const MaterialCard = ({
     setEditIsList(material.is_list || false);
     setEditIsReference(material.is_reference || false);
     setEditListContent(material.list_content || "");
+    setEditSectionNumber(material.section_number || "all");
+    setEditNotes(material.notes || "");
     setEditOpen(true);
   };
 
@@ -142,6 +146,8 @@ const MaterialCard = ({
         is_list: editIsList,
         is_reference: editIsReference,
         list_content: editIsList ? editListContent : null,
+        section_number: editSectionNumber === "all" ? null : editSectionNumber,
+        notes: editNotes.trim() || null,
       });
       toast.success(lang === "ar" ? "تم التعديل بنجاح ✅" : "Updated successfully ✅");
       setEditOpen(false);
@@ -213,11 +219,19 @@ const MaterialCard = ({
               </p>
             )}
 
-            {material.is_assignment && (
-              <span className="inline-block text-xs font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary mb-2">
-                {t("material.assignment")}
-              </span>
-            )}
+            <div className="flex flex-wrap items-center gap-1.5 mb-2">
+              {material.is_assignment && (
+                <span className="inline-block text-xs font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                  {t("material.assignment")}
+                </span>
+              )}
+              {material.section_number && material.section_number !== "all" && (
+                <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-primary/15 text-primary border border-primary/25">
+                  <span>📌</span>
+                  <span>{material.section_number.startsWith("سكشن") ? material.section_number : (lang === "ar" ? `سكشن ${material.section_number}` : `Sec ${material.section_number}`)}</span>
+                </span>
+              )}
+            </div>
 
             <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
               {material.is_assignment && !material.deadline && (
@@ -464,6 +478,19 @@ const MaterialCard = ({
               </a>
             )}
 
+            {/* Material Notes with subtle light background */}
+            {material.notes && (
+              <div className="mt-3 p-3 rounded-xl bg-amber-500/10 dark:bg-amber-500/15 border border-amber-500/25 text-xs text-foreground/90 leading-relaxed flex items-start gap-2 shadow-sm">
+                <span className="text-sm shrink-0">📝</span>
+                <div className="flex-1 whitespace-pre-wrap">
+                  <span className="font-semibold text-amber-700 dark:text-amber-400 block mb-0.5">
+                    {lang === "ar" ? "ملحوظات:" : "Notes:"}
+                  </span>
+                  {material.notes}
+                </div>
+              </div>
+            )}
+
             {material.is_list && (
               <div className="mt-3">
                 <button 
@@ -633,6 +660,36 @@ const MaterialCard = ({
                 <div>
                   <label className="text-xs text-muted-foreground mb-1 block">{lang === "ar" ? "رابط خارجي" : "External Link"}</label>
                   <Input value={editExternalLink} onChange={e => setEditExternalLink(e.target.value)} className="bg-secondary/50" placeholder="https://..." />
+                </div>
+
+                <div>
+                  <label className="text-xs text-muted-foreground mb-1 block">
+                    {lang === "ar" ? "تحديد السكشن (اختياري)" : "Assign to Section (optional)"}
+                  </label>
+                  <select
+                    value={editSectionNumber}
+                    onChange={e => setEditSectionNumber(e.target.value)}
+                    className="w-full rounded-md bg-secondary/50 border border-input px-3 py-2 text-xs"
+                  >
+                    <option value="all">{lang === "ar" ? "عام (جميع السكاشن)" : "All Sections"}</option>
+                    {Array.from({ length: 18 }, (_, idx) => String(idx + 1)).map(num => (
+                      <option key={num} value={num}>
+                        {lang === "ar" ? `سكشن ${num}` : `Section ${num}`}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-xs text-muted-foreground mb-1 block">
+                    {lang === "ar" ? "ملحوظات على المادة / التكليف (تظهر بخلفية هادئة)" : "Material Notes (displays with tinted background)"}
+                  </label>
+                  <textarea
+                    value={editNotes}
+                    onChange={e => setEditNotes(e.target.value)}
+                    className="w-full bg-secondary/50 rounded-md border border-input px-3 py-2 text-xs min-h-[50px]"
+                    placeholder={lang === "ar" ? "اكتب أي ملحوظات أو تنبيهات هنا..." : "Write any notes here..."}
+                  />
                 </div>
 
                 {material.is_assignment && (

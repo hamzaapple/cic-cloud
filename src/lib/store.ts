@@ -37,6 +37,8 @@ export interface MaterialCategory {
   name_en: string;
   /** null = unified category shown in every department */
   department_id?: string | null;
+  /** null = unified category shown in every academic year */
+  academic_year?: string | null;
   display_order?: number | null;
   created_at?: string;
 }
@@ -51,6 +53,7 @@ export interface Course {
   department_id?: string | null;
   academic_year: string;
   semester: string;
+  notes?: string | null;
   created_at?: string;
 }
 
@@ -69,6 +72,8 @@ export interface Material {
   is_list?: boolean;
   list_content?: string | null;
   is_reference?: boolean | null;
+  section_number?: string | null;
+  notes?: string | null;
   archived: boolean;
   sort_order?: number | null;
   video_url?: string | null;
@@ -278,13 +283,26 @@ export const db = {
       .order("created_at");
     return (data || []) as MaterialCategory[];
   },
-  addCategory: async (cat: { name_ar: string; name_en: string; department_id?: string | null }) => {
-    const { data, error } = await supabase.from("material_categories").insert(cat).select().single();
+  addCategory: async (cat: { name_ar: string; name_en: string; department_id?: string | null; academic_year?: string | null }) => {
+    const payload = { ...cat };
+    let { data, error } = await supabase.from("material_categories").insert(payload).select().single();
+    if (error && error.message?.includes("academic_year")) {
+      delete (payload as any).academic_year;
+      const retry = await supabase.from("material_categories").insert(payload).select().single();
+      data = retry.data;
+      error = retry.error;
+    }
     if (error) throw error;
     return data as MaterialCategory;
   },
-  updateCategory: async (id: string, updates: Partial<Pick<MaterialCategory, "name_ar" | "name_en" | "department_id">>) => {
-    const { error } = await supabase.from("material_categories").update(updates).eq("id", id);
+  updateCategory: async (id: string, updates: Partial<Pick<MaterialCategory, "name_ar" | "name_en" | "department_id" | "academic_year">>) => {
+    const payload = { ...updates };
+    let { error } = await supabase.from("material_categories").update(payload).eq("id", id);
+    if (error && error.message?.includes("academic_year")) {
+      delete (payload as any).academic_year;
+      const retry = await supabase.from("material_categories").update(payload).eq("id", id);
+      error = retry.error;
+    }
     if (error) throw error;
   },
   deleteCategory: async (id: string) => {
@@ -309,15 +327,28 @@ export const db = {
     const { data } = await supabase.from("courses").select("*").eq("department_id", departmentId).order("created_at");
     return (data || []) as Course[];
   },
-  addCourse: async (course: { name: string; code: string; description: string; description_ar?: string; department_id?: string | null; academic_year: string; semester: string }) => {
+  addCourse: async (course: { name: string; code: string; description: string; description_ar?: string; department_id?: string | null; academic_year: string; semester: string; notes?: string | null }) => {
     const { data: existing } = await supabase.from("courses").select("id");
     const color = COURSE_COLORS[(existing?.length || 0) % COURSE_COLORS.length];
-    const { data, error } = await supabase.from("courses").insert({ ...course, color }).select().single();
+    const payload: any = { ...course, color };
+    let { data, error } = await supabase.from("courses").insert(payload).select().single();
+    if (error && error.message?.includes("notes")) {
+      delete payload.notes;
+      const retry = await supabase.from("courses").insert(payload).select().single();
+      data = retry.data;
+      error = retry.error;
+    }
     if (error) throw error;
     return data as Course;
   },
-  updateCourse: async (id: string, updates: Partial<Pick<Course, "name" | "code" | "description" | "description_ar" | "department_id" | "academic_year" | "semester">>) => {
-    const { error } = await supabase.from("courses").update(updates).eq("id", id);
+  updateCourse: async (id: string, updates: Partial<Pick<Course, "name" | "code" | "description" | "description_ar" | "department_id" | "academic_year" | "semester" | "notes">>) => {
+    const payload: any = { ...updates };
+    let { error } = await supabase.from("courses").update(payload).eq("id", id);
+    if (error && error.message?.includes("notes")) {
+      delete payload.notes;
+      const retry = await supabase.from("courses").update(payload).eq("id", id);
+      error = retry.error;
+    }
     if (error) throw error;
   },
   deleteCourse: async (id: string) => {
@@ -373,13 +404,23 @@ export const db = {
     is_list?: boolean;
     list_content?: string | null;
     is_reference?: boolean | null;
+    section_number?: string | null;
+    notes?: string | null;
   }) => {
-    const { data, error } = await supabase.from("materials").insert({
+    const payload: any = {
       ...material,
       archived: false,
       is_assignment: material.is_assignment || false,
       is_list: material.is_list || false,
-    }).select().single();
+    };
+    let { data, error } = await supabase.from("materials").insert(payload).select().single();
+    if (error && (error.message?.includes("section_number") || error.message?.includes("notes"))) {
+      if (error.message?.includes("section_number")) delete payload.section_number;
+      if (error.message?.includes("notes")) delete payload.notes;
+      const retry = await supabase.from("materials").insert(payload).select().single();
+      data = retry.data;
+      error = retry.error;
+    }
     if (error) throw error;
     return data as Material;
   },
@@ -396,8 +437,17 @@ export const db = {
     is_list?: boolean;
     is_reference?: boolean;
     list_content?: string | null;
+    section_number?: string | null;
+    notes?: string | null;
   }) => {
-    const { error } = await supabase.from("materials").update(updates).eq("id", id);
+    const payload: any = { ...updates };
+    let { error } = await supabase.from("materials").update(payload).eq("id", id);
+    if (error && (error.message?.includes("section_number") || error.message?.includes("notes"))) {
+      if (error.message?.includes("section_number")) delete payload.section_number;
+      if (error.message?.includes("notes")) delete payload.notes;
+      const retry = await supabase.from("materials").update(payload).eq("id", id);
+      error = retry.error;
+    }
     if (error) throw error;
   },
   archiveMaterial: async (id: string) => {
@@ -722,10 +772,17 @@ export const store = {
   isAdmin: () => auth.isLoggedIn(),
 };
 
-/** Categories visible for a given department: unified ones (department_id null) + department-specific ones. */
+/** Categories visible for a given department and academic year:
+ * unified department (department_id null) + department-specific ones,
+ * AND unified year (academic_year null) + year-specific ones. */
 export function categoriesForDepartment(
   categories: MaterialCategory[],
-  departmentId?: string | null
+  departmentId?: string | null,
+  academicYear?: string | null
 ): MaterialCategory[] {
-  return categories.filter(c => !c.department_id || (departmentId && c.department_id === departmentId));
+  return categories.filter(c => {
+    const matchesDept = !c.department_id || (departmentId && c.department_id === departmentId);
+    const matchesYear = !c.academic_year || (academicYear && c.academic_year === academicYear);
+    return matchesDept && matchesYear;
+  });
 }

@@ -49,8 +49,8 @@ const BachelorTechPage = () => {
     queryFn: db.getCategories,
   });
 
-  // Categories scoped to this course's department (unified + department-specific)
-  const categories = categoriesForDepartment(allCategories, course?.department_id ?? null);
+  // Categories scoped to this course's department and academic year (unified + specific)
+  const categories = categoriesForDepartment(allCategories, course?.department_id ?? null, course?.academic_year ?? null);
 
   // Set default active category
   const activeCategory = activeCategoryId || categories[0]?.id || "";

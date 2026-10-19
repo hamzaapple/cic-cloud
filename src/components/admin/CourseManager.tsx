@@ -46,6 +46,7 @@ const CourseManager = ({
   const [courseName, setCourseName] = useState("");
   const [courseCode, setCourseCode] = useState("");
   const [courseDesc, setCourseDesc] = useState("");
+  const [courseNotes, setCourseNotes] = useState("");
   const [courseDeptId, setCourseDeptId] = useState(deptFilter !== "all" ? deptFilter : (departments[0]?.id || ""));
   const [courseYear, setCourseYear] = useState(isOwner ? "1" : modYear);
   const [courseSemester, setCourseSemester] = useState(
@@ -55,6 +56,7 @@ const CourseManager = ({
   const [editName, setEditName] = useState("");
   const [editCode, setEditCode] = useState("");
   const [editDesc, setEditDesc] = useState("");
+  const [editNotes, setEditNotes] = useState("");
   const [editYear, setEditYear] = useState("1");
   const [editSemester, setEditSemester] = useState("1");
 
@@ -123,6 +125,7 @@ const CourseManager = ({
         name: courseName,
         code: courseCode,
         description: courseDesc,
+        notes: courseNotes.trim() || null,
         department_id: courseDeptId === "none" ? null : (courseDeptId || null),
         academic_year: courseYear,
         semester: courseSemester
@@ -134,6 +137,7 @@ const CourseManager = ({
       setCourseName("");
       setCourseCode("");
       setCourseDesc("");
+      setCourseNotes("");
       setCourseYear(isOwner ? "1" : modYear);
       setCourseSemester(semesterFilter && semesterFilter !== "all" ? semesterFilter : "1");
       setCourseTargetDepts([]);
@@ -149,6 +153,7 @@ const CourseManager = ({
     setEditName(translateCourseName(c.name, lang)); 
     setEditCode(c.code); 
     setEditDesc(c.description || ""); 
+    setEditNotes(c.notes || "");
     setEditYear(c.academic_year || "1"); 
     setEditSemester(c.semester || "2");
     
@@ -161,7 +166,7 @@ const CourseManager = ({
   };
 
   const saveEdit = async (id: string) => {
-    await db.updateCourse(id, { name: editName, code: editCode, description: editDesc, academic_year: editYear, semester: editSemester });
+    await db.updateCourse(id, { name: editName, code: editCode, description: editDesc, notes: editNotes.trim() || null, academic_year: editYear, semester: editSemester });
     await db.setTargetDepartmentsForCourse(id, editTargetDepts);
     onUpdate();
     setEditingId(null);
@@ -206,7 +211,8 @@ const CourseManager = ({
           <div className="space-y-2">
             <Input value={editName} onChange={e => setEditName(e.target.value)} className="bg-secondary/50 text-sm" placeholder={t("courseMgr.courseName")} />
             <Input value={editCode} onChange={e => setEditCode(e.target.value)} className="bg-secondary/50 text-sm" placeholder={t("courseMgr.courseCode")} />
-            <Textarea value={editDesc} onChange={e => setEditDesc(e.target.value)} className="bg-secondary/50 text-sm min-h-[60px]" placeholder={t("courseMgr.courseDesc")} />
+            <Textarea value={editDesc} onChange={e => setEditDesc(e.target.value)} className="bg-secondary/50 text-sm min-h-[50px]" placeholder={t("courseMgr.courseDesc")} />
+            <Textarea value={editNotes} onChange={e => setEditNotes(e.target.value)} className="bg-secondary/50 text-sm min-h-[50px]" placeholder={lang === "ar" ? "ملحوظات المادة (تظهر للطلاب بخلفية هادئة)" : "Course Notes (displays with tinted background)"} />
             <div className="grid grid-cols-2 gap-2">
               <Select value={editYear} onValueChange={setEditYear} disabled={!isOwner}>
                 <SelectTrigger className="bg-secondary/50 h-8 text-xs"><SelectValue placeholder="Year" /></SelectTrigger>
@@ -314,6 +320,12 @@ const CourseManager = ({
             <h3 className="font-display font-semibold text-sm text-foreground">{translateCourseName(course.name, lang)}</h3>
             <p className="text-xs text-muted-foreground mt-0.5 font-mono">{course.code}</p>
             {course.description && <p className="text-xs text-muted-foreground/80 mt-1 line-clamp-2">{course.description}</p>}
+            {course.notes && (
+              <div className="mt-2 p-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-[11px] text-foreground/90">
+                <span className="font-semibold text-amber-600 dark:text-amber-400 block mb-0.5">📌 {lang === "ar" ? "ملحوظات المادة:" : "Course Notes:"}</span>
+                <p className="line-clamp-2">{course.notes}</p>
+              </div>
+            )}
           </div>
         )}
       </motion.div>
@@ -400,7 +412,8 @@ const CourseManager = ({
               <form onSubmit={handleAddCourse} className="space-y-3">
                 <Input placeholder={t("courseMgr.courseName")} value={courseName} onChange={e => setCourseName(e.target.value)} className="bg-secondary/50" />
                 <Input placeholder={t("courseMgr.courseCode")} value={courseCode} onChange={e => setCourseCode(e.target.value)} className="bg-secondary/50" />
-                <Textarea placeholder={t("courseMgr.courseDesc")} value={courseDesc} onChange={e => setCourseDesc(e.target.value)} className="bg-secondary/50 min-h-[80px]" />
+                <Textarea placeholder={t("courseMgr.courseDesc")} value={courseDesc} onChange={e => setCourseDesc(e.target.value)} className="bg-secondary/50 min-h-[70px]" />
+                <Textarea placeholder={lang === "ar" ? "ملحوظات المادة (اختياري - تظهر للطلاب في صفحة المقرر بخلفية ملونة هادئة)" : "Course Notes (optional - displays at top of course page with tinted background)"} value={courseNotes} onChange={e => setCourseNotes(e.target.value)} className="bg-secondary/50 min-h-[60px] text-xs" />
                 <Select value={courseDeptId} onValueChange={setCourseDeptId}>
                   <SelectTrigger className="bg-secondary/50"><SelectValue placeholder={t("admin.selectDept")} /></SelectTrigger>
                   <SelectContent>

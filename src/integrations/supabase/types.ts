@@ -120,6 +120,7 @@ export type Database = {
           description_ar: string
           id: string
           name: string
+          notes: string | null
           semester: string
         }
         Insert: {
@@ -132,6 +133,7 @@ export type Database = {
           description_ar?: string
           id?: string
           name: string
+          notes?: string | null
           semester?: string
         }
         Update: {
@@ -144,6 +146,7 @@ export type Database = {
           description_ar?: string
           id?: string
           name?: string
+          notes?: string | null
           semester?: string
         }
         Relationships: [
@@ -235,6 +238,7 @@ export type Database = {
       }
       material_categories: {
         Row: {
+          academic_year: string | null
           created_at: string
           department_id: string | null
           id: string
@@ -242,6 +246,7 @@ export type Database = {
           name_en: string
         }
         Insert: {
+          academic_year?: string | null
           created_at?: string
           department_id?: string | null
           id?: string
@@ -249,6 +254,7 @@ export type Database = {
           name_en: string
         }
         Update: {
+          academic_year?: string | null
           created_at?: string
           department_id?: string | null
           id?: string
@@ -278,8 +284,10 @@ export type Database = {
           is_assignment: boolean
           is_list: boolean | null
           list_content: string | null
+          notes: string | null
           pdf_display_name: string | null
           pdf_url: string | null
+          section_number: string | null
           sort_order: number | null
           submission_link: string | null
           title: string
@@ -297,8 +305,10 @@ export type Database = {
           is_assignment?: boolean
           is_list?: boolean | null
           list_content?: string | null
+          notes?: string | null
           pdf_display_name?: string | null
           pdf_url?: string | null
+          section_number?: string | null
           sort_order?: number | null
           submission_link?: string | null
           title: string
@@ -316,8 +326,10 @@ export type Database = {
           is_assignment?: boolean
           is_list?: boolean | null
           list_content?: string | null
+          notes?: string | null
           pdf_display_name?: string | null
           pdf_url?: string | null
+          section_number?: string | null
           sort_order?: number | null
           submission_link?: string | null
           title?: string
