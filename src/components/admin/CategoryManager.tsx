@@ -139,7 +139,7 @@ const CategoryManager = () => {
   return (
     <div className="grid lg:grid-cols-3 gap-8">
       <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="lg:col-span-1">
-        <div className="glass-card rounded-2xl p-6 sticky top-24">
+        <div className="glass-card rounded-2xl p-5 sticky top-20 max-h-[calc(100vh-5.5rem)] overflow-y-auto overscroll-contain">
           <h2 className="font-display font-semibold text-lg mb-4 flex items-center gap-2">
             <Plus className="w-5 h-5 text-primary" /> {t("cat.addCategory")}
           </h2>
