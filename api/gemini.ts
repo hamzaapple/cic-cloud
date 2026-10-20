@@ -21,7 +21,7 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    const { prompt, pdfUrl, listContent, history, apiKey: clientApiKey } = req.body || {};
+    const { prompt, pdfUrl, listContent, history, apiKey: clientApiKey, maxOutputTokens } = req.body || {};
 
     const fallbackKey = typeof atob !== 'undefined'
       ? atob('QVEuQWI4Uk42THhwUVo2UmR5NVp3ZWVFWUJmNm5RS0J0TWdYeTlGRXd4cG8yTVNvcTRBdFE=')
@@ -38,18 +38,18 @@ export default async function handler(req: any, res: any) {
 
     const parts: any[] = [];
 
-    // Optionally download PDF on server if under 8MB
-    if (pdfUrl && !listContent) {
+    // Download PDF on server if under 18MB
+    if (pdfUrl) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        const timeoutId = setTimeout(() => controller.abort(), 25000);
         const pdfRes = await fetch(pdfUrl, { signal: controller.signal });
         clearTimeout(timeoutId);
 
         if (pdfRes.ok) {
           const arrayBuffer = await pdfRes.arrayBuffer();
           const buffer = Buffer.from(arrayBuffer);
-          if (buffer.length < 8 * 1024 * 1024) {
+          if (buffer.length < 18 * 1024 * 1024) {
             const base64 = buffer.toString('base64');
             const contentType = pdfRes.headers.get('content-type') || 'application/pdf';
             parts.push({
@@ -63,20 +63,22 @@ export default async function handler(req: any, res: any) {
       } catch (err) {
         console.warn('Server failed to fetch PDF inline, continuing with prompt:', err);
       }
-    } else if (listContent) {
+    }
+
+    if (listContent) {
       parts.push({
-        text: `محتوى المادة الدراسية:\n${listContent.slice(0, 15000)}`,
+        text: `المحتوى الدراسي والنصي المساعد:\n${listContent.slice(0, 30000)}`,
       });
     }
 
     parts.push({ text: prompt });
 
     const models = [
-      'gemini-3.5-flash-lite',
-      'gemini-3.5-flash',
+      'gemini-2.5-flash',
       'gemini-flash-latest',
+      'gemini-3.5-flash',
       'gemini-3.8-flash',
-      'gemini-3.7-flash',
+      'gemini-2.5-pro',
       'gemini-pro-latest',
     ];
 
@@ -111,8 +113,8 @@ export default async function handler(req: any, res: any) {
         const requestBody: any = {
           contents: safeContents,
           generationConfig: {
-            temperature: 0.3,
-            maxOutputTokens: 1800,
+            temperature: 0.35,
+            maxOutputTokens: typeof maxOutputTokens === 'number' ? maxOutputTokens : 8192,
           },
         };
 

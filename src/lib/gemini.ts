@@ -89,7 +89,7 @@ export const clearAiCacheForMaterial = (
   fallbackKey?: string | null
 ) => {
   try {
-    ["summary", "explain", "quiz", "chat"].forEach((t) => {
+    ["full_explain", "summary", "explain", "quiz", "chat"].forEach((t) => {
       localStorage.removeItem(`ai_cache_${materialId}_${t}`);
       if (fallbackKey && fallbackKey !== materialId) {
         localStorage.removeItem(`ai_cache_${fallbackKey}_${t}`);
@@ -104,11 +104,13 @@ export const callGeminiApi = async ({
   pdfUrl,
   listContent,
   history,
+  maxOutputTokens = 8192,
 }: {
   prompt: string;
   pdfUrl?: string | null;
   listContent?: string | null;
   history?: { role: "user" | "model"; parts: { text: string }[] }[];
+  maxOutputTokens?: number;
 }): Promise<string> => {
   const apiKey = getGeminiApiKey();
   if (!apiKey) {
@@ -127,6 +129,7 @@ export const callGeminiApi = async ({
         listContent,
         history,
         apiKey,
+        maxOutputTokens,
       }),
     });
 
@@ -153,11 +156,11 @@ export const callGeminiApi = async ({
 
   // 2. Fallback: Direct client fetch to generativelanguage.googleapis.com
   const models = [
-    "gemini-3.5-flash-lite",
-    "gemini-3.5-flash",
+    "gemini-2.5-flash",
     "gemini-flash-latest",
+    "gemini-3.5-flash",
     "gemini-3.8-flash",
-    "gemini-3.7-flash",
+    "gemini-2.5-pro",
     "gemini-pro-latest",
   ];
 
@@ -166,17 +169,17 @@ export const callGeminiApi = async ({
   // Prepare contents parts
   const parts: any[] = [];
 
-  // Try to load PDF as inlineData if available and size < 6MB
-  if (pdfUrl && !listContent) {
+  // Try to load PDF as inlineData if available and size < 15MB
+  if (pdfUrl) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000);
+      const timeoutId = setTimeout(() => controller.abort(), 25000);
       const res = await fetch(pdfUrl, { signal: controller.signal });
       clearTimeout(timeoutId);
 
       if (res.ok) {
         const blob = await res.blob();
-        if (blob.size < 6 * 1024 * 1024) {
+        if (blob.size < 15 * 1024 * 1024) {
           const base64 = await blobToBase64(blob);
           parts.push({
             inlineData: {
@@ -189,9 +192,11 @@ export const callGeminiApi = async ({
     } catch (err) {
       console.warn("Could not fetch PDF as inline base64, continuing with text prompt:", err);
     }
-  } else if (listContent) {
+  }
+
+  if (listContent) {
     parts.push({
-      text: `محتوى المادة الدراسية:\n${listContent.slice(0, 15000)}`,
+      text: `المحتوى الدراسي والنصي المساعد للمحاضرة:\n${listContent.slice(0, 30000)}`,
     });
   }
 
@@ -227,8 +232,8 @@ export const callGeminiApi = async ({
       const requestBody: any = {
         contents: safeContents,
         generationConfig: {
-          temperature: 0.3,
-          maxOutputTokens: 1800,
+          temperature: 0.35,
+          maxOutputTokens: maxOutputTokens || 8192,
         },
       };
 
@@ -310,11 +315,16 @@ export const getExternalModelUrls = (params: {
   const courseStr = courseName ? ` في مقرر ${courseName}` : "";
   const fileRef = pdfUrl ? `\nرابط ملف المحاضرة: ${pdfUrl}` : "";
 
-  const studyPrompt = `مرحباً، أرجو منك بصفتك أستاذاً جامعياً متميزاً أن تشرح لي وتلخص هذه المحاضرة بعنوان "${title}"${courseStr} باللغة العربية.${fileRef}
-المطلوب بالتفصيل:
-1. فكرة المحاضرة العامة وملخص شامل لأهم النقاط في نقاط واضحة.
-2. شرح وتبسيط المفاهيم والمصطلحات الصعبة مع أمثلة تطبيقية.
-3. 5 أسئلة تدريبية متوقعة (مع الإجابات النموذجية والتعليل).`;
+  const studyPrompt = `مرحباً، أرجو منك بصفتك أستاذاً ومحاضراً جامعياً عبقرياً أن تشرح لي محتوى هذه المحاضرة بعنوان "${title}"${courseStr} باللغة العربية شرحاً شاملاً وتفصيلياً كاملاً من الألف إلى الياء، دون أي تلخيص مخل ودون إهمال لأي صفحة أو سلايد.${fileRef}
+
+المطلوب بدقة وتفصيل:
+1. تفكيك المحاضرة بالكامل سلايد بسلايد (أو صفحة بصفحة) بالترتيب.
+2. شرح متعمق لكل حرف ومفهوم وقانون ورد في المحاضرة.
+3. شرح عملي وتطبيقي (وليس نظري فقط):
+   - أكواد برمجية كاملة مشروحة (إن كانت المادة تقنية أو برمجية).
+   - حل مسائل وقوانين رياضية خطوة بخطوة بالتعويض (إن كانت المادة علمية أو حسابية).
+   - أمثلة واقعية وسيناريوهات من سوق العمل مع مقارنات وجداول.
+4. فخاخ الامتحانات (Exam Tricks): كيف يسأل الدكتور في الامتحان عن كل نقطة وكيف يجيب الطالب بشكل نموذجي؟`;
 
   const encodedPrompt = encodeURIComponent(studyPrompt);
 
